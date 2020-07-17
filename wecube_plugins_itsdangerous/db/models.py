@@ -3,7 +3,7 @@
 from __future__ import absolute_import
 
 from talos.db.dictbase import DictBase
-from sqlalchemy import Column, ForeignKey, String, text
+from sqlalchemy import Column, ForeignKey, String, text, JSON
 from sqlalchemy.dialects.mysql import INTEGER, TINYINT
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -19,7 +19,7 @@ class MatchParam(Base, DictBase):
     name = Column(String(36), nullable=False)
     description = Column(String(63), server_default=text("''"))
     type = Column(String(36), nullable=False)
-    params = Column(String(512), nullable=False)
+    params = Column(JSON, nullable=False)
 
 
 class Policy(Base, DictBase):
@@ -38,7 +38,7 @@ class Policy(Base, DictBase):
 
 class Rule(Base, DictBase):
     __tablename__ = 'rule'
-    attributes = ['id', 'name', 'description', 'level', 'type', 'effect_on', 'match_type', 'match_param_id', 'match_value', 'match_param']
+    attributes = ['id', 'name', 'description', 'level', 'effect_on', 'match_type', 'match_param_id', 'match_value', 'match_param']
     detail_attributes = attributes
     summary_attributes = attributes
 
@@ -46,7 +46,6 @@ class Rule(Base, DictBase):
     name = Column(String(36), nullable=False)
     description = Column(String(63), server_default=text("''"))
     level = Column(INTEGER(11), nullable=False)
-    type = Column(String(36), nullable=False)
     effect_on = Column(String(36), nullable=False)
     match_type = Column(String(36), nullable=False)
     match_param_id = Column(ForeignKey('match_param.id'), nullable=True)

@@ -13,29 +13,20 @@ from talos.core import utils
 
 
 class Simulator(object):
-    def __init__(self, expr):
-        self._expr = expr
-        
-    def _parse(self):
-        # expr example:
+
+    def __init__(self, args):
+        self.args = args
+        self.parser = self._prepare()
+    
+    def _prepare(self):
+        # arg example:
         # name: required
         # shortcut: None(default)/'-a, -b'
         # convert_int:  None(default)/int
         # action: store(default)/store_true/store_false/count/append
         # repeatable: None(default)/?/+/*/num
-        # operator: set/notset/eq/ne/lt/lte/gt/gte/like/ilike
-        # value: None(default)/any
-        return json.loads(self._expr)
-    
-    def check(self, input_args):
-        # parse expr
-        # split args
-        # prepare ArgumentParser
-        # arg parse
-        # arg check
-        args = self._parse()
         parser = argparse.ArgumentParser(add_help=False)
-        for arg in args:
+        for arg in self.args:
             prepare_args = [s.strip() for s in (arg.get('shortcut', None) or '').split(',') if s.strip()]
             prepare_kwargs = {}
             if not prepare_args:
@@ -49,25 +40,29 @@ class Simulator(object):
                 
             parser.add_argument(*prepare_args, 
                                 **prepare_kwargs)
+        return parser
+    
+    def check(self, input_args, filters, parser=None):
+        parser = parser or self.parser
         space = parser.parse_known_args(input_args)
         result = True
-        for arg in args:
-            val = getattr(space[0], arg['name'])
-            if arg['operator'] == 'set':
+        for _filter in filters:
+            val = getattr(space[0], _filter['name'])
+            if _filter['operator'] == 'set':
                 if val:
                     result = result and True
                 else:
                     result = result and False
-            elif arg['operator'] == 'notset':
+            elif _filter['operator'] == 'notset':
                 if val:
                     result = result and False
                 else:
                     result = result and True
-            elif arg['operator'] == 'ilike':
+            elif _filter['operator'] == 'ilike':
                 if utils.is_list_type(val):
                     every_rets = []
                     for v in val:
-                        if arg['value'].lower() in v.lower():
+                        if _filter['value'] in v:
                             every_rets.append(True)
                         else:
                             every_rets.append(False)
@@ -76,7 +71,24 @@ class Simulator(object):
                     else:
                         result = result and False
                 else:
-                    if arg['value'].lower() in val.lower():
+                    if _filter['value'] in val:
+                        result = result and True
+                    else:
+                        result = result and False
+            elif _filter['operator'] == 'eq':
+                if utils.is_list_type(val):
+                    every_rets = []
+                    for v in val:
+                        if _filter['value'] == v:
+                            every_rets.append(True)
+                        else:
+                            every_rets.append(False)
+                    if True in every_rets:
+                        result = result and True
+                    else:
+                        result = result and False
+                else:
+                    if _filter['value'] in val:
                         result = result and True
                     else:
                         result = result and False

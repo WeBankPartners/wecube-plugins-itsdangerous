@@ -25,6 +25,18 @@ class Reader(object):
     def iter(self):
         # iterable: (lineno, contents)
         pass
+    
+    
+class FullTextReader(Reader):        
+
+    def iter(self):
+        instream = None
+        if isinstance(self.content, str):
+            instream = io.StringIO(self.content)
+        else:
+            instream = self.content
+        text = instream.read()
+        yield 1, [text]
 
 
 class LineReader(Reader):        
