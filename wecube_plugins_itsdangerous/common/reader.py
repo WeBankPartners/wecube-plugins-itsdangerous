@@ -6,28 +6,28 @@ wecube_plugins_itsdangerous.common.reader
 本模块提供格式解析读取器
 
 """
+import bisect
 import io
-
-import sqlparse
 
 from wecube_plugins_itsdangerous.common import eshlex
 from wecube_plugins_itsdangerous.common import esqllexer
 
 
 class Reader(object):
+
     def __init__(self, content):
         '''
         init a reader
         :param content: file-like or str
         '''
         self.content = content
-        
+
     def iter(self):
         # iterable: (lineno, contents)
         pass
-    
-    
-class FullTextReader(Reader):        
+
+
+class FullTextReader(Reader):
 
     def iter(self):
         instream = None
@@ -39,7 +39,8 @@ class FullTextReader(Reader):
         yield 1, [text]
 
 
-class LineReader(Reader):        
+class LineReader(Reader):
+
     def iter(self):
         instream = None
         if isinstance(self.content, str):
@@ -52,13 +53,14 @@ class LineReader(Reader):
             yield (lineno, [l.strip('\r\n')])
             l = instream.readline()
             lineno += 1
-    
+
 
 class ShellReader(Reader):
+
     def __init__(self, content):
         Reader.__init__(self, content)
         self.special_punctuation = ['|', '||', '&&', ';']
-        
+
     def iter(self):
         ret = eshlex.EShlex(self.content, posix=True, punctuation_chars=True)
         # we want $ or chinese charatars be together
@@ -86,7 +88,7 @@ class ShellReader(Reader):
 
 
 class SqlReader(Reader):
-        
+
     def iter(self):
         instream = None
         if isinstance(self.content, str):
@@ -94,12 +96,24 @@ class SqlReader(Reader):
         else:
             instream = self.content
         content = instream.read()
-        sqls = esqllexer.split(content)
+        sqls = esqllexer.splitf(content)
         results = []
-        for pos,sql in sqls:
-            lineno = self.content.count('\n', 0, pos) + 1
-            lineno -= sql.count('\n')
-            results.append((lineno, sqlparse.format(sql, strip_comments=True, strip_whitespace=True)))
+        lineno = 1
+        # culculate index of \n
+        newline_indexes = []
+        newline_start = 0
+        newline_end = len(content)
+        while True:
+            newline_start = content.find('\n', newline_start, newline_end) + 1
+            if newline_start == 0:
+                break
+            else:
+                newline_indexes.append(newline_start)
+        for pos, sql in sqls:
+            # lineno = self.content.count('\n', 0, pos) + 1 - sql.count('\n')
+            # optimize for newline count
+            lineno = bisect.bisect(newline_indexes, pos) + 1 - sql.count('\n')
+            results.append((lineno, sql))
         for lineno, sql in results:
             yield lineno, [sql]
-        
+

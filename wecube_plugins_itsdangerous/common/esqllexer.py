@@ -7,16 +7,19 @@ wecube_plugins_itsdangerous.common.esqllexer
 
 """
 from sqlparse import engine
+from sqlparse import filters
+from sqlparse import formatter
 from sqlparse import lexer
-from sqlparse import tokens
 from sqlparse import sql, tokens as T
-from sqlparse.keywords import SQL_REGEX
+from sqlparse import tokens
 from sqlparse.compat import text_type, file_types
-from sqlparse.utils import consume
 from sqlparse.engine import grouping
+from sqlparse.keywords import SQL_REGEX
+from sqlparse.utils import consume
 
 
 class ELexer(lexer.Lexer):
+
     @staticmethod
     def get_tokens(text, encoding=None):
         if isinstance(text, file_types):
@@ -55,18 +58,19 @@ class ELexer(lexer.Lexer):
 
 
 class EStatementSplitter(engine.StatementSplitter):
+
     def process(self, stream):
         """Process the stream"""
         EOS_TTYPE = T.Whitespace, T.Comment.Single, T.Comment.Multiline
         C_TTYPE = T.Comment.Single, T.Comment.Multiline
-        
+
         # Run over all stream tokens
         for params in stream:
             pos, ttype, value = params
             if self.consume_ws and ttype not in EOS_TTYPE:
                 yield pos, sql.Statement(self.tokens)
                 self._reset()
-            self.level += self._change_splitlevel(ttype, value) 
+            self.level += self._change_splitlevel(ttype, value)
             self.tokens.append(sql.Token(ttype, value))
             if self.level <= 0 and ttype is T.Punctuation and value == ';':
                 self.consume_ws = True
@@ -76,8 +80,8 @@ class EStatementSplitter(engine.StatementSplitter):
             yield pos, sql.Statement(self.tokens)
 
 
-
 class EFilterStack(engine.FilterStack):
+
     def run(self, sql, encoding=None):
         stream = ELexer().get_tokens(sql, encoding)
         # Process token stream
@@ -99,15 +103,19 @@ class EFilterStack(engine.FilterStack):
             for filter_ in self.postprocess:
                 stmt = filter_.process(stmt)
 
-            yield pos,stmt
-            
+            yield pos, stmt
 
-def split(sql, encoding=None):
-    """Split *sql* into single statements.
 
-    :param sql: A string containing one or more SQL statements.
-    :param encoding: The encoding of the statement (optional).
-    :returns: A list of strings.
+def splitf(sql, encoding=None):
     """
+    Split & format *sql* into single statements.
+    """
+    # stack = EFilterStack()
+    # return [(pos, text_type(stmt).strip()) for pos, stmt in stack.run(sql, encoding)]
     stack = EFilterStack()
-    return [(pos,text_type(stmt).strip()) for pos,stmt in stack.run(sql, encoding)]
+    options = formatter.validate_options({'strip_comments':True, 'strip_whitespace':True})
+    formatter.build_filter_stack(stack, options)
+    stack.postprocess.append(filters.SerializerUnicode())
+    # optimize for skipping empty and comment lines
+    return [(pos, stmt) for pos, stmt in stack.run(sql, encoding)]
+
