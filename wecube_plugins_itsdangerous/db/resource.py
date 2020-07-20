@@ -2,9 +2,9 @@
 
 from __future__ import absolute_import
 
-from wecube_plugins_itsdangerous.db import models
-
 from talos.db import crud
+
+from wecube_plugins_itsdangerous.db import models
 
 
 class Policy(crud.ResourceBase):

@@ -2,11 +2,11 @@
 
 from __future__ import absolute_import
 
-from talos.db.dictbase import DictBase
 from sqlalchemy import Column, ForeignKey, String, text, JSON
 from sqlalchemy.dialects.mysql import INTEGER, TINYINT
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+from talos.db.dictbase import DictBase
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -32,13 +32,13 @@ class Policy(Base, DictBase):
     name = Column(String(36), nullable=False)
     description = Column(String(63), server_default=text("''"))
     enabled = Column(TINYINT(4), nullable=False)
-    
+
     rules = relationship("Rule", secondary="policy_rule", lazy='subquery')
 
 
 class Rule(Base, DictBase):
     __tablename__ = 'rule'
-    attributes = ['id', 'name', 'description', 'level', 'effect_on', 'match_type', 'match_param_id', 'match_value', 'match_param']
+    attributes = ['id', 'name', 'description', 'level', 'effect_on', 'enabled', 'match_type', 'match_param_id', 'match_value', 'match_param']
     detail_attributes = attributes
     summary_attributes = attributes
 
@@ -50,7 +50,8 @@ class Rule(Base, DictBase):
     match_type = Column(String(36), nullable=False)
     match_param_id = Column(ForeignKey('match_param.id'), nullable=True)
     match_value = Column(String(512), nullable=False)
-    
+    enabled = Column(TINYINT(4), nullable=False)
+
     match_param = relationship('MatchParam', lazy=False)
     # policies = relationship("Policy", back_populates="policy_rule")
 
@@ -65,7 +66,7 @@ class Subject(Base, DictBase):
     name = Column(String(36), nullable=False)
     description = Column(String(63), server_default=text("''"))
     enabled = Column(TINYINT(4), nullable=False)
-    
+
     targets = relationship('Target', secondary='subject_target', lazy='subquery')
 
 
@@ -77,7 +78,7 @@ class Target(Base, DictBase):
     args_scope = Column(String(512))
     entity_scope = Column(String(512))
     enabled = Column(TINYINT(4), nullable=False)
-    
+
     # subjects = relationship('SubjectTarget', back_populates='target')
 
 

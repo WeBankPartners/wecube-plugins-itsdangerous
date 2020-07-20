@@ -2,19 +2,18 @@
 
 from __future__ import absolute_import
 
-import logging
 import json
+import logging
 import re
 
-from wecube_plugins_itsdangerous.common import reader
 from wecube_plugins_itsdangerous.common import clisimulator
-from wecube_plugins_itsdangerous.db import resource
-
+from wecube_plugins_itsdangerous.common import reader
 
 LOG = logging.getLogger(__name__)
 
 
 class BashCliDetector(object):
+
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -32,7 +31,7 @@ class BashCliDetector(object):
             cli_param = match_param['params']
             simulators = self.parsers.setdefault(cli_param['name'], [])
             simulators.append(clisimulator.Simulator(cli_param['args']))
-        
+
     def check(self):
         results = []
         stream = self.reader(self.content)
@@ -52,7 +51,7 @@ class BashCliDetector(object):
                                                 'message': r_name
                                                 })
         return results
-        
+
 
 class SqlDetector(object):
 
@@ -60,7 +59,7 @@ class SqlDetector(object):
         self.content = content
         self.rules = rules
         self.reader = reader.SqlReader
-        
+
     def check(self):
         results = []
         stream = self.reader(self.content)
@@ -93,7 +92,7 @@ class FullTextDetector(object):
         self.content = content
         self.rules = rules
         self.reader = reader.FullTextReader
-        
+
     def check(self):
         results = []
         stream = self.reader(self.content)
@@ -121,6 +120,7 @@ class FullTextDetector(object):
 
 
 class LineTextDetector(FullTextDetector):
+
     def __init__(self, content, rules):
         self.content = content
         self.rules = rules
