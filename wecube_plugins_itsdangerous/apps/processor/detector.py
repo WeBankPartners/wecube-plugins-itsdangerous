@@ -8,8 +8,33 @@ import re
 
 from wecube_plugins_itsdangerous.common import clisimulator
 from wecube_plugins_itsdangerous.common import reader
+from wecube_plugins_itsdangerous.common import scope
 
 LOG = logging.getLogger(__name__)
+
+
+class JsonFilterDetector(object):
+
+    def __init__(self, content, rules):
+        '''
+        :param content: input params dict
+        :param rules: [{db.model.rule}]
+        '''
+        self.content = content
+        self.rules = rules
+        self.reader = None
+
+    def check(self):
+        results = []
+        lineno = -1
+        for rule in self.rules:
+            if scope.JsonScope(rule['match_value']).is_match(self.content):
+                results.append({'lineno': lineno,
+                                'level': rule['level'],
+                                'content': rule['match_value'],
+                                'message': rule['name']
+                                })
+        return results
 
 
 class BashCliDetector(object):
@@ -100,6 +125,7 @@ class FullTextDetector(object):
         self.content = content
         self.rules = rules
         self.reader = reader.FullTextReader
+        self.max_content_length = 128
 
     def check(self):
         results = []
@@ -107,7 +133,7 @@ class FullTextDetector(object):
         for lineno, tokens in stream.iter():
             # empty statement passthrough
             if tokens not in ('', ';'):
-                sql = tokens[0]
+                text = tokens[0]
                 for rule in self.rules:
                     r_name = rule['name']
                     r_level = rule['level']
@@ -118,10 +144,13 @@ class FullTextDetector(object):
                         append_flag = getattr(re, f, None)
                         if append_flag and isinstance(append_flag, int):
                             flag = flag | append_flag
-                    if re.search(r_filters, sql, flags=flag):
+                    dot_text = text[:self.max_content_length] if self.max_content_length else text
+                    if len(text) > len(dot_text):
+                        dot_text += '...'
+                    if re.search(r_filters, text, flags=flag):
                         results.append({'lineno': lineno,
                                         'level': r_level,
-                                        'content': sql,
+                                        'content': dot_text,
                                         'message': r_name
                                         })
         return results
@@ -137,3 +166,4 @@ class LineTextDetector(FullTextDetector):
         self.content = content
         self.rules = rules
         self.reader = reader.LineReader
+        self.max_content_length = None

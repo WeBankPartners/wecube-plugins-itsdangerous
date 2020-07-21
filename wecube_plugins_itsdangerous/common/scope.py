@@ -98,11 +98,18 @@ class WeCMDBScope(object):
         if input_guids:
             # NOTICE: may be bug, assume all data is the same ci type
             input_ci_id = str(int(input_guids[0].split('_')[0]))
-            expr_groups = expression.expr_parse(self.expression)
-            # only if input ci type == expr result ci type
-            if input_ci_id == ci_mapping[expr_groups[-1]['data']['ci']]:
-                results = expression.expr_query(self.expression, wecmdb_ci_getter, ci_mapping)
-                expr_guids = [d['data']['guid'] for d in results]
-                if set(input_guids) & set(expr_guids):
-                    return True
+            try:
+                expr_groups = expression.expr_parse(self.expression)
+            except ValueError as e:
+                LOG.exception(e)
+            else:
+                expect_ci_id = ci_mapping[expr_groups[-1]['data']['ci']]
+                # only if input ci type == expr result ci type
+                if input_ci_id == expect_ci_id:
+                    results = expression.expr_query(self.expression, wecmdb_ci_getter, ci_mapping)
+                    expr_guids = [d['data']['guid'] for d in results]
+                    if set(input_guids) & set(expr_guids):
+                        return True
+                else:
+                    LOG.debug('input ci(%s) is not the same as expression require(%s), passthrough...', input_ci_id, expect_ci_id)
         return False

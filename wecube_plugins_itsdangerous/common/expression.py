@@ -132,7 +132,7 @@ def expr_parse(expr):
     return split_res
 
 
-def expr_match_input(expr_groups, ci_getter, input_data):
+def expr_match_input(expr_groups, ci_getter, input_data, ci_mapping):
     '''
     fetch data according to expression by specific source(input_data), see if there are any matches
     :param expr_groups: result of expr_parse()
@@ -165,7 +165,7 @@ def expr_match_input(expr_groups, ci_getter, input_data):
                     # can not find any data that match expression
                     cur_data = []
                     break
-                cur_data = ci_getter(expr_data, is_backref, guids)
+                cur_data = ci_getter(expr_data, is_backref, guids, ci_mapping)
                 guids = []
                 for j in range(len(cur_data)):
                     guid = ""
