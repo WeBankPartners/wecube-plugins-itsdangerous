@@ -56,6 +56,10 @@ class BashCliDetector(object):
 class SqlDetector(object):
 
     def __init__(self, content, rules):
+        '''
+        :param content: script content
+        :param rules: [{db.model.rule}]
+        '''
         self.content = content
         self.rules = rules
         self.reader = reader.SqlReader
@@ -89,6 +93,10 @@ class SqlDetector(object):
 class FullTextDetector(object):
 
     def __init__(self, content, rules):
+        '''
+        :param content: script content
+        :param rules: [{db.model.rule}]
+        '''
         self.content = content
         self.rules = rules
         self.reader = reader.FullTextReader
@@ -122,6 +130,10 @@ class FullTextDetector(object):
 class LineTextDetector(FullTextDetector):
 
     def __init__(self, content, rules):
+        '''
+        :param content: script content
+        :param rules: [{db.model.rule}]
+        '''
         self.content = content
         self.rules = rules
         self.reader = reader.LineReader
