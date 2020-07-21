@@ -19,11 +19,11 @@ def test_expression():
                                          {'name': 'created_time', 'operator': 'null', 'value': None},
                                          {'name': 'name', 'operator': 'eq', 'value': 'test'},
                                          {'name': 'id', 'operator': 'in', 'value': ['1', '2']}]
-    
+
     assert ret[1]['type'] == 'op'
     assert ret[1]['value'] == "->"
     assert ret[1]['data'] is None
-    
+
     assert ret[2]['type'] == 'expr'
     assert ret[2]['value'] == "b.c"
     assert ret[2]['data']['plugin'] == ''
@@ -31,11 +31,11 @@ def test_expression():
     assert ret[2]['data']['backref_attribute'] == ''
     assert ret[2]['data']['attribute'] == 'c'
     assert ret[2]['data']['filters'] == []
-    
+
     assert ret[3]['type'] == 'op'
     assert ret[3]['value'] == ">"
     assert ret[3]['data'] is None
-    
+
     assert ret[4]['type'] == 'expr'
     assert ret[4]['value'] == "c"
     assert ret[4]['data']['plugin'] == ''
@@ -43,11 +43,11 @@ def test_expression():
     assert ret[4]['data']['backref_attribute'] == ''
     assert ret[4]['data']['attribute'] == ''
     assert ret[4]['data']['filters'] == []
-    
+
     assert ret[5]['type'] == 'op'
     assert ret[5]['value'] == "~"
     assert ret[5]['data'] is None
-    
+
     assert ret[6]['type'] == 'expr'
     assert ret[6]['value'] == "(c)d.e"
     assert ret[6]['data']['plugin'] == ''
@@ -55,6 +55,20 @@ def test_expression():
     assert ret[6]['data']['backref_attribute'] == 'c'
     assert ret[6]['data']['attribute'] == 'e'
     assert ret[6]['data']['filters'] == []
+
+
+def test_expression_advance():
+    expr1 = "cmdb:a{id eq '1'}{obj.attr eq 2}"
+    ret = expression.expr_parse(expr1)
+    assert len(ret) == 1
+    assert ret[0]['type'] == 'expr'
+    assert ret[0]['value'] == "cmdb:a{id eq '1'}{obj.attr eq 2}"
+    assert ret[0]['data']['plugin'] == 'cmdb'
+    assert ret[0]['data']['ci'] == 'a'
+    assert ret[0]['data']['backref_attribute'] == ''
+    assert ret[0]['data']['attribute'] == ''
+    assert ret[0]['data']['filters'] == [{'name': 'id', 'operator': 'eq', 'value': '1'},
+                                         {'name': 'obj.attr', 'operator': 'eq', 'value': 2}]
 
 
 def test_expression_error():

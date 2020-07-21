@@ -6,13 +6,13 @@ wecube_plugins_itsdangerous.common.expression
 本模块提供WeCube通用表达式解析
 
 """
-import re
 import json
+import re
+
 from talos.core import utils
 
-
-R_SINGLE_FILTER = re.compile('\{([_a-zA-Z][_a-zA-Z0-9]*)\s+([a-zA-Z]+)\s+([^}]+)\}')
-R_SEG_EXPRESSION = re.compile('(?:\(([_a-zA-Z][_a-zA-Z0-9]*)\))?(?:([_a-zA-Z][_a-zA-Z0-9]*):)?([_a-zA-Z][_a-zA-Z0-9]*)((?:\{[_a-zA-Z][_a-zA-Z0-9]*\s+[a-zA-Z]+\s+.*\}){1,30})?(?:\.([_a-zA-Z][_a-zA-Z0-9]*))?$')
+R_SINGLE_FILTER = re.compile('\{([_a-zA-Z][_a-zA-Z0-9.]*)\s+([a-zA-Z]+)\s+([^}]+)\}')
+R_SEG_EXPRESSION = re.compile('(?:\(([_a-zA-Z][_a-zA-Z0-9]*)\))?(?:([_a-zA-Z][_a-zA-Z0-9]*):)?([_a-zA-Z][_a-zA-Z0-9]*)((?:\{[_a-zA-Z][_a-zA-Z0-9.]*\s+[a-zA-Z]+\s+.*\}){1,30})?(?:\.([_a-zA-Z][_a-zA-Z0-9]*))?$')
 
 
 def _expr_op_finder(expr):
@@ -25,7 +25,7 @@ def _expr_op_finder(expr):
     for el in ops:
         index = expr.find(el)
         if index != -1:
-            if el == '>' and expr[index-1] == '-':
+            if el == '>' and expr[index - 1] == '-':
                 # ignore it, we will find it when op = '->'
                 pass
             else:
@@ -33,11 +33,11 @@ def _expr_op_finder(expr):
         while index != -1:
             index = expr.find(el, index + len(el))
             if index != -1:
-                if el == '>' and expr[index-1] == '-':
+                if el == '>' and expr[index - 1] == '-':
                     # ignore it, we will find it when op = '->'
                     pass
                 else:
-                    results.append({'op': el, 'index': index})               
+                    results.append({'op': el, 'index': index})
     results.sort(key=lambda x: x['index'])
     return results
 
@@ -79,7 +79,7 @@ def expr_filter_parse(expr_filter):
                     filter_op = 'notNull'
                     filter_val = None
                 elif filter_op == 'in':
-                    # TODO: fix this
+                    # TODO: fix this, replace is not good enough
                     filter_val = json.loads(filter_val[1:-1].replace("'", '"'))
                 elif filter_val.startswith("'") and filter_val.endswith("'"):
                     # string
@@ -87,7 +87,7 @@ def expr_filter_parse(expr_filter):
                 else:
                     # number
                     filter_val = int(filter_val)
-                
+
                 results.append({'name': filter_name, 'operator': filter_op, 'value': filter_val})
                 index = res.end()
             else:
@@ -110,10 +110,10 @@ def expr_seg_parse(expr):
     res = R_SEG_EXPRESSION.match(expr)
     if (res):
         result = {
-            'backref_attribute': res.groups()[0] or '', 
-            'plugin': res.groups()[1] or '', 
-            'ci': res.groups()[2] or '', 
-            'filters': res.groups()[3] or '', 
+            'backref_attribute': res.groups()[0] or '',
+            'plugin': res.groups()[1] or '',
+            'ci': res.groups()[2] or '',
+            'filters': res.groups()[3] or '',
             'attribute': res.groups()[4] or ''}
         result['filters'] = expr_filter_parse(result['filters'])
         return result
@@ -188,7 +188,7 @@ def expr_match_input(expr_groups, ci_getter, input_data):
     return results
 
 
-def expr_query(expr, ci_getter):
+def expr_query(expr, ci_getter, ci_mapping):
     '''
     fetch data according to expression
     :param expr: result of ()
@@ -214,7 +214,7 @@ def expr_query(expr, ci_getter):
                 # can not find any data that match expression
                 results = []
                 break
-            results = ci_getter(expr_data, is_backref, guids)
+            results = ci_getter(expr_data, is_backref, guids, ci_mapping)
             guids = []
             for j in range(len(results)):
                 guid = ""
