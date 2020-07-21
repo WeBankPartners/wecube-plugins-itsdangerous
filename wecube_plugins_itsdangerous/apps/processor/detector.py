@@ -51,10 +51,12 @@ class BashCliDetector(object):
         for rule in rules:
             if rule['match_param']:
                 arg_params[rule['match_param_id']] = rule['match_param']
+        # map rule.match_param_id => cmd => args
         self.parsers = {}
         for match_param in arg_params.values():
             cli_param = match_param['params']
-            simulators = self.parsers.setdefault(cli_param['name'], [])
+            m_param = self.parsers.setdefault(match_param['id'], {})
+            simulators = m_param.setdefault(cli_param['name'], [])
             simulators.append(clisimulator.Simulator(cli_param['args']))
 
     def check(self):
@@ -66,9 +68,11 @@ class BashCliDetector(object):
                 for rule in self.rules:
                     r_name = rule['name']
                     r_level = rule['level']
+                    if r_name.startswith('强制kill('):
+                        pass
                     r_filters = json.loads(rule['match_value'])
-                    if cmd in self.parsers:
-                        for sim in self.parsers[cmd]:
+                    if rule['match_param_id'] in self.parsers and cmd in self.parsers[rule['match_param_id']]:
+                        for sim in self.parsers[rule['match_param_id']][cmd]:
                             if sim.check(args, r_filters):
                                 results.append({'lineno': lineno,
                                                 'level': r_level,

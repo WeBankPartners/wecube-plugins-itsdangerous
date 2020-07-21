@@ -54,7 +54,7 @@ class ELexer(lexer.Lexer):
                 consume(iterable, m.end() - pos - 1)
                 break
             else:
-                yield 1, tokens.Error, char
+                yield pos, tokens.Error, char
 
 
 class EStatementSplitter(engine.StatementSplitter):
