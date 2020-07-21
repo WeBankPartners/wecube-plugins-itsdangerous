@@ -2,7 +2,7 @@
 --
 -- Host: 127.0.0.1    Database: itsdangerous
 -- ------------------------------------------------------
--- Server version       10.1.44-MariaDB-0ubuntu0.18.04.1
+-- Server version	10.1.44-MariaDB-0ubuntu0.18.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -33,6 +33,23 @@ CREATE TABLE `box` (
   KEY `fkey_box_subject_id` (`subject_id`),
   CONSTRAINT `fkey_box_policy_id` FOREIGN KEY (`policy_id`) REFERENCES `policy` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fkey_box_subject_id` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `match_param`
+--
+
+DROP TABLE IF EXISTS `match_param`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `match_param` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(36) NOT NULL,
+  `description` varchar(63) DEFAULT '',
+  `params` varchar(512) NOT NULL,
+  `type` varchar(36) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -83,10 +100,11 @@ CREATE TABLE `rule` (
   `name` varchar(36) NOT NULL,
   `description` varchar(63) DEFAULT '',
   `level` int(11) unsigned NOT NULL,
-  `type` varchar(36) NOT NULL,
   `effect_on` varchar(36) NOT NULL,
   `match_type` varchar(36) NOT NULL,
   `match_value` varchar(512) NOT NULL,
+  `match_param_id` int(11) unsigned DEFAULT NULL,
+  `enabled` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -152,4 +170,4 @@ CREATE TABLE `target` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-14 15:47:51
+-- Dump completed on 2020-07-21 17:23:09
