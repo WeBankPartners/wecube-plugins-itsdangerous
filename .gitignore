@@ -3,3 +3,6 @@
 /.pydevproject
 /.settings/*
 *.pyc
+assets/*
+htmlcov/*
+unit_test_report.html
