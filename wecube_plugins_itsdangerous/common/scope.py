@@ -31,8 +31,7 @@ class JsonScope(object):
         return jsonfilter.match_all(self.filters, data)
 
 
-def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
-    base_url = CONF.wecube_platform.base_url
+def get_token(base_url):
     token = CONF.wecube_platform.token
     if not CONF.wecube_platform.use_token:
         token = cache.get(WECUBE_TOKEN)
@@ -41,21 +40,34 @@ def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
                               json={"username":CONF.wecube_platform.username,
                                     "password":CONF.wecube_platform.password}).json()['data'][1]['token']
             cache.set(WECUBE_TOKEN, token)
+    return token
+
+
+def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
+    base_url = CONF.wecube_platform.base_url
+    token = get_token(base_url)
     data = {
         'filters': expr_data['filters']
     }
+    ci_data_key = 'wecmdb/ci-types/%(ci)s' % {'ci': ci_mapping[expr_data['ci']]}
+    results = cache.get(ci_data_key, exipres=30)
+    if not cache.validate(results):
+        LOG.debug('POST /wecmdb/ui/v2/ci-types/%s/ci-data/query' % expr_data['ci'])
+        LOG.debug('    filters: ', data)
+        resp = requests.post(base_url + '/wecmdb/ui/v2/ci-types/%s/ci-data/query' % ci_mapping[expr_data['ci']],
+                      json={},
+                      headers={'Authorization': 'Bearer ' + token})
+        results = resp.json()['data']['contents']
+        LOG.debug('get %s result(all) length: %s' % (expr_data['ci'], len(results)))
+        cache.set(ci_data_key, results)
+    # build json filters
     if guids is not None:
         if is_backref:
-            data['filters'].append({'name': expr_data['backref_attribute'], 'operator': 'in', 'value': guids})
+            data['filters'].append({'name': expr_data['backref_attribute'] + '.guid', 'operator': 'in', 'value': guids})
         else:
             data['filters'].append({'name': 'guid', 'operator': 'in', 'value': guids})
-    LOG.debug('POST /wecmdb/ui/v2/ci-types/%s/ci-data/query' % expr_data['ci'])
-    LOG.debug('    filters: ', data)
-    resp = requests.post(base_url + '/wecmdb/ui/v2/ci-types/%s/ci-data/query' % ci_mapping[expr_data['ci']],
-                  json=data,
-                  headers={'Authorization': 'Bearer ' + token})
-    results = resp.json()['data']['contents']
-    LOG.debug('get result length: %s' % len(results))
+    results = [ret for ret in results if jsonfilter.match_all(data['filters'], ret['data'])]
+    LOG.debug('get %s result(filter) length: %s' % (expr_data['ci'], len(results)))
     return results
 
 

@@ -12,6 +12,11 @@ from talos.core import utils
 
 
 def match_all(filters, data):
+    '''
+    check if data match all filters
+    :param filters: [{xx eq xx}, {...}]
+    :param data: {...}
+    '''
     results = set([True])
     for _filter in filters:
         val = utils.get_item(data, _filter['name'])
@@ -94,7 +99,7 @@ def match_all(filters, data):
         # TODO: other operator
         else:
             # unregconize operator, ignore it
-            pass
+            results.add(False)
     if False in results or len(results) == 0:
         return False
     return True

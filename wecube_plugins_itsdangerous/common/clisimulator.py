@@ -8,8 +8,6 @@ wecube_plugins_itsdangerous.common.clisimulator
 """
 import argparse
 
-from talos.core import utils
-
 from wecube_plugins_itsdangerous.common import jsonfilter
 
 
