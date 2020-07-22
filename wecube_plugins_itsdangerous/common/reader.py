@@ -8,9 +8,64 @@ wecube_plugins_itsdangerous.common.reader
 """
 import bisect
 import io
+import re
 
 from wecube_plugins_itsdangerous.common import eshlex
 from wecube_plugins_itsdangerous.common import esqllexer
+
+
+def _guess_text_sql(text):
+    rating = 0
+    name_between_bracket_re = re.compile(r'\[[a-zA-Z_]\w*\]')
+    name_between_backtick_re = re.compile(r'`[a-zA-Z_]\w*`')
+    name_command_re = re.compile(r'(insert\s+into|update\s+.*\s+set|alter\s+table|create\s+table|select\s+.+\s+from|delete\s+from).+;', re.I)
+    name_between_backtick_count = len(
+        name_between_backtick_re.findall(text))
+    name_between_bracket_count = len(
+        name_between_bracket_re.findall(text))
+    name_command_count = len(
+        name_command_re.findall(text))
+    # Same logic as above in the TSQL analysis
+    dialect_name_count = name_between_backtick_count + name_between_bracket_count
+    if dialect_name_count >= 1 and \
+       name_between_backtick_count >= 2 * name_between_bracket_count:
+        # Found at least twice as many `name` as [name].
+        rating += 0.4
+    elif name_between_backtick_count > name_between_bracket_count:
+        rating += 0.2
+    elif name_between_backtick_count > 0:
+        rating += 0.1
+    if name_command_count:
+        rating += 0.2
+    return rating
+
+
+def _guess_text_shell(text):
+    rating = 0
+    name_begin_re = re.compile(r'^#!\s+/.*/(bash|zsh|sh|dash)')
+    name_variable_re = re.compile(r'\${?[a-zA-Z_]\w*}?')
+    name_command_re = re.compile(r'^(cd|cat|awk|ps|sed|find|echo|mkdir|ls) .*$', re.MULTILINE)
+    if name_begin_re.search(text):
+        rating = 1.0
+    name_variable_count = len(
+        name_variable_re.findall(text))
+    name_command_count = len(
+        name_command_re.findall(text))
+    if name_variable_count:
+        rating += 0.3
+    if name_command_count:
+        rating += 0.7
+    return rating
+
+
+def guess(text):
+    rate_sql = _guess_text_sql(text)
+    rate_shell = _guess_text_shell(text)
+    if rate_shell >= rate_sql:
+        return 'shell'
+    if rate_sql > 0:
+        return 'sql'
+    return None
 
 
 class Reader(object):
@@ -116,4 +171,3 @@ class SqlReader(Reader):
             results.append((lineno, sql))
         for lineno, sql in results:
             yield lineno, [sql]
-

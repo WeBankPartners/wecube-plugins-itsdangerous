@@ -3,9 +3,7 @@ import pytest
 
 from wecube_plugins_itsdangerous.common import reader
 
-
-def test_reader_bash():
-    t = r'''top # haha
+text_bash = r'''top # haha
 cat > mytest.sh << EOF
 $a123 ';' $me
 
@@ -23,36 +21,8 @@ echo '$var'
 echo "$var"
 echo \1\2 #-ef
 '''
-    expected = [
-        (1, ['top']),
-        (2, ['cat', '>', 'mytest.sh', '<<', 'EOF']),
-        (3, ['$a123', ';', '$me']),
-        (6, ['rm', '-rf', '/tmp/kkk/*']),
-        (7, ['EOF']),
-        (8, ['ls']),
-        (8, ['grep', 'abc']),
-        (8, ['date']),
-        (8, ['tree']),
-        (8, ['ps', '-ef']),
-        (8, ['grep', 'grep']),
-        (9, ['ps', '\n-ef']),
-        (11, ['rm', '-r', '-f', '/tmp/abc']),
-        (12, ['echo', '   -e 456']),
-        (13, ['echo', '你好']),
-        (14, ['echo', '$var']),
-        (15, ['echo', '$var']),
-        (16, ['echo', '$var']),
-        (17, ['echo', '12']),
-        ]
-    s = reader.ShellReader(t)
-    counter = 0
-    for x in s.iter():
-        assert x == expected[counter]
-        counter += 1
 
-
-def test_reader_sql():
-    t = r'''-- MySQL dump 10.16  Distrib 10.1.44-MariaDB, for debian-linux-gnu (x86_64)
+text_sql = r'''-- MySQL dump 10.16  Distrib 10.1.44-MariaDB, for debian-linux-gnu (x86_64)
 
 /*!40101 SET NAMES utf8 */;
 
@@ -84,6 +54,56 @@ CREATE TABLE `box` (
 
 -- Dump completed on 2020-07-14 15:47:51
 '''
+
+text_fulltext = r'''top # haha
+cat > mytest.sh << EOF
+$a123 ';' $me
+
+# this is comment
+ls|grep abc && date||tree;ps -ef|grep grep
+ps \
+-ef
+'''
+
+text_mix = '''var1=date
+echo ${var1}
+var2=`date`
+echo $var2
+cat > test.log << EOF
+delete from `table_name` where id='1';
+EOF'''
+
+
+def test_reader_bash():
+    expected = [
+        (1, ['top']),
+        (2, ['cat', '>', 'mytest.sh', '<<', 'EOF']),
+        (3, ['$a123', ';', '$me']),
+        (6, ['rm', '-rf', '/tmp/kkk/*']),
+        (7, ['EOF']),
+        (8, ['ls']),
+        (8, ['grep', 'abc']),
+        (8, ['date']),
+        (8, ['tree']),
+        (8, ['ps', '-ef']),
+        (8, ['grep', 'grep']),
+        (9, ['ps', '\n-ef']),
+        (11, ['rm', '-r', '-f', '/tmp/abc']),
+        (12, ['echo', '   -e 456']),
+        (13, ['echo', '你好']),
+        (14, ['echo', '$var']),
+        (15, ['echo', '$var']),
+        (16, ['echo', '$var']),
+        (17, ['echo', '12']),
+        ]
+    s = reader.ShellReader(text_bash)
+    counter = 0
+    for x in s.iter():
+        assert x == expected[counter]
+        counter += 1
+
+
+def test_reader_sql():
     expected = [
         (2, ['']),
         (3, ['']),
@@ -104,7 +124,7 @@ CREATE TABLE `box` (
         (29, [';']),
         (31, ['']),
         ]
-    s = reader.SqlReader(t)
+    s = reader.SqlReader(text_sql)
     counter = 0
     for x in s.iter():
         assert x == expected[counter]
@@ -112,15 +132,6 @@ CREATE TABLE `box` (
 
 
 def test_reader_line():
-    t = r'''top # haha
-cat > mytest.sh << EOF
-$a123 ';' $me
-
-# this is comment
-ls|grep abc && date||tree;ps -ef|grep grep
-ps \
--ef
-'''
     expected = [
         (1, ['top # haha']),
         (2, ['cat > mytest.sh << EOF']),
@@ -131,7 +142,7 @@ ps \
         (7, ['ps \\']),
         (8, ['-ef']),
         ]
-    s = reader.LineReader(t)
+    s = reader.LineReader(text_fulltext)
     counter = 0
     for x in s.iter():
         assert x == expected[counter]
@@ -139,20 +150,18 @@ ps \
 
 
 def test_reader_fulltext():
-    t = r'''top # haha
-cat > mytest.sh << EOF
-$a123 ';' $me
-
-# this is comment
-ls|grep abc && date||tree;ps -ef|grep grep
-ps \
--ef
-'''
     expected = [
         (1, ["top # haha\ncat > mytest.sh << EOF\n$a123 ';' $me\n\n# this is comment\nls|grep abc && date||tree;ps -ef|grep grep\nps \\\n-ef\n"])
         ]
-    s = reader.FullTextReader(t)
+    s = reader.FullTextReader(text_fulltext)
     counter = 0
     for x in s.iter():
         assert x == expected[counter]
         counter += 1
+
+
+def test_reader_guess():
+    assert reader.guess(text_bash) == 'shell'
+    assert reader.guess(text_sql) == 'sql'
+    assert reader.guess(text_fulltext) == 'shell'
+    assert reader.guess(text_mix) == 'shell'

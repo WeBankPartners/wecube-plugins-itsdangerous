@@ -7,6 +7,7 @@ import logging
 from talos.common import cache
 
 from wecube_plugins_itsdangerous.apps.processor import detector
+from wecube_plugins_itsdangerous.common import reader
 from wecube_plugins_itsdangerous.common import scope
 from wecube_plugins_itsdangerous.db import resource
 
@@ -69,16 +70,19 @@ class Box(resource.Box):
             service_name = data['serviceName']
             input_params = data['inputParams']
             entity_instances = data['entityInstances']
+            # TODO: one or more scripts support
+            script = input_params.get('script', '') or ''
+            script_type = input_params.get('script_type', None)
             rules = self._get_rules(data)
             rules = self._rule_grouping(rules)
             for key, values in rules.items():
-                # TODO: one or more scripts support
-                script = input_params.get('script', '') or ''
+                if not script_type:
+                    script_type = reader.guess(script) or 'text'
                 if key == 'filter':
                     results.extend(detector.JsonFilterDetector(data, values).check())
-                elif key == 'cli':
+                elif key == 'cli' and script_type == 'shell':
                     results.extend(detector.BashCliDetector(script, values).check())
-                elif key == 'sql':
+                elif key == 'sql' and script_type == 'sql':
                     results.extend(detector.SqlDetector(script, values).check())
                 elif key == 'text':
                     results.extend(detector.LineTextDetector(script, values).check())
