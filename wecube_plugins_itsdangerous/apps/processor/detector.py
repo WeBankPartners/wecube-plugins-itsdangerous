@@ -26,7 +26,7 @@ class JsonFilterDetector(object):
 
     def check(self):
         results = []
-        lineno = -1
+        lineno = (-1, -1)
         for rule in self.rules:
             if scope.JsonScope(rule['match_value']).is_match(self.content):
                 results.append({'lineno': lineno,

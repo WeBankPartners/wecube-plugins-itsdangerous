@@ -49,25 +49,25 @@ def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
     data = {
         'filters': expr_data['filters']
     }
-    ci_data_key = 'wecmdb/ci-types/%(ci)s' % {'ci': ci_mapping[expr_data['ci']]}
-    results = cache.get(ci_data_key, exipres=30)
-    if not cache.validate(results):
-        LOG.debug('POST /wecmdb/ui/v2/ci-types/%s/ci-data/query' % expr_data['ci'])
-        LOG.debug('    filters: ', data)
-        resp = requests.post(base_url + '/wecmdb/ui/v2/ci-types/%s/ci-data/query' % ci_mapping[expr_data['ci']],
-                      json={},
-                      headers={'Authorization': 'Bearer ' + token})
-        results = resp.json()['data']['contents']
-        LOG.debug('get %s result(all) length: %s' % (expr_data['ci'], len(results)))
-        cache.set(ci_data_key, results)
     # build json filters
     if guids is not None:
         if is_backref:
             data['filters'].append({'name': expr_data['backref_attribute'] + '.guid', 'operator': 'in', 'value': guids})
         else:
             data['filters'].append({'name': 'guid', 'operator': 'in', 'value': guids})
+    ci_data_key = 'wecmdb/ci-types/%(ci)s' % {'ci': ci_mapping[expr_data['ci']]}
+    results = cache.get(ci_data_key, exipres=30)
+    if not cache.validate(results):
+        LOG.debug('wecmdb_ci_getter POST /wecmdb/ui/v2/ci-types/%s/ci-data/query' % expr_data['ci'])
+        LOG.debug('wecmdb_ci_getter     filters: %s', data)
+        resp = requests.post(base_url + '/wecmdb/ui/v2/ci-types/%s/ci-data/query' % ci_mapping[expr_data['ci']],
+                      json={},
+                      headers={'Authorization': 'Bearer ' + token})
+        results = resp.json()['data']['contents']
+        LOG.debug('wecmdb_ci_getter get %s result(all) length: %s' % (expr_data['ci'], len(results)))
+        cache.set(ci_data_key, results)
     results = [ret for ret in results if jsonfilter.match_all(data['filters'], ret['data'])]
-    LOG.debug('get %s result(filter) length: %s' % (expr_data['ci'], len(results)))
+    LOG.debug('wecmdb_ci_getter get %s result(filter) length: %s' % (expr_data['ci'], len(results)))
     return results
 
 

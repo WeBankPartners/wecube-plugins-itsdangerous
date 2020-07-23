@@ -81,6 +81,22 @@ class Reader(object):
         # iterable: (lineno, contents)
         pass
 
+    def countlr(self, text, char='\n'):
+        count_left = 0
+        count_right = 0
+        step = len(char)
+        for i in range(0, len(text), step):
+            if text[i:i + step] == char:
+                count_left += 1
+            else:
+                break
+        for i in range(len(text), 0 , 0 - step):
+            if text[i - step:i] == char:
+                count_right += 1
+            else:
+                break
+        return count_left, count_right
+
 
 class FullTextReader(Reader):
 
@@ -91,7 +107,7 @@ class FullTextReader(Reader):
         else:
             instream = self.content
         text = instream.read()
-        yield 1, [text]
+        yield (1, 1 + text.count('\n')), [text]
 
 
 class LineReader(Reader):
@@ -105,7 +121,7 @@ class LineReader(Reader):
         lineno = 1
         l = instream.readline()
         while l:
-            yield (lineno, [l.strip('\r\n')])
+            yield ((lineno, lineno), [l.strip('\r\n')])
             l = instream.readline()
             lineno += 1
 
@@ -126,7 +142,7 @@ class ShellReader(Reader):
         while token:
             if is_punctuation and token in self.special_punctuation:
                 if tokens:
-                    yield (lineno, tokens)
+                    yield ((lineno, lineno), tokens)
                 tokens = []
             else:
                 if new_lineno != lineno:
@@ -139,7 +155,7 @@ class ShellReader(Reader):
                     tokens.append(token)
             new_lineno, token, is_punctuation = ret.read_token_ex()
             if not token and tokens:
-                yield (lineno, tokens)
+                yield ((lineno, lineno), tokens)
 
 
 class SqlReader(Reader):
@@ -164,10 +180,14 @@ class SqlReader(Reader):
                 break
             else:
                 newline_indexes.append(newline_start)
-        for pos, sql in sqls:
+        for pos, sql, origin_sql in sqls:
             # lineno = self.content.count('\n', 0, pos) + 1 - sql.count('\n')
             # optimize for newline count
-            lineno = bisect.bisect(newline_indexes, pos) + 1 - sql.count('\n')
+            lineno_end = bisect.bisect(newline_indexes, pos) + 1
+            newline_count = origin_sql.count('\n')
+            newline_left, newline_right = self.countlr(origin_sql)
+            lineno = (lineno_end - newline_count + newline_left, lineno_end - newline_right)
             results.append((lineno, sql))
         for lineno, sql in results:
-            yield lineno, [sql]
+            line_s, line_o = lineno
+            yield (line_s, line_o), [sql]

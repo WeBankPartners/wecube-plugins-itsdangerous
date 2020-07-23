@@ -10,7 +10,7 @@ from sqlparse import engine
 from sqlparse import filters
 from sqlparse import formatter
 from sqlparse import lexer
-from sqlparse import sql, tokens as T
+from sqlparse import sql as S, tokens as T
 from sqlparse import tokens
 from sqlparse.compat import text_type, file_types
 from sqlparse.engine import grouping
@@ -68,16 +68,16 @@ class EStatementSplitter(engine.StatementSplitter):
         for params in stream:
             pos, ttype, value = params
             if self.consume_ws and ttype not in EOS_TTYPE:
-                yield pos, sql.Statement(self.tokens)
+                yield pos, S.Statement(self.tokens)
                 self._reset()
             self.level += self._change_splitlevel(ttype, value)
-            self.tokens.append(sql.Token(ttype, value))
+            self.tokens.append(S.Token(ttype, value))
             if self.level <= 0 and ttype is T.Punctuation and value == ';':
                 self.consume_ws = True
             elif ttype in C_TTYPE:
                 self.consume_ws = True
         if self.tokens:
-            yield pos, sql.Statement(self.tokens)
+            yield pos + len(u''.join([t.value for t in self.tokens])), S.Statement(self.tokens)
 
 
 class EFilterStack(engine.FilterStack):
@@ -94,6 +94,7 @@ class EFilterStack(engine.FilterStack):
         # Output: Stream processed Statements
         for params in stream:
             pos, stmt = params
+            origin_stmt = str(stmt)
             if self._grouping:
                 stmt = grouping.group(stmt)
 
@@ -103,7 +104,7 @@ class EFilterStack(engine.FilterStack):
             for filter_ in self.postprocess:
                 stmt = filter_.process(stmt)
 
-            yield pos, stmt
+            yield pos, stmt, origin_stmt
 
 
 def splitf(sql, encoding=None):
@@ -117,5 +118,5 @@ def splitf(sql, encoding=None):
     formatter.build_filter_stack(stack, options)
     stack.postprocess.append(filters.SerializerUnicode())
     # optimize for skipping empty and comment lines
-    return [(pos, stmt) for pos, stmt in stack.run(sql, encoding)]
+    return [(pos, stmt, str(origin_stmt)) for pos, stmt, origin_stmt in stack.run(sql, encoding)]
 

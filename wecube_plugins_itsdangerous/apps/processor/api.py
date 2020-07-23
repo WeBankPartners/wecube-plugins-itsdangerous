@@ -27,9 +27,12 @@ class Box(resource.Box):
         hasher = hashlib.sha256()
         hasher.update(json.dumps(data).encode('utf-8'))
         digest = hasher.hexdigest()
+        LOG.debug('scope test with data - %s', data)
         for b in boxes:
+            LOG.debug('scope test of box[%s - %s]', b['id'], b['name'])
             subject_included = False
             for target in b['subject']['targets']:
+                LOG.debug('scope test of target[%s - %s]', target['id'], target['name'])
                 target_included = True
                 # target with the same data is cached
                 key = 'scope/target/%s/data/%s' % (target['id'], digest)
@@ -43,11 +46,19 @@ class Box(resource.Box):
                         else:
                             target_included = True
                         if target_included:
+                            LOG.debug('args scope: accepted')
                             if target['entity_scope'] is not None:
                                 target_included = scope.WeCMDBScope(target['entity_scope']).is_match(data['entityInstances'])
                             else:
                                 target_included = True
+                            if target_included:
+                                LOG.debug('entity scope: accepted')
+                            else:
+                                LOG.debug('entity scope: rejected')
+                        else:
+                            LOG.debug('args scope: rejected')
                     else:
+                        LOG.debug('target: disabled')
                         target_included = False
                 cache.set(key, target_included)
                 if target_included:
@@ -58,6 +69,9 @@ class Box(resource.Box):
                 for rule in b['policy']['rules']:
                     if rule['enabled']:
                         rules[rule['id']] = rule
+                LOG.debug('scope test of box[%s - %s]: accepted, rules: %s', b['id'], b['name'], list(rules.keys()))
+            else:
+                LOG.debug('scope test of box[%s - %s]: rejected', b['id'], b['name'])
         return list(rules.values())
 
     def _rule_grouping(self, rules):
