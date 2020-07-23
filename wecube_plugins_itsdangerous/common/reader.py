@@ -142,12 +142,12 @@ class ShellReader(Reader):
         while token:
             if is_punctuation and token in self.special_punctuation:
                 if tokens:
-                    yield ((lineno, lineno), tokens)
+                    yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
                 tokens = []
             else:
                 if new_lineno != lineno:
                     if tokens:
-                        yield (lineno, tokens)
+                        yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
                     tokens = []
                     lineno = new_lineno
                     tokens.append(token)
@@ -155,7 +155,7 @@ class ShellReader(Reader):
                     tokens.append(token)
             new_lineno, token, is_punctuation = ret.read_token_ex()
             if not token and tokens:
-                yield ((lineno, lineno), tokens)
+                yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
 
 
 class SqlReader(Reader):

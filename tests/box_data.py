@@ -3,7 +3,6 @@
 script_shell = r'''top # haha
 cat > mytest.sh << EOF
 $a123 ';' $me
-
 var=`date`
 # this is comment
 rm -rf /tmp/kkk/*;
