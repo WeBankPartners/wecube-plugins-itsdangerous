@@ -44,26 +44,31 @@ def _guess_text_shell(text):
     rating = 0
     name_begin_re = re.compile(r'^#!\s+/.*/(bash|zsh|sh|dash)')
     name_variable_re = re.compile(r'\${?[a-zA-Z_]\w*}?')
-    name_command_re = re.compile(r'^(cd|cat|awk|ps|sed|find|echo|mkdir|ls) .*$', re.MULTILINE)
+    name_command_re = re.compile(r'^(cd|cat|awk|ps|sed|find|echo|mkdir|ls) ', re.MULTILINE)
+    name_command_like_re = re.compile(r'^(\./)?([a-zA-Z_]\w*[ \t]+)+([-]+[a-zA-Z0-9])+', re.MULTILINE)
     if name_begin_re.search(text):
         rating = 1.0
     name_variable_count = len(
         name_variable_re.findall(text))
     name_command_count = len(
         name_command_re.findall(text))
+    name_command_like_count = len(
+        name_command_like_re.findall(text))
     if name_variable_count:
         rating += 0.3
     if name_command_count:
         rating += 0.7
+    if name_command_like_count:
+        rating += 0.3
     return rating
 
 
 def guess(text):
     rate_sql = _guess_text_sql(text)
     rate_shell = _guess_text_shell(text)
-    if rate_shell >= rate_sql:
+    if rate_shell - rate_sql > 0.000001:
         return 'shell'
-    if rate_sql > 0:
+    if rate_sql > 0.000001:
         return 'sql'
     return None
 

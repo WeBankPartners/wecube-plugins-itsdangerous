@@ -71,6 +71,17 @@ def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
     return results
 
 
+def wecmdb_ci_mapping():
+    base_url = CONF.wecube_platform.base_url
+    token = get_token(base_url)
+    resp = requests.get(base_url + '/wecmdb/ui/v2/ci-types',
+                         headers={'Authorization': 'Bearer ' + token})
+    results = {}
+    for data in resp.json()['data']:
+        results[data['tableName']] = data['ciTypeId']
+    return results
+
+
 class WeCMDBScope(object):
 
     def __init__(self, expr):
@@ -84,15 +95,7 @@ class WeCMDBScope(object):
         if data is None:
             return True
         # TODO: fix this, get ci mapping from api
-        ci_mapping = {
-            'host_resource_instance': '32',
-            'resource_set': '29',
-            'deploy_environment': '3',
-            'app_instance': '50',
-            'unit': '48',
-            'subsys': '47',
-            'app_system': '46',
-            }
+        ci_mapping = wecmdb_ci_mapping()
         input_guids = [d['data']['guid'] for d in data]
         input_ci_id = None
         if input_guids:

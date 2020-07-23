@@ -121,3 +121,5 @@ def test_reader_guess():
     assert reader.guess(box_data.script_sql) == 'sql'
     assert reader.guess(text_fulltext) == 'shell'
     assert reader.guess(text_mix) == 'shell'
+    assert reader.guess('docker run -it 44fc0f0582d9') == 'shell'
+    assert reader.guess('docker attach 44fc0f0582d9') is None
