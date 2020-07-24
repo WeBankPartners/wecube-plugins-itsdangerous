@@ -155,7 +155,10 @@ def expr_match_input(expr_groups, ci_getter, input_data, ci_mapping):
             expr_data = expr['data']
             # user input_data
             if i == 0:
-                guid = el['data'][expr_data['attribute']]['guid']
+                if len(expr_data['attribute']) > 0:
+                    guid = el['data'][expr_data['attribute']]['guid']
+                else:
+                    guid = el['data']['guid']
                 if guid:
                     guids.append(guid)
                 continue
@@ -170,7 +173,7 @@ def expr_match_input(expr_groups, ci_getter, input_data, ci_mapping):
                 for j in range(len(cur_data)):
                     guid = ""
                     if len(expr_data['attribute']) > 0:
-                        result_item = results[j]['data'][expr_data['attribute']]
+                        result_item = cur_data[j]['data'][expr_data['attribute']]
                         if utils.is_list_type(result_item):
                             guids.extend([i_result_item['guid'] for i_result_item in result_item])
                         else:

@@ -1,7 +1,7 @@
 # coding=utf-8
 import pytest
 
-from wecube_plugins_itsdangerous.common import expression
+from wecube_plugins_itsdangerous.common import expression, scope
 
 
 def test_expression():
@@ -69,6 +69,14 @@ def test_expression_advance():
     assert ret[0]['data']['attribute'] == ''
     assert ret[0]['data']['filters'] == [{'name': 'id', 'operator': 'eq', 'value': '1'},
                                          {'name': 'obj.attr', 'operator': 'eq', 'value': 2}]
+
+
+def test_expression_match():
+    expr1 = "wecmdb:deploy_environment{guid eq '0003_0000000001'}~(deploy_environment)wecmdb:app_system~(app_system)wecmdb:subsys{key_name eq 'PRD_TaDEMO_CORE'}~(subsys)wecmdb:unit~(unit)wecmdb:app_instance.host_resource_instance>wecmdb:host_resource_instance"
+    ret = expression.expr_match_input(expression.expr_parse(expr1), scope.wecmdb_ci_getter, [{'data': {'guid': '0003_0000000001'}}], scope.wecmdb_ci_mapping())
+    for env_guid, vals in ret.items():
+        for v in vals:
+            assert v['data']['guid'] in ['0032_0000000022', '0032_0000000023']
 
 
 def test_expression_error():
