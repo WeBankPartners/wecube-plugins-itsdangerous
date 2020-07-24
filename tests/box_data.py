@@ -24,6 +24,24 @@ reboot
 sysctl -p
 '''
 
+script_shell_multiline = r'''ls -al;
+rm \
+-rf \
+/
+rm \
+ \
+ \
+-rf \
+/
+rm \ 
+-rf \ 
+/
+rm "\
+-rf \" \
+/"
+echo Done
+'''
+
 script_sql = r'''-- MySQL dump 10.16  Distrib 10.1.44-MariaDB, for debian-linux-gnu (x86_64)
 
 /*!40101 SET NAMES utf8 */;

@@ -37,7 +37,7 @@ def test_reader_bash():
         ((8, 8), ['tree']),
         ((8, 8), ['ps', '-ef']),
         ((8, 8), ['grep', 'grep']),
-        ((9, 10), ['ps', '\n-ef']),
+        ((9, 10), ['ps', '-ef']),
         ((11, 11), ['rm', '-r', '-f', '/tmp/abc']),
         ((12, 12), ['echo', '   -e 456']),
         ((13, 13), ['echo', '你好']),
@@ -53,6 +53,24 @@ def test_reader_bash():
         ((22, 22), ['sysctl', '-p']),
         ]
     s = reader.ShellReader(box_data.script_shell)
+    counter = 0
+    for x in s.iter():
+        assert x == expected[counter]
+        counter += 1
+
+
+def test_reader_bash_multiline():
+    expected = [
+        ((1, 1), ['ls', '-al']),
+        ((2, 4), ['rm', '-rf', '/']),
+        ((5, 9), ['rm', '-rf', '/']),
+        ((10, 10), ['rm', ' ']),
+        ((11, 11), ['-rf', ' ']),
+        ((12, 12), ['/']),
+        ((13, 15), ['rm', '\\\n-rf " \\\n/']),
+        ((16, 16), ['echo', 'Done']),
+        ]
+    s = reader.ShellReader(box_data.script_shell_multiline)
     counter = 0
     for x in s.iter():
         assert x == expected[counter]

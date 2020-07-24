@@ -10,9 +10,11 @@ import shlex
 
 
 class EShlex(shlex.shlex):
-    def __init__(self, instream=None, infile=None, posix=False, 
+
+    def __init__(self, instream=None, infile=None, posix=False,
         punctuation_chars=False):
         shlex.shlex.__init__(self, instream=instream, infile=infile, posix=posix, punctuation_chars=punctuation_chars)
+        self.commentstate = False
 
     def read_token_ex(self):
         '''
@@ -22,6 +24,7 @@ class EShlex(shlex.shlex):
         escapedstate = ' '
         token_line = self.lineno
         is_punctuation = False
+        line_continue = False
         while True:
             if self.punctuation_chars and self._pushback_chars:
                 nextchar = self._pushback_chars.pop()
@@ -33,7 +36,7 @@ class EShlex(shlex.shlex):
                 print("shlex: in state %r I see character: %r" % (self.state,
                                                                   nextchar))
             if self.state is None:
-                self.token = ''        # past end of file
+                self.token = ''  # past end of file
                 break
             elif self.state == ' ':
                 if not nextchar:
@@ -43,13 +46,17 @@ class EShlex(shlex.shlex):
                     if self.debug >= 2:
                         print("shlex: I see whitespace in whitespace state")
                     if self.token or (self.posix and quoted):
-                        break   # emit current token
+                        break  # emit current token
                     else:
                         continue
                 elif nextchar in self.commenters:
+                    self.commentstate = True
+                    break
+                elif self.commentstate:
                     self.instream.readline()
                     self.lineno += 1
                     token_line = self.lineno
+                    self.commentstate = False
                 elif self.posix and nextchar in self.escape:
                     escapedstate = 'a'
                     self.state = nextchar
@@ -69,12 +76,12 @@ class EShlex(shlex.shlex):
                 else:
                     self.token = nextchar
                     if self.token or (self.posix and quoted):
-                        break   # emit current token
+                        break  # emit current token
                     else:
                         continue
             elif self.state in self.quotes:
                 quoted = True
-                if not nextchar:      # end of file
+                if not nextchar:  # end of file
                     if self.debug >= 2:
                         print("shlex: I see EOF in quotes state")
                     # XXX what error should be raised here?
@@ -93,7 +100,7 @@ class EShlex(shlex.shlex):
                 else:
                     self.token += nextchar
             elif self.state in self.escape:
-                if not nextchar:      # end of file
+                if not nextchar:  # end of file
                     if self.debug >= 2:
                         print("shlex: I see EOF in escape state")
                     # XXX what error should be raised here?
@@ -103,20 +110,25 @@ class EShlex(shlex.shlex):
                 if (escapedstate in self.quotes and
                         nextchar != self.state and nextchar != escapedstate):
                     self.token += self.state
-                self.token += nextchar
-                self.state = escapedstate
+                if not (escapedstate == 'a' and nextchar in '\r\n'):
+                    # escape with newline mean the same line
+                    self.token += nextchar
+                    self.state = escapedstate
+                if escapedstate == 'a' and nextchar in '\r\n':
+                    line_continue = True
+                    self.state = ' '
             elif self.state in ('a', 'c'):
                 if not nextchar:
-                    self.state = None   # end of file
+                    self.state = None  # end of file
                     break
                 elif nextchar in self.whitespace:
                     if self.debug >= 2:
                         print("shlex: I see whitespace in word state")
                     self.state = ' '
                     if self.token or (self.posix and quoted):
-                        if not quoted:
+                        if not quoted and self.token in self._punctuation_chars:
                             is_punctuation = True
-                        break   # emit current token
+                        break  # emit current token
                     else:
                         continue
                 elif nextchar in self.commenters:
@@ -126,7 +138,7 @@ class EShlex(shlex.shlex):
                     if self.posix:
                         self.state = ' '
                         if self.token or (self.posix and quoted):
-                            break   # emit current token
+                            break  # emit current token
                         else:
                             continue
                 elif self.state == 'c':
@@ -157,16 +169,16 @@ class EShlex(shlex.shlex):
                         print("shlex: I see punctuation in word state")
                     self.state = ' '
                     if self.token or (self.posix and quoted):
-                        break   # emit current token
+                        break  # emit current token
                     else:
                         continue
         result = self.token
         self.token = ''
-        if self.posix and not quoted and result == '':
+        if self.posix and not quoted and result == '' and not self.commentstate:
             result = None
         if self.debug > 1:
             if result:
                 print("shlex: raw token=" + repr(result))
             else:
                 print("shlex: raw token=EOF")
-        return token_line,result,is_punctuation
+        return token_line, result, is_punctuation, line_continue

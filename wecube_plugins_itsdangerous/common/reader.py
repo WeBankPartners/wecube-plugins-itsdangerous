@@ -142,24 +142,29 @@ class ShellReader(Reader):
         # we want $ or chinese charatars be together
         ret.whitespace_split = True
         tokens = []
-        lineno, token, is_punctuation = ret.read_token_ex()
+        lineno, token, is_punctuation, line_continue = ret.read_token_ex()
         new_lineno = lineno
-        while token:
+        while token is not None:
             if is_punctuation and token in self.special_punctuation:
                 if tokens:
                     yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
                 tokens = []
+            elif token == '':
+                # empty string means newline token
+                yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
+                tokens = []
+                lineno = new_lineno
             else:
-                if new_lineno != lineno:
+                if new_lineno != lineno and not line_continue:
                     if tokens:
-                        yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
+                        yield ((lineno, new_lineno - 1), tokens)
                     tokens = []
                     lineno = new_lineno
                     tokens.append(token)
                 else:
                     tokens.append(token)
-            new_lineno, token, is_punctuation = ret.read_token_ex()
-            if not token and tokens:
+            new_lineno, token, is_punctuation, line_continue = ret.read_token_ex()
+            if token is None and tokens:
                 yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
 
 
