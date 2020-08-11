@@ -10,9 +10,10 @@ wecube_plugins_itsdangerous.server.wsgi_server
 from __future__ import absolute_import
 
 import os
+import json
 from talos.server import base
+from talos.core import utils
 # from talos.core import config
-
 
 # @config.intercept('db_password', 'other_password')
 # def get_password(value, origin_value):
@@ -25,6 +26,17 @@ from talos.server import base
 #     return base64.b64decode(origin_value)
 
 
+def error_serializer(req, resp, exception):
+    representation = exception.to_dict()
+    representation['status'] = 'ERROR'
+    representation['data'] = None
+    resp.body = json.dumps(representation, cls=utils.ComplexEncoder)
+    resp.content_type = 'application/json'
+
+
 application = base.initialize_server('wecube_plugins_itsdangerous',
-                                     os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF', './etc/wecube_plugins_itsdangerous.conf'),
-                                     conf_dir=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR', './etc/wecube_plugins_itsdangerous.conf.d'))
+                                     os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF',
+                                                    './etc/wecube_plugins_itsdangerous.conf'),
+                                     conf_dir=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
+                                                             './etc/wecube_plugins_itsdangerous.conf.d'))
+application.set_error_serializer(error_serializer)
