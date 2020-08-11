@@ -34,3 +34,7 @@ class PolicyRule(crud.ResourceBase):
 
 class SubjectTarget(crud.ResourceBase):
     orm_meta = models.SubjectTarget
+
+
+class MatchParam(crud.ResourceBase):
+    orm_meta = models.MatchParam

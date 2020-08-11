@@ -15,12 +15,28 @@ from wecube_plugins_itsdangerous.db import resource
 
 LOG = logging.getLogger(__name__)
 
-Policy = resource.Policy
-Subject = resource.Subject
+
+class Policy(resource.Policy):
+    pass
+
+
+class Rule(resource.Rule):
+    pass
+
+
+class MatchParam(resource.MatchParam):
+    pass
+
+
+class Subject(resource.Subject):
+    pass
+
+
+class Target(resource.Target):
+    pass
 
 
 class Box(resource.Box):
-
     def _get_rules(self, data, boxes=None):
         boxes = boxes or self.list(filters={'policy.enabled': 1, 'subject.enabled': 1})
         rules = {}
@@ -48,7 +64,8 @@ class Box(resource.Box):
                         if target_included:
                             LOG.debug('args scope: accepted')
                             if target['entity_scope'] is not None:
-                                target_included = scope.WeCMDBScope(target['entity_scope']).is_match(data['entityInstances'])
+                                target_included = scope.WeCMDBScope(target['entity_scope']).is_match(
+                                    data['entityInstances'])
                             else:
                                 target_included = True
                             if target_included:
