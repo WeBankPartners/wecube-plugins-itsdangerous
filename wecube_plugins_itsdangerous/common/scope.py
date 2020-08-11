@@ -44,6 +44,9 @@ def get_token(base_url):
 
 
 def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
+    if expr_data['ci'].lower() != 'wecmdb'.lower():
+        LOG.warn('wecmdb_ci_getter is for ci:wecmdb only, but we got ci:%s instead', expr_data['ci'])
+        return []
     base_url = CONF.wecube_platform.base_url
     token = get_token(base_url)
     data = {
@@ -94,7 +97,6 @@ class WeCMDBScope(object):
         '''
         if data is None:
             return True
-        # TODO: fix this, get ci mapping from api
         ci_mapping = wecmdb_ci_mapping()
         input_guids = [d['data']['guid'] for d in data]
         input_ci_id = None
