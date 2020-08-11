@@ -13,7 +13,7 @@ class EShlex(shlex.shlex):
 
     def __init__(self, instream=None, infile=None, posix=False,
         punctuation_chars=False):
-        shlex.shlex.__init__(self, instream=instream, infile=infile, posix=posix, punctuation_chars=punctuation_chars)
+        super(EShlex, self).__init__(instream=instream, infile=infile, posix=posix, punctuation_chars=punctuation_chars)
         self.commentstate = False
 
     def read_token_ex(self):
@@ -126,7 +126,7 @@ class EShlex(shlex.shlex):
                         print("shlex: I see whitespace in word state")
                     self.state = ' '
                     if self.token or (self.posix and quoted):
-                        if not quoted and self.token in self._punctuation_chars:
+                        if not quoted and self.token in self.punctuation_chars:
                             is_punctuation = True
                         break  # emit current token
                     else:

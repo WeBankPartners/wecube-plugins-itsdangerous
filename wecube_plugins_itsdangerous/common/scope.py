@@ -44,8 +44,8 @@ def get_token(base_url):
 
 
 def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
-    if expr_data['ci'].lower() != 'wecmdb'.lower():
-        LOG.warn('wecmdb_ci_getter is for ci:wecmdb only, but we got ci:%s instead', expr_data['ci'])
+    if expr_data['plugin'].lower() != 'wecmdb'.lower():
+        LOG.warning('wecmdb_ci_getter is for wecmdb only, but we got %s instead', expr_data['plugin'])
         return []
     base_url = CONF.wecube_platform.base_url
     token = get_token(base_url)
