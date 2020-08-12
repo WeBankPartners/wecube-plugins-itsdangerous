@@ -104,7 +104,7 @@ CREATE TABLE `rule` (
   `match_type` varchar(36) NOT NULL,
   `match_value` varchar(512) NOT NULL,
   `match_param_id` int(11) unsigned DEFAULT NULL,
-  `enabled` tinyint(4) DEFAULT NULL,
+  `enabled` tinyint(4) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -170,4 +170,4 @@ CREATE TABLE `target` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-21 17:23:09
+-- Dump completed on 2020-08-12 15:46:53

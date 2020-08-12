@@ -58,9 +58,9 @@ class ItemTarget(controller.Item):
 
 class CollectionBox(controller.Collection):
     name = 'wecube_plugins_itsdangerous.processor.box'
-    resource = processor_api.Box
+    resource = processor_api.BoxManage
 
 
 class ItemBox(controller.Item):
     name = 'wecube_plugins_itsdangerous.processor.box'
-    resource = processor_api.Box
+    resource = processor_api.BoxManage

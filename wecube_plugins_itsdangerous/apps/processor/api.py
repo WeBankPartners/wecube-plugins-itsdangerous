@@ -36,6 +36,10 @@ class Target(resource.Target):
     pass
 
 
+class BoxManage(resource.BoxManage):
+    pass
+
+
 class Box(resource.Box):
     def _get_rules(self, data, boxes=None):
         boxes = boxes or self.list(filters={'policy.enabled': 1, 'subject.enabled': 1})

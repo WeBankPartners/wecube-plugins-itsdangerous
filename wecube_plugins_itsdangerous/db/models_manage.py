@@ -17,7 +17,7 @@ class MatchParam(Base, DictBase):
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
-    description = Column(String(63), server_default=text("''"))
+    description = Column(String(63), server_default=text("''"), nullable=True)
     type = Column(String(36), nullable=False)
     params = Column(JSON, nullable=False)
 
@@ -26,25 +26,28 @@ class Policy(Base, DictBase):
     __tablename__ = 'policy'
     attributes = ['id', 'name', 'description', 'enabled', 'rules']
     detail_attributes = attributes
-    summary_attributes = attributes
+    summary_attributes = ['id', 'name', 'description', 'enabled']
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
-    description = Column(String(63), server_default=text("''"))
+    description = Column(String(63), server_default=text("''"), nullable=True)
     enabled = Column(TINYINT(4), nullable=False)
 
-    rules = relationship("Rule", secondary="policy_rule", lazy='subquery')
+    rules = relationship("Rule", secondary="policy_rule", lazy=False)
 
 
 class Rule(Base, DictBase):
     __tablename__ = 'rule'
-    attributes = ['id', 'name', 'description', 'level', 'effect_on', 'enabled', 'match_type', 'match_param_id', 'match_value', 'match_param']
+    attributes = [
+        'id', 'name', 'description', 'level', 'effect_on', 'enabled', 'match_type', 'match_param_id', 'match_value',
+        'match_param'
+    ]
     detail_attributes = attributes
     summary_attributes = attributes
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
-    description = Column(String(63), server_default=text("''"))
+    description = Column(String(63), server_default=text("''"), nullable=True)
     level = Column(INTEGER(11), nullable=False)
     effect_on = Column(String(36), nullable=False)
     match_type = Column(String(36), nullable=False)
@@ -60,14 +63,14 @@ class Subject(Base, DictBase):
     __tablename__ = 'subject'
     attributes = ['id', 'name', 'description', 'enabled', 'targets']
     detail_attributes = attributes
-    summary_attributes = attributes
+    summary_attributes = ['id', 'name', 'description', 'enabled']
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
-    description = Column(String(63), server_default=text("''"))
+    description = Column(String(63), server_default=text("''"), nullable=True)
     enabled = Column(TINYINT(4), nullable=False)
 
-    targets = relationship('Target', secondary='subject_target', lazy='subquery')
+    targets = relationship('Target', secondary='subject_target', lazy=False)
 
 
 class Target(Base, DictBase):
@@ -75,8 +78,8 @@ class Target(Base, DictBase):
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
-    args_scope = Column(String(512))
-    entity_scope = Column(String(512))
+    args_scope = Column(String(512), nullable=True)
+    entity_scope = Column(String(512), nullable=True)
     enabled = Column(TINYINT(4), nullable=False)
 
     # subjects = relationship('SubjectTarget', back_populates='target')
@@ -90,7 +93,7 @@ class Box(Base, DictBase):
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
-    description = Column(String(63), server_default=text("''"))
+    description = Column(String(63), server_default=text("''"), nullable=True)
     policy_id = Column(ForeignKey('policy.id'), nullable=False, index=True)
     subject_id = Column(ForeignKey('subject.id'), nullable=False, index=True)
 
