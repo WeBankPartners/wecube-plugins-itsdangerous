@@ -82,7 +82,7 @@ def match_all(filters, data):
             if utils.is_list_type(val):
                 results.add(False)
             else:
-                results.add(True) if val not in _filter['value']  else results.add(False)
+                results.add(True) if val not in _filter['value'] else results.add(False)
         elif _filter['operator'] in ('regex', 'iregex'):
             flag = 0
             if _filter['operator'] == 'iregex':

@@ -12,7 +12,6 @@ from wecube_plugins_itsdangerous.common import jsonfilter
 
 
 class Simulator(object):
-
     def __init__(self, args):
         self.args = args
         self.parser = self._prepare()
@@ -37,8 +36,7 @@ class Simulator(object):
                 prepare_kwargs['type'] = (int if arg.get('convert', None) else str)
                 prepare_kwargs['nargs'] = arg.get('repeatable', None)
 
-            parser.add_argument(*prepare_args,
-                                **prepare_kwargs)
+            parser.add_argument(*prepare_args, **prepare_kwargs)
         return parser
 
     def check(self, input_args, filters, parser=None):

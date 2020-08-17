@@ -17,7 +17,6 @@ WECUBE_TOKEN = 'wecube_platform_token'
 
 
 class JsonScope(object):
-
     def __init__(self, expr):
         self.filters = expression.expr_filter_parse(expr)
 
@@ -37,8 +36,10 @@ def get_token(base_url):
         token = cache.get(WECUBE_TOKEN)
         if not cache.validate(token):
             token = requests.post(base_url + '/auth/v1/api/login',
-                              json={"username":CONF.wecube_platform.username,
-                                    "password":CONF.wecube_platform.password}).json()['data'][1]['token']
+                                  json={
+                                      "username": CONF.wecube_platform.username,
+                                      "password": CONF.wecube_platform.password
+                                  }).json()['data'][1]['token']
             cache.set(WECUBE_TOKEN, token)
     return token
 
@@ -49,9 +50,7 @@ def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
         return []
     base_url = CONF.wecube_platform.base_url
     token = get_token(base_url)
-    data = {
-        'filters': expr_data['filters']
-    }
+    data = {'filters': expr_data['filters']}
     # build json filters
     if guids is not None:
         if is_backref:
@@ -64,8 +63,8 @@ def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
         LOG.debug('wecmdb_ci_getter POST /wecmdb/ui/v2/ci-types/%s/ci-data/query' % expr_data['ci'])
         LOG.debug('wecmdb_ci_getter     filters: %s', data)
         resp = requests.post(base_url + '/wecmdb/ui/v2/ci-types/%s/ci-data/query' % ci_mapping[expr_data['ci']],
-                      json={},
-                      headers={'Authorization': 'Bearer ' + token})
+                             json={},
+                             headers={'Authorization': 'Bearer ' + token})
         results = resp.json()['data']['contents']
         LOG.debug('wecmdb_ci_getter get %s result(all) length: %s' % (expr_data['ci'], len(results)))
         cache.set(ci_data_key, results)
@@ -77,8 +76,7 @@ def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
 def wecmdb_ci_mapping():
     base_url = CONF.wecube_platform.base_url
     token = get_token(base_url)
-    resp = requests.get(base_url + '/wecmdb/ui/v2/ci-types',
-                         headers={'Authorization': 'Bearer ' + token})
+    resp = requests.get(base_url + '/wecmdb/ui/v2/ci-types', headers={'Authorization': 'Bearer ' + token})
     results = {}
     for data in resp.json()['data']:
         results[data['tableName']] = data['ciTypeId']
@@ -86,7 +84,6 @@ def wecmdb_ci_mapping():
 
 
 class WeCMDBScope(object):
-
     def __init__(self, expr):
         self.expression = expr
 
@@ -116,5 +113,6 @@ class WeCMDBScope(object):
                     if set(input_guids) & set(expr_guids):
                         return True
                 else:
-                    LOG.debug('input ci(%s) is not the same as expression require(%s), passthrough...', input_ci_id, expect_ci_id)
+                    LOG.debug('input ci(%s) is not the same as expression require(%s), passthrough...', input_ci_id,
+                              expect_ci_id)
         return False

@@ -19,7 +19,6 @@ from sqlparse.utils import consume
 
 
 class ELexer(lexer.Lexer):
-
     @staticmethod
     def get_tokens(text, encoding=None):
         if isinstance(text, file_types):
@@ -36,8 +35,7 @@ class ELexer(lexer.Lexer):
                 except UnicodeDecodeError:
                     text = text.decode('unicode-escape')
         else:
-            raise TypeError(u"Expected text or file-like object, got {!r}".
-                            format(type(text)))
+            raise TypeError(u"Expected text or file-like object, got {!r}".format(type(text)))
 
         iterable = enumerate(text)
         for pos, char in iterable:
@@ -58,7 +56,6 @@ class ELexer(lexer.Lexer):
 
 
 class EStatementSplitter(engine.StatementSplitter):
-
     def process(self, stream):
         """Process the stream"""
         EOS_TTYPE = T.Whitespace, T.Comment.Single, T.Comment.Multiline
@@ -81,7 +78,6 @@ class EStatementSplitter(engine.StatementSplitter):
 
 
 class EFilterStack(engine.FilterStack):
-
     def run(self, sql, encoding=None):
         stream = ELexer().get_tokens(sql, encoding)
         # Process token stream
@@ -114,9 +110,8 @@ def splitf(sql, encoding=None):
     # stack = EFilterStack()
     # return [(pos, text_type(stmt).strip()) for pos, stmt in stack.run(sql, encoding)]
     stack = EFilterStack()
-    options = formatter.validate_options({'strip_comments':True, 'strip_whitespace':True})
+    options = formatter.validate_options({'strip_comments': True, 'strip_whitespace': True})
     formatter.build_filter_stack(stack, options)
     stack.postprocess.append(filters.SerializerUnicode())
     # optimize for skipping empty and comment lines
     return [(pos, stmt, str(origin_stmt)) for pos, stmt, origin_stmt in stack.run(sql, encoding)]
-

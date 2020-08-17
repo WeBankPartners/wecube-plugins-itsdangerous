@@ -18,13 +18,11 @@ def _guess_text_sql(text):
     rating = 0
     name_between_bracket_re = re.compile(r'\[[a-zA-Z_]\w*\]')
     name_between_backtick_re = re.compile(r'`[a-zA-Z_]\w*`')
-    name_command_re = re.compile(r'(insert\s+into|update\s+.*\s+set|alter\s+table|create\s+table|select\s+.+\s+from|delete\s+from).+;', re.I)
-    name_between_backtick_count = len(
-        name_between_backtick_re.findall(text))
-    name_between_bracket_count = len(
-        name_between_bracket_re.findall(text))
-    name_command_count = len(
-        name_command_re.findall(text))
+    name_command_re = re.compile(
+        r'(insert\s+into|update\s+.*\s+set|alter\s+table|create\s+table|select\s+.+\s+from|delete\s+from).+;', re.I)
+    name_between_backtick_count = len(name_between_backtick_re.findall(text))
+    name_between_bracket_count = len(name_between_bracket_re.findall(text))
+    name_command_count = len(name_command_re.findall(text))
     # Same logic as above in the TSQL analysis
     dialect_name_count = name_between_backtick_count + name_between_bracket_count
     if dialect_name_count >= 1 and \
@@ -48,12 +46,9 @@ def _guess_text_shell(text):
     name_command_like_re = re.compile(r'^(\./)?([a-zA-Z_]\w*[ \t]+)+([-]+[a-zA-Z0-9])+', re.MULTILINE)
     if name_begin_re.search(text):
         rating = 1.0
-    name_variable_count = len(
-        name_variable_re.findall(text))
-    name_command_count = len(
-        name_command_re.findall(text))
-    name_command_like_count = len(
-        name_command_like_re.findall(text))
+    name_variable_count = len(name_variable_re.findall(text))
+    name_command_count = len(name_command_re.findall(text))
+    name_command_like_count = len(name_command_like_re.findall(text))
     if name_variable_count:
         rating += 0.3
     if name_command_count:
@@ -74,7 +69,6 @@ def guess(text):
 
 
 class Reader(object):
-
     def __init__(self, content):
         '''
         init a reader
@@ -95,7 +89,7 @@ class Reader(object):
                 count_left += 1
             else:
                 break
-        for i in range(len(text), 0 , 0 - step):
+        for i in range(len(text), 0, 0 - step):
             if text[i - step:i] == char:
                 count_right += 1
             else:
@@ -104,7 +98,6 @@ class Reader(object):
 
 
 class FullTextReader(Reader):
-
     def iter(self):
         instream = None
         if isinstance(self.content, str):
@@ -116,7 +109,6 @@ class FullTextReader(Reader):
 
 
 class LineReader(Reader):
-
     def iter(self):
         instream = None
         if isinstance(self.content, str):
@@ -132,7 +124,6 @@ class LineReader(Reader):
 
 
 class ShellReader(Reader):
-
     def __init__(self, content):
         Reader.__init__(self, content)
         self.special_punctuation = ['|', '||', '&&', ';']
@@ -169,7 +160,6 @@ class ShellReader(Reader):
 
 
 class SqlReader(Reader):
-
     def iter(self):
         instream = None
         if isinstance(self.content, str):

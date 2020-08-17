@@ -14,7 +14,6 @@ LOG = logging.getLogger(__name__)
 
 
 class JsonFilterDetector(object):
-
     def __init__(self, content, rules):
         '''
         :param content: input params dict
@@ -29,16 +28,16 @@ class JsonFilterDetector(object):
         lineno = (-1, -1)
         for rule in self.rules:
             if scope.JsonScope(rule['match_value']).is_match(self.content):
-                results.append({'lineno': lineno,
-                                'level': rule['level'],
-                                'content': rule['match_value'],
-                                'message': rule['name']
-                                })
+                results.append({
+                    'lineno': lineno,
+                    'level': rule['level'],
+                    'content': rule['match_value'],
+                    'message': rule['name']
+                })
         return results
 
 
 class BashCliDetector(object):
-
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -74,16 +73,16 @@ class BashCliDetector(object):
                     if rule['match_param_id'] in self.parsers and cmd in self.parsers[rule['match_param_id']]:
                         for sim in self.parsers[rule['match_param_id']][cmd]:
                             if sim.check(args, r_filters):
-                                results.append({'lineno': lineno,
-                                                'level': r_level,
-                                                'content': ' '.join(tokens),
-                                                'message': r_name
-                                                })
+                                results.append({
+                                    'lineno': lineno,
+                                    'level': r_level,
+                                    'content': ' '.join(tokens),
+                                    'message': r_name
+                                })
         return results
 
 
 class SqlDetector(object):
-
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -111,16 +110,11 @@ class SqlDetector(object):
                         if append_flag and isinstance(append_flag, int):
                             flag = flag | append_flag
                     if re.search(r_filters, sql, flags=flag):
-                        results.append({'lineno': lineno,
-                                        'level': r_level,
-                                        'content': sql,
-                                        'message': r_name
-                                        })
+                        results.append({'lineno': lineno, 'level': r_level, 'content': sql, 'message': r_name})
         return results
 
 
 class FullTextDetector(object):
-
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -152,16 +146,11 @@ class FullTextDetector(object):
                     if len(text) > len(dot_text):
                         dot_text += '...'
                     if re.search(r_filters, text, flags=flag):
-                        results.append({'lineno': lineno,
-                                        'level': r_level,
-                                        'content': dot_text,
-                                        'message': r_name
-                                        })
+                        results.append({'lineno': lineno, 'level': r_level, 'content': dot_text, 'message': r_name})
         return results
 
 
 class LineTextDetector(FullTextDetector):
-
     def __init__(self, content, rules):
         '''
         :param content: script content

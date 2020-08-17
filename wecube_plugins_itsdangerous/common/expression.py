@@ -12,7 +12,9 @@ import re
 from talos.core import utils
 
 R_SINGLE_FILTER = re.compile('\{([_a-zA-Z][_a-zA-Z0-9.]*)\s+([a-zA-Z]+)\s+([^}]+)\}')
-R_SEG_EXPRESSION = re.compile('(?:\(([_a-zA-Z][_a-zA-Z0-9]*)\))?(?:([_a-zA-Z][_a-zA-Z0-9]*):)?([_a-zA-Z][_a-zA-Z0-9]*)((?:\{[_a-zA-Z][_a-zA-Z0-9.]*\s+[a-zA-Z]+\s+.*\}){1,30})?(?:\.([_a-zA-Z][_a-zA-Z0-9]*))?$')
+R_SEG_EXPRESSION = re.compile(
+    '(?:\(([_a-zA-Z][_a-zA-Z0-9]*)\))?(?:([_a-zA-Z][_a-zA-Z0-9]*):)?([_a-zA-Z][_a-zA-Z0-9]*)((?:\{[_a-zA-Z][_a-zA-Z0-9.]*\s+[a-zA-Z]+\s+.*\}){1,30})?(?:\.([_a-zA-Z][_a-zA-Z0-9]*))?$'
+)
 
 
 def _expr_op_finder(expr):
@@ -114,7 +116,8 @@ def expr_seg_parse(expr):
             'plugin': res.groups()[1] or '',
             'ci': res.groups()[2] or '',
             'filters': res.groups()[3] or '',
-            'attribute': res.groups()[4] or ''}
+            'attribute': res.groups()[4] or ''
+        }
         result['filters'] = expr_filter_parse(result['filters'])
         return result
     raise ValueError('invalid expression: ' + expr)

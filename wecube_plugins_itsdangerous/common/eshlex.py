@@ -10,9 +10,7 @@ import shlex
 
 
 class EShlex(shlex.shlex):
-
-    def __init__(self, instream=None, infile=None, posix=False,
-        punctuation_chars=False):
+    def __init__(self, instream=None, infile=None, posix=False, punctuation_chars=False):
         super(EShlex, self).__init__(instream=instream, infile=infile, posix=posix, punctuation_chars=punctuation_chars)
         self.commentstate = False
 
@@ -33,8 +31,7 @@ class EShlex(shlex.shlex):
             if nextchar == '\n':
                 self.lineno += 1
             if self.debug >= 3:
-                print("shlex: in state %r I see character: %r" % (self.state,
-                                                                  nextchar))
+                print("shlex: in state %r I see character: %r" % (self.state, nextchar))
             if self.state is None:
                 self.token = ''  # past end of file
                 break
@@ -93,8 +90,7 @@ class EShlex(shlex.shlex):
                         break
                     else:
                         self.state = 'a'
-                elif (self.posix and nextchar in self.escape and self.state
-                      in self.escapedquotes):
+                elif (self.posix and nextchar in self.escape and self.state in self.escapedquotes):
                     escapedstate = self.state
                     self.state = nextchar
                 else:
@@ -107,8 +103,7 @@ class EShlex(shlex.shlex):
                     raise ValueError("No escaped character")
                 # In posix shells, only the quote itself or the escape
                 # character may be escaped within quotes.
-                if (escapedstate in self.quotes and
-                        nextchar != self.state and nextchar != escapedstate):
+                if (escapedstate in self.quotes and nextchar != self.state and nextchar != escapedstate):
                     self.token += self.state
                 if not (escapedstate == 'a' and nextchar in '\r\n'):
                     # escape with newline mean the same line
@@ -157,8 +152,7 @@ class EShlex(shlex.shlex):
                     escapedstate = 'a'
                     self.state = nextchar
                 elif (nextchar in self.wordchars or nextchar in self.quotes
-                      or (self.whitespace_split and
-                          nextchar not in self.punctuation_chars)):
+                      or (self.whitespace_split and nextchar not in self.punctuation_chars)):
                     self.token += nextchar
                 else:
                     if self.punctuation_chars:
