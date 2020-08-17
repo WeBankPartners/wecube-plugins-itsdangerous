@@ -2,12 +2,13 @@
 
 from __future__ import absolute_import
 
+from talos.core.i18n import _
 from talos.db import crud
 from talos.db import validator
-from talos.core.i18n import _
 
-from wecube_plugins_itsdangerous.db import models_manage
 from wecube_plugins_itsdangerous.db import models_box
+from wecube_plugins_itsdangerous.db import models_manage
+from wecube_plugins_itsdangerous.db import validator as my_validator
 
 
 class BackRefValidator(validator.NullValidator):
@@ -23,10 +24,11 @@ class BackRefValidator(validator.NullValidator):
 class MatchParam(crud.ResourceBase):
     orm_meta = models_manage.MatchParam
     _validate = [
-        crud.ColumnValidator(field='name', rule_type='length', rule='1,36', validate_on=['create:M', 'update:O']),
+        crud.ColumnValidator(field='name',
+                             rule=my_validator.LengthValidator(1, 36),
+                             validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='description',
-                             rule_type='length',
-                             rule='0,63',
+                             rule=my_validator.LengthValidator(0, 63),
                              validate_on=['create:O', 'update:O'],
                              nullable=True),
         crud.ColumnValidator(field='type', rule_type='in', rule=['regex', 'cli'], validate_on=('create:M', 'update:O')),
@@ -37,10 +39,11 @@ class MatchParam(crud.ResourceBase):
 class Policy(crud.ResourceBase):
     orm_meta = models_manage.Policy
     _validate = [
-        crud.ColumnValidator(field='name', rule_type='length', rule='1,36', validate_on=['create:M', 'update:O']),
+        crud.ColumnValidator(field='name',
+                             rule=my_validator.LengthValidator(1, 36),
+                             validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='description',
-                             rule_type='length',
-                             rule='0,63',
+                             rule=my_validator.LengthValidator(0, 63),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='enabled', rule_type='in', rule=[0, 1], validate_on=('create:M', 'update:O')),
@@ -69,10 +72,11 @@ class Policy(crud.ResourceBase):
 class Rule(crud.ResourceBase):
     orm_meta = models_manage.Rule
     _validate = [
-        crud.ColumnValidator(field='name', rule_type='length', rule='1,36', validate_on=['create:M', 'update:O']),
+        crud.ColumnValidator(field='name',
+                             rule=my_validator.LengthValidator(1, 36),
+                             validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='description',
-                             rule_type='length',
-                             rule='0,63',
+                             rule=my_validator.LengthValidator(0, 63),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='level',
@@ -92,8 +96,7 @@ class Rule(crud.ResourceBase):
                              nullable=True),
         crud.ColumnValidator(field='enabled', rule_type='in', rule=[0, 1], validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='match_value',
-                             rule_type='length',
-                             rule='1,512',
+                             rule=my_validator.LengthValidator(1, 512),
                              validate_on=('create:M', 'update:O')),
     ]
 
@@ -101,10 +104,11 @@ class Rule(crud.ResourceBase):
 class Subject(crud.ResourceBase):
     orm_meta = models_manage.Subject
     _validate = [
-        crud.ColumnValidator(field='name', rule_type='length', rule='1,36', validate_on=['create:M', 'update:O']),
+        crud.ColumnValidator(field='name',
+                             rule=my_validator.LengthValidator(1, 36),
+                             validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='description',
-                             rule_type='length',
-                             rule='0,63',
+                             rule=my_validator.LengthValidator(0, 63),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='enabled', rule_type='in', rule=[0, 1], validate_on=('create:M', 'update:O')),
@@ -133,16 +137,16 @@ class Subject(crud.ResourceBase):
 class Target(crud.ResourceBase):
     orm_meta = models_manage.Target
     _validate = [
-        crud.ColumnValidator(field='name', rule_type='length', rule='1,36', validate_on=['create:M', 'update:O']),
+        crud.ColumnValidator(field='name',
+                             rule=my_validator.LengthValidator(1, 36),
+                             validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='enabled', rule_type='in', rule=[0, 1], validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='args_scope',
-                             rule_type='length',
-                             rule='1,512',
+                             rule=my_validator.LengthValidator(1, 512),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='entity_scope',
-                             rule_type='length',
-                             rule='1,512',
+                             rule=my_validator.LengthValidator(1, 512),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
     ]
@@ -157,10 +161,11 @@ class Box(crud.ResourceBase):
 class BoxManage(crud.ResourceBase):
     orm_meta = models_manage.Box
     _validate = [
-        crud.ColumnValidator(field='name', rule_type='length', rule='1,36', validate_on=['create:M', 'update:O']),
+        crud.ColumnValidator(field='name',
+                             rule=my_validator.LengthValidator(1, 36),
+                             validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='description',
-                             rule_type='length',
-                             rule='0,63',
+                             rule=my_validator.LengthValidator(0, 63),
                              validate_on=['create:O', 'update:O'],
                              nullable=True),
         crud.ColumnValidator(field='policy_id', rule=BackRefValidator(Policy), validate_on=('create:M', 'update:O')),

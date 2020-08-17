@@ -2,10 +2,14 @@
 
 from __future__ import absolute_import
 
+import falcon
 from talos.common.controller import CollectionController
 from talos.common.controller import ItemController
+from talos.core import exceptions
+
 
 class Collection(CollectionController):
+
     def on_get(self, req, resp, **kwargs):
         self._validate_method(req)
         refs = []
@@ -16,29 +20,30 @@ class Collection(CollectionController):
             count = self.count(req, criteria, results=refs, **kwargs)
         resp.json = {
             'code': 200,
-            'status': 'OK', 
+            'status': 'OK',
             'data': {'count': count, 'data': refs},
             'message': 'success'}
-    
+
     def on_post(self, req, resp, **kwargs):
         self._validate_method(req)
         self._validate_data(req)
         resp.json = {
             'code': 200,
-            'status': 'OK', 
+            'status': 'OK',
             'data': self.create(req, req.json, **kwargs),
             'message': 'success'}
         resp.status = falcon.HTTP_201
 
 
 class Item(ItemController):
+
     def on_get(self, req, resp, **kwargs):
         self._validate_method(req)
         ref = self.get(req, **kwargs)
         if ref is not None:
             resp.json = {
                 'code': 200,
-                'status': 'OK', 
+                'status': 'OK',
                 'data': ref,
                 'message': 'success'}
         else:
@@ -51,7 +56,7 @@ class Item(ItemController):
         if ref_after is not None:
             resp.json = {
                 'code': 200,
-                'status': 'OK', 
+                'status': 'OK',
                 'data': ref_after,
                 'message': 'success'}
         else:
