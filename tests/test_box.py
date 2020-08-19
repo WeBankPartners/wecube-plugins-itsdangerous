@@ -1,7 +1,7 @@
 # coding=utf-8
 from tests import box_data
+
 from wecube_plugins_itsdangerous.apps.processor import api
-from wecube_plugins_itsdangerous.server.wsgi_server import application
 
 
 def test():
@@ -21,8 +21,8 @@ def test():
             }
         }]
     }
-    assert len(api.Box().check(data, box_data.complex_boxes)) == 7
-    assert len(api.Box().check(data, box_data.complex_boxes)) == 7
+    assert len(api.Box().check(data, box_data.nocmdb_boxes)) == 7
+    assert len(api.Box().check(data, box_data.nocmdb_boxes)) == 7
     data = {
         'serviceName': 'qcloud/vm(resource)/action',
         'inputParams': {
@@ -39,7 +39,7 @@ def test():
             }
         }]
     }
-    assert len(api.Box().check(data, box_data.complex_boxes)) == 3
+    assert len(api.Box().check(data, box_data.nocmdb_boxes)) == 3
     data = {
         'serviceName': 'qcloud/vm(resource)/action',
         'inputParams': {
@@ -55,4 +55,4 @@ def test():
             }
         }]
     }
-    assert len(api.Box().check(data, box_data.complex_boxes)) == 0
+    assert len(api.Box().check(data, box_data.nocmdb_boxes)) == 6

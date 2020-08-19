@@ -17,6 +17,7 @@ WECUBE_TOKEN = 'wecube_platform_token'
 
 
 class JsonScope(object):
+
     def __init__(self, expr):
         self.filters = expression.expr_filter_parse(expr)
 
@@ -60,16 +61,16 @@ def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
     ci_data_key = 'wecmdb/ci-types/%(ci)s' % {'ci': ci_mapping[expr_data['ci']]}
     results = cache.get(ci_data_key, exipres=30)
     if not cache.validate(results):
-        LOG.debug('wecmdb_ci_getter POST /wecmdb/ui/v2/ci-types/%s/ci-data/query' % expr_data['ci'])
-        LOG.debug('wecmdb_ci_getter     filters: %s', data)
+        LOG.info('wecmdb_ci_getter POST /wecmdb/ui/v2/ci-types/%s/ci-data/query' % expr_data['ci'])
+        LOG.info('wecmdb_ci_getter     filters: %s', data)
         resp = requests.post(base_url + '/wecmdb/ui/v2/ci-types/%s/ci-data/query' % ci_mapping[expr_data['ci']],
                              json={},
                              headers={'Authorization': 'Bearer ' + token})
         results = resp.json()['data']['contents']
-        LOG.debug('wecmdb_ci_getter get %s result(all) length: %s' % (expr_data['ci'], len(results)))
+        LOG.info('wecmdb_ci_getter get %s result(all) length: %s' % (expr_data['ci'], len(results)))
         cache.set(ci_data_key, results)
     results = [ret for ret in results if jsonfilter.match_all(data['filters'], ret['data'])]
-    LOG.debug('wecmdb_ci_getter get %s result(filter) length: %s' % (expr_data['ci'], len(results)))
+    LOG.info('wecmdb_ci_getter get %s result(filter) length: %s' % (expr_data['ci'], len(results)))
     return results
 
 
@@ -84,6 +85,7 @@ def wecmdb_ci_mapping():
 
 
 class WeCMDBScope(object):
+
     def __init__(self, expr):
         self.expression = expr
 

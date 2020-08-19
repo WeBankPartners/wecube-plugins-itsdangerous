@@ -83,7 +83,8 @@ def expr_filter_parse(expr_filter):
                 elif filter_op == 'in':
                     # TODO: fix this, replace is not good enough
                     filter_val = json.loads(filter_val[1:-1].replace("'", '"'))
-                elif filter_val.startswith("'") and filter_val.endswith("'"):
+                elif (filter_val.startswith("'") and filter_val.endswith("'")) or (filter_val.startswith('"')
+                                                                                   and filter_val.endswith('"')):
                     # string
                     filter_val = filter_val[1:-1]
                 else:

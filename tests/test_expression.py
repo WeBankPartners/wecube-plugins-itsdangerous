@@ -1,7 +1,11 @@
 # coding=utf-8
+import logging
+
 import pytest
 
 from wecube_plugins_itsdangerous.common import expression, scope
+
+LOG = logging.getLogger(__name__)
 
 
 def test_expression():
@@ -9,16 +13,33 @@ def test_expression():
     ret = expression.expr_parse(expr1)
     assert len(ret) == 7
     assert ret[0]['type'] == 'expr'
-    assert ret[0]['value'] == "cmdb:a{id eq '1'}{seq_num eq 2}{created_time is NULL}{name eq 'test'}{id in '['1', '2']'}.b_1"
+    assert ret[0][
+        'value'] == "cmdb:a{id eq '1'}{seq_num eq 2}{created_time is NULL}{name eq 'test'}{id in '['1', '2']'}.b_1"
     assert ret[0]['data']['plugin'] == 'cmdb'
     assert ret[0]['data']['ci'] == 'a'
     assert ret[0]['data']['backref_attribute'] == ''
     assert ret[0]['data']['attribute'] == 'b_1'
-    assert ret[0]['data']['filters'] == [{'name': 'id', 'operator': 'eq', 'value': '1'},
-                                         {'name': 'seq_num', 'operator': 'eq', 'value': 2},
-                                         {'name': 'created_time', 'operator': 'null', 'value': None},
-                                         {'name': 'name', 'operator': 'eq', 'value': 'test'},
-                                         {'name': 'id', 'operator': 'in', 'value': ['1', '2']}]
+    assert ret[0]['data']['filters'] == [{
+        'name': 'id',
+        'operator': 'eq',
+        'value': '1'
+    }, {
+        'name': 'seq_num',
+        'operator': 'eq',
+        'value': 2
+    }, {
+        'name': 'created_time',
+        'operator': 'null',
+        'value': None
+    }, {
+        'name': 'name',
+        'operator': 'eq',
+        'value': 'test'
+    }, {
+        'name': 'id',
+        'operator': 'in',
+        'value': ['1', '2']
+    }]
 
     assert ret[1]['type'] == 'op'
     assert ret[1]['value'] == "->"
@@ -67,14 +88,31 @@ def test_expression_advance():
     assert ret[0]['data']['ci'] == 'a'
     assert ret[0]['data']['backref_attribute'] == ''
     assert ret[0]['data']['attribute'] == ''
-    assert ret[0]['data']['filters'] == [{'name': 'id', 'operator': 'eq', 'value': '1'},
-                                         {'name': 'obj.attr', 'operator': 'eq', 'value': 2}]
+    assert ret[0]['data']['filters'] == [{
+        'name': 'id',
+        'operator': 'eq',
+        'value': '1'
+    }, {
+        'name': 'obj.attr',
+        'operator': 'eq',
+        'value': 2
+    }]
 
 
-def test_expression_match():
+def test_expression_match(mocker):
+    mocker.patch.object(scope, 'wecmdb_ci_getter', return_value=[{'data': {'guid': '0032_0000000022', 'host_resource_instance': {'guid': '1'}}},
+                                                                 {'data': {'guid': '0032_0000000023', 'host_resource_instance': {'guid': '1'}}}])
+    mocker.patch.object(scope, 'wecmdb_ci_mapping', return_value={})
     expr1 = "wecmdb:deploy_environment{guid eq '0003_0000000001'}~(deploy_environment)wecmdb:app_system~(app_system)wecmdb:subsys{key_name eq 'PRD_TaDEMO_CORE'}~(subsys)wecmdb:unit~(unit)wecmdb:app_instance.host_resource_instance>wecmdb:host_resource_instance"
-    ret = expression.expr_match_input(expression.expr_parse(expr1), scope.wecmdb_ci_getter, [{'data': {'guid': '0003_0000000001'}}], scope.wecmdb_ci_mapping())
+    ret = expression.expr_match_input(expression.expr_parse(expr1), scope.wecmdb_ci_getter, [{
+        'data': {
+            'guid': '0003_0000000001'
+        }
+    }], scope.wecmdb_ci_mapping())
+    LOG.info(ret)
     for env_guid, vals in ret.items():
+        assert env_guid == '0003_0000000001'
+        assert len(vals) == 2
         for v in vals:
             assert v['data']['guid'] in ['0032_0000000022', '0032_0000000023']
 
