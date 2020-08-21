@@ -21,6 +21,9 @@ def add_routes(api):
     # target
     api.add_route('/itsdangerous/ui/v1/targets', controller.CollectionTarget())
     api.add_route('/itsdangerous/ui/v1/targets/{rid}', controller.ItemTarget())
+    # service script
+    api.add_route('/itsdangerous/ui/v1/service-scripts', controller.CollectionServiceScript())
+    api.add_route('/itsdangerous/ui/v1/service-scripts/{rid}', controller.ItemServiceScript())
     # box
     api.add_route('/itsdangerous/ui/v1/boxes', controller.CollectionBox())
     api.add_route('/itsdangerous/ui/v1/boxes/{rid}', controller.ItemBox())

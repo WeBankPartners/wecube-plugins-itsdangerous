@@ -2,8 +2,8 @@
 
 from __future__ import absolute_import
 
-from wecube_plugins_itsdangerous.common import controller
 from wecube_plugins_itsdangerous.apps.processor import api as processor_api
+from wecube_plugins_itsdangerous.common import controller
 
 
 class CollectionPolicy(controller.Collection):
@@ -54,6 +54,16 @@ class CollectionTarget(controller.Collection):
 class ItemTarget(controller.Item):
     name = 'wecube_plugins_itsdangerous.processor.target'
     resource = processor_api.Target
+
+
+class CollectionServiceScript(controller.Collection):
+    name = 'wecube_plugins_itsdangerous.processor.servicescript'
+    resource = processor_api.ServiceScript
+
+
+class ItemServiceScript(controller.Item):
+    name = 'wecube_plugins_itsdangerous.processor.servicescript'
+    resource = processor_api.ServiceScript
 
 
 class CollectionBox(controller.Collection):

@@ -12,6 +12,7 @@ from wecube_plugins_itsdangerous.db import validator as my_validator
 
 
 class BackRefValidator(validator.NullValidator):
+
     def __init__(self, cls_res):
         self.cls_res = cls_res
 
@@ -186,4 +187,25 @@ class SubjectTarget(crud.ResourceBase):
     _validate = [
         crud.ColumnValidator(field='subject_id', validate_on=('create:M', 'update:M')),
         crud.ColumnValidator(field='target_id', rule=BackRefValidator(Target), validate_on=('create:M', 'update:M')),
+    ]
+
+
+class ServiceScript(crud.ResourceBase):
+    orm_meta = models_manage.ServiceScript
+    _validate = [
+        crud.ColumnValidator(field='service',
+                             rule=my_validator.LengthValidator(1, 63),
+                             validate_on=['create:M', 'update:O']),
+        crud.ColumnValidator(field='content_type',
+                             rule=my_validator.LengthValidator(1, 36),
+                             validate_on=['create:O', 'update:O'],
+                             nullable=True),
+        crud.ColumnValidator(field='content_field',
+                             rule=my_validator.LengthValidator(1, 63),
+                             validate_on=['create:O', 'update:O'],
+                             nullable=True),
+        crud.ColumnValidator(field='endpoint_field',
+                             rule=my_validator.LengthValidator(1, 63),
+                             validate_on=['create:O', 'update:O'],
+                             nullable=True),
     ]

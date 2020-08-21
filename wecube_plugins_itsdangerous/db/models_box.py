@@ -121,3 +121,14 @@ class SubjectTarget(Base, DictBase):
 
     # subject = relationship('Subject', back_populates='targets')
     # target = relationship('Target', back_populates='subjects')
+
+
+class SerivceScript(Base, DictBase):
+    __tablename__ = 'serivce_script'
+    __table_args__ = {'comment': 'serivce script extraction '}
+
+    id = Column(INTEGER(11), primary_key=True)
+    service = Column(String(63), nullable=False)
+    content_type = Column(String(36))
+    content_field = Column(String(63))
+    endpoint_field = Column(String(63))
