@@ -8,9 +8,9 @@ def test():
     data = {
         'serviceName': 'qcloud/vm(resource)/action',
         'inputParams': {
-            'script': box_data.script_shell,
             'name': 'destroy'
         },  # , 'script_type': 'shell'
+        'scripts': [{'content': box_data.script_shell}],
         'entityInstances': [{
             'data': {
                 'guid': '0032_0000000023'
@@ -26,9 +26,9 @@ def test():
     data = {
         'serviceName': 'qcloud/vm(resource)/action',
         'inputParams': {
-            'script': box_data.script_sql,
             'name': 'destroy'
         },  # , 'script_type': 'sql'
+        'scripts': [{'content': box_data.script_sql}],
         'entityInstances': [{
             'data': {
                 'guid': '0032_0000000023'
@@ -43,8 +43,8 @@ def test():
     data = {
         'serviceName': 'qcloud/vm(resource)/action',
         'inputParams': {
-            'script': box_data.script_shell
         },  # , 'script_type': 'shell'
+        'scripts': [{'content': box_data.script_shell}],
         'entityInstances': [{
             'data': {
                 'guid': '0032_0000000025'

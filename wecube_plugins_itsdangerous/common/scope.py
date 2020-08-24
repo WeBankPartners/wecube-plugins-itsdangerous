@@ -27,7 +27,7 @@ class JsonScope(object):
         :param data: dict
         '''
         if data is None:
-            return True
+            return False
         return jsonfilter.match_all(self.filters, data)
 
 
@@ -95,7 +95,7 @@ class WeCMDBScope(object):
         :param data: [{...}]
         '''
         if data is None:
-            return True
+            return False
         ci_mapping = wecmdb_ci_mapping()
         input_guids = [d['data']['guid'] for d in data]
         input_ci_id = None

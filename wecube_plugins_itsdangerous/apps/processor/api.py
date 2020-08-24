@@ -109,26 +109,37 @@ class Box(resource.Box):
         return results
 
     def check(self, data, boxes=None):
+        '''
+        data: {
+            (Optional - JsonScope check)"serviceName": "xxx", 
+            (Optional - JsonScope check)"inputParams": {...service input params}, 
+            (Must - script check)"scripts": [{"type": None/"sql"/"shell", "content": "...", "name": "additional name info"}], 
+            (Must - WeCMDBScope check)"entityInstances": [{"guid": "xxx"}, {...}]}
+        '''
+
         results = []
-        service_name = data['serviceName']
-        input_params = data['inputParams']
-        entity_instances = data['entityInstances']
-        # TODO: one or more scripts support
-        script = input_params.get('script', '') or ''
-        script_type = input_params.get('script_type', None)
-        rules = self._get_rules(data, boxes=boxes)
-        rules = self._rule_grouping(rules)
-        for key, values in rules.items():
-            if not script_type:
-                script_type = reader.guess(script) or 'text'
-            if key == 'filter':
-                results.extend(detector.JsonFilterDetector(data, values).check())
-            elif key == 'cli' and script_type == 'shell':
-                results.extend(detector.BashCliDetector(script, values).check())
-            elif key == 'sql' and script_type == 'sql':
-                results.extend(detector.SqlDetector(script, values).check())
-            elif key == 'text':
-                results.extend(detector.LineTextDetector(script, values).check())
-            elif key == 'fulltext':
-                results.extend(detector.FullTextDetector(script, values).check())
+        scripts = data['scripts']
+        for item in scripts:
+            script_name = item.get('name', '') or ''
+            script_content = item.get('content', '') or ''
+            script_type = item.get('type', None)
+            rules = self._get_rules(data, boxes=boxes)
+            rules = self._rule_grouping(rules)
+            for key, values in rules.items():
+                script_results = []
+                if not script_type:
+                    script_type = reader.guess(script_content) or 'text'
+                if key == 'filter':
+                    script_results = detector.JsonFilterDetector(data, values).check()
+                elif key == 'cli' and script_type == 'shell':
+                    script_results = detector.BashCliDetector(script_content, values).check()
+                elif key == 'sql' and script_type == 'sql':
+                    script_results = detector.SqlDetector(script_content, values).check()
+                elif key == 'text':
+                    script_results = detector.LineTextDetector(script_content, values).check()
+                elif key == 'fulltext':
+                    script_results = detector.FullTextDetector(script_content, values).check()
+                for r in script_results:
+                    r['script_name'] = script_name
+                results.extend(script_results)
         return results
