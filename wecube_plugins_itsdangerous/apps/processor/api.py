@@ -52,19 +52,20 @@ class Box(resource.Box):
         hasher = hashlib.sha256()
         hasher.update(json.dumps(data).encode('utf-8'))
         digest = hasher.hexdigest()
-        LOG.debug('scope test with data - %s', data)
+        LOG.debug('scope test with data - %s ...', str(data)[:4096])
         for b in boxes:
             LOG.debug('scope test of box[%s - %s]', b['id'], b['name'])
             subject_included = False
             for target in b['subject']['targets']:
-                LOG.debug('scope test of target[%s - %s]', target['id'], target['name'])
                 target_included = True
                 # target with the same data is cached
                 key = 'scope/target/%s/data/%s' % (target['id'], digest)
                 cached = cache.get(key, 30)
                 if cache.validate(cached):
                     target_included = cached
+                    LOG.debug('scope test of target[%s - %s]: %s', target['id'], target['name'], ('accepted' if cached else 'rejected'))
                 else:
+                    LOG.debug('scope test of target[%s - %s]', target['id'], target['name'])
                     if target['enabled']:
                         if target['args_scope'] is not None:
                             target_included = scope.JsonScope(target['args_scope']).is_match(data)
