@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 import json
 import logging
+import os.path
 import re
 
 from wecube_plugins_itsdangerous.common import clisimulator
@@ -14,6 +15,7 @@ LOG = logging.getLogger(__name__)
 
 
 class JsonFilterDetector(object):
+
     def __init__(self, content, rules):
         '''
         :param content: input params dict
@@ -38,6 +40,7 @@ class JsonFilterDetector(object):
 
 
 class BashCliDetector(object):
+
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -55,8 +58,14 @@ class BashCliDetector(object):
         for match_param in arg_params.values():
             cli_param = match_param['params']
             m_param = self.parsers.setdefault(match_param['id'], {})
-            simulators = m_param.setdefault(cli_param['name'], [])
-            simulators.append(clisimulator.Simulator(cli_param['args']))
+            m_param['name'] = cli_param['name']
+            m_param['opt_strip_path'] = cli_param.get('opt_strip_path', False)
+            m_param['simulator'] = clisimulator.Simulator(cli_param['args'])
+
+    def _command_equal(self, cmd, parser):
+        if parser['opt_strip_path']:
+            return parser['name'] == os.path.basename(cmd)
+        return parser['name'] == cmd
 
     def check(self):
         results = []
@@ -67,22 +76,21 @@ class BashCliDetector(object):
                 for rule in self.rules:
                     r_name = rule['name']
                     r_level = rule['level']
-                    if r_name.startswith('强制kill('):
-                        pass
                     r_filters = json.loads(rule['match_value'])
-                    if rule['match_param_id'] in self.parsers and cmd in self.parsers[rule['match_param_id']]:
-                        for sim in self.parsers[rule['match_param_id']][cmd]:
-                            if sim.check(args, r_filters):
-                                results.append({
-                                    'lineno': lineno,
-                                    'level': r_level,
-                                    'content': ' '.join(tokens),
-                                    'message': r_name
-                                })
+                    if rule['match_param_id'] in self.parsers and self._command_equal(cmd, self.parsers[rule['match_param_id']]):
+                        sim = self.parsers[rule['match_param_id']]['simulator']
+                        if sim.check(args, r_filters):
+                            results.append({
+                                'lineno': lineno,
+                                'level': r_level,
+                                'content': ' '.join(tokens),
+                                'message': r_name
+                            })
         return results
 
 
 class SqlDetector(object):
+
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -115,6 +123,7 @@ class SqlDetector(object):
 
 
 class FullTextDetector(object):
+
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -151,6 +160,7 @@ class FullTextDetector(object):
 
 
 class LineTextDetector(FullTextDetector):
+
     def __init__(self, content, rules):
         '''
         :param content: script content
