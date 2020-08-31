@@ -8,7 +8,6 @@ import sys
 
 from setuptools import setup, find_packages, Extension
 
-
 # To use a consistent encoding
 here = path.abspath(path.dirname(__file__))
 
@@ -18,8 +17,10 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 with open(path.join(here, 'VERSION'), encoding='utf-8') as f:
     version = f.read()
 with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
-    requirements = [line.strip()
-                    for line in f if line.strip() and not line.strip().startswith('--') and not line.strip().startswith('#')]
+    requirements = [
+        line.strip() for line in f
+        if line.strip() and not line.strip().startswith('--') and not line.strip().startswith('#')
+    ]
 
 data_files = []
 
@@ -33,7 +34,6 @@ setup(
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version=version,
-
     description='Falcon Base API Framework',
     long_description=long_description,
 
@@ -58,9 +58,7 @@ setup(
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License ',
-
         'Topic :: Software Development :: Libraries',
-
         'Framework :: Falcon',
         'Framework :: SQLAlchemy',
         'Framework :: Celery',
@@ -68,13 +66,14 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
+        # 'Programming Language :: Python :: 2',
+        # 'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        # 'Programming Language :: Python :: 3.4',
+        # 'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Operating System :: OS Independent'
     ],
 
@@ -104,15 +103,13 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    package_data={
-    },
+    package_data={},
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
     # http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files # noqa
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
     data_files=data_files,
-
     zip_safe=False,
     cmdclass=cmdclass,
     ext_modules=ext_modules,
@@ -122,7 +119,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-           'wecube_plugins_itsdangerous_server=wecube_plugins_itsdangerous.server.simple_server:main',
+            'wecube_plugins_itsdangerous_server=wecube_plugins_itsdangerous.server.simple_server:main',
         ],
     },
 )

@@ -23,17 +23,6 @@ jobs:
         pip3 install -e .[testing]
         python3.6 setup.py test
 
-    - name: Set up Python 2.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 2.7
-
-    - name: run unittest python27
-      run: |
-        pip2 install -r requirements.txt
-        pip2 install -e .[testing]
-        python2.7 setup.py test
-
     - name: build dist
       run: |
         pip3 install wheel
