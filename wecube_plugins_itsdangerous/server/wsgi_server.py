@@ -14,7 +14,6 @@ import os
 import json
 from talos.server import base
 from talos.core import utils
-from wecube_plugins_itsdangerous.server import conf_intercepter
 from talos.core import config
 
 

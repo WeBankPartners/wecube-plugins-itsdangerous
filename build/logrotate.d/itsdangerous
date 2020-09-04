@@ -1,4 +1,4 @@
-/var/log/wecube-plugins-itsdangerous/access.log /var/log/wecube-plugins-itsdangerous/error.log /var/log/wecube-plugins-itsdangerous/server.log {
+/var/log/itsdangerous/access.log /var/log/itsdangerous/error.log /var/log/itsdangerous/server.log {
     daily
     rotate 7
     missingok
