@@ -38,7 +38,7 @@ def error_serializer(req, resp, exception):
 
 application = base.initialize_server('wecube_plugins_itsdangerous',
                                      os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF',
-                                                    './etc/wecube_plugins_itsdangerous.conf'),
+                                                    '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
                                      conf_dir=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
-                                                             './etc/wecube_plugins_itsdangerous.conf.d'))
+                                                             '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'))
 application.set_error_serializer(error_serializer)

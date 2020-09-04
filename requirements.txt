@@ -5,6 +5,8 @@ talos-api
 sqlparse==0.3.1
 pymysql
 minio
+gunicorn
+gevent
 # celery
 # dogpile.cache
 # redis

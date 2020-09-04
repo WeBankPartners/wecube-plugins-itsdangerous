@@ -1,0 +1,8 @@
+/var/log/wecube-plugins-itsdangerous/access.log /var/log/wecube-plugins-itsdangerous/error.log /var/log/wecube-plugins-itsdangerous/server.log {
+    daily
+    rotate 7
+    missingok
+    create 640 app app
+    compress
+    delaycompress
+}
