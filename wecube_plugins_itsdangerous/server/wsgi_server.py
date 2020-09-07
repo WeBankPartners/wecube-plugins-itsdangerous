@@ -17,8 +17,8 @@ from talos.core import utils
 from talos.core import config
 
 
-@config.intercept('itsdangerous_db_username', 'itsdangerous_db_password', 'itsdangerous_db_hostip',
-                  'itsdangerous_db_hostport', 'itsdangerous_db_schema', 'gateway_url', 'jwt_signing_key')
+@config.intercept('db_username', 'db_password', 'db_hostip', 'db_hostport', 'db_schema', 'gateway_url',
+                  'jwt_signing_key')
 def get_env_value(value, origin_value):
     prefix = 'ENV@'
     if value.startswith(prefix):
