@@ -110,6 +110,23 @@ CREATE TABLE `rule` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `service_script`
+--
+
+DROP TABLE IF EXISTS `service_script`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `service_script` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service` varchar(63) NOT NULL,
+  `content_type` varchar(36) DEFAULT NULL,
+  `content_field` varchar(63) DEFAULT NULL,
+  `endpoint_field` varchar(63) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='serivce script extraction ';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `subject`
 --
 
@@ -170,4 +187,4 @@ CREATE TABLE `target` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-08-12 15:46:53
+-- Dump completed on 2020-09-07 16:17:04
