@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package name="wecube-plugins-itsdangerous" version="{{PLUGIN_VERSION}}">
+<package name="itsdangerous" version="{{PLUGIN_VERSION}}">
     <!-- 1.依赖分析 - 描述运行本插件包需要的其他插件包 -->
     <packageDependencies>
         <packageDependency name="wecmdb" version="v1.5.0" />
