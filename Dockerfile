@@ -21,8 +21,8 @@ RUN apt-get -y install gcc python3-dev && \
 RUN mkdir -p /etc/itsdangerous/
 RUN mkdir -p /var/log/itsdangerous/
 ADD etc/* /etc/itsdangerous/
-RUN adduser --disabled-password app
-RUN chown -R app:app /etc/itsdangerous/
-RUN chown -R app:app /var/log/itsdangerous/
-USER app
+# RUN adduser --disabled-password app
+# RUN chown -R app:app /etc/itsdangerous/
+# RUN chown -R app:app /var/log/itsdangerous/
+# USER app
 CMD ["/usr/local/bin/gunicorn", "--config", "/etc/itsdangerous/gunicorn.py", "wecube_plugins_itsdangerous.server.wsgi_server:application"]
