@@ -6,7 +6,6 @@ import os
 from talos.server import base
 # from talos.core import config
 
-
 # @config.intercept('db_password', 'other_password')
 # def get_password(value, origin_value):
 #     """value为上一个拦截器处理后的值（若此函数为第一个拦截器，等价于origin_value）
@@ -17,9 +16,10 @@ from talos.server import base
 #     # 演示使用不安全的base64，请使用你认为安全的算法进行处理
 #     return base64.b64decode(origin_value)
 
-
-base.initialize_config(os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF', './etc/wecube_plugins_itsdangerous.conf'),
-                       dir_path=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR', './etc/wecube_plugins_itsdangerous.conf.d'))
+base.initialize_config(os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF',
+                                      '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
+                       dir_path=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
+                                               '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'))
 base.initialize_logger()
 base.initialize_i18n('wecube_plugins_itsdangerous')
 # not allowed database connections by default, if you want to use db features, pls remove '#'
@@ -27,5 +27,3 @@ base.initialize_i18n('wecube_plugins_itsdangerous')
 # import celery later, after initialize config
 from talos.common import celery
 app = celery.app
-
-

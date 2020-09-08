@@ -14,12 +14,11 @@ import os
 import json
 from talos.server import base
 from talos.core import utils
-from wecube_plugins_itsdangerous.server import conf_intercepter
 from talos.core import config
 
 
-@config.intercept('itsdangerous_db_username', 'itsdangerous_db_password', 'itsdangerous_db_hostip',
-                  'itsdangerous_db_hostport', 'itsdangerous_db_schema', 'gateway_url', 'jwt_signing_key')
+@config.intercept('db_username', 'db_password', 'db_hostip', 'db_hostport', 'db_schema', 'gateway_url',
+                  'jwt_signing_key')
 def get_env_value(value, origin_value):
     prefix = 'ENV@'
     if value.startswith(prefix):
@@ -38,7 +37,7 @@ def error_serializer(req, resp, exception):
 
 application = base.initialize_server('wecube_plugins_itsdangerous',
                                      os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF',
-                                                    './etc/wecube_plugins_itsdangerous.conf'),
+                                                    '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
                                      conf_dir=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
-                                                             './etc/wecube_plugins_itsdangerous.conf.d'))
+                                                             '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'))
 application.set_error_serializer(error_serializer)
