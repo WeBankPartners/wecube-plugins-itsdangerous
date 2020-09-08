@@ -1,7 +1,8 @@
+SET FOREIGN_KEY_CHECKS = 0;
 --
 -- Table structure for table `policy`
 --
-
+DROP TABLE IF EXISTS `policy`;
 CREATE TABLE `policy` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
@@ -14,7 +15,7 @@ CREATE TABLE `policy` (
 --
 -- Table structure for table `subject`
 --
-
+DROP TABLE IF EXISTS `subject`;
 CREATE TABLE `subject` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
@@ -27,7 +28,7 @@ CREATE TABLE `subject` (
 --
 -- Table structure for table `box`
 --
-
+DROP TABLE IF EXISTS `box`;
 CREATE TABLE `box` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
@@ -45,7 +46,7 @@ CREATE TABLE `box` (
 --
 -- Table structure for table `match_param`
 --
-
+DROP TABLE IF EXISTS `match_param`;
 CREATE TABLE `match_param` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
@@ -59,7 +60,7 @@ CREATE TABLE `match_param` (
 --
 -- Table structure for table `rule`
 --
-
+DROP TABLE IF EXISTS `rule`;
 CREATE TABLE `rule` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
@@ -77,7 +78,7 @@ CREATE TABLE `rule` (
 --
 -- Table structure for table `policy_rule`
 --
-
+DROP TABLE IF EXISTS `policy_rule`;
 CREATE TABLE `policy_rule` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `policy_id` int(11) unsigned NOT NULL,
@@ -92,7 +93,7 @@ CREATE TABLE `policy_rule` (
 --
 -- Table structure for table `service_script`
 --
-
+DROP TABLE IF EXISTS `service_script`;
 CREATE TABLE `service_script` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `service` varchar(63) NOT NULL,
@@ -106,7 +107,7 @@ CREATE TABLE `service_script` (
 --
 -- Table structure for table `target`
 --
-
+DROP TABLE IF EXISTS `target`;
 CREATE TABLE `target` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
@@ -120,7 +121,7 @@ CREATE TABLE `target` (
 --
 -- Table structure for table `subject_target`
 --
-
+DROP TABLE IF EXISTS `subject_target`;
 CREATE TABLE `subject_target` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `subject_id` int(11) unsigned NOT NULL,
@@ -132,3 +133,4 @@ CREATE TABLE `subject_target` (
   CONSTRAINT `fkey_subject_target_target_id` FOREIGN KEY (`target_id`) REFERENCES `target` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+SET FOREIGN_KEY_CHECKS = 1;
