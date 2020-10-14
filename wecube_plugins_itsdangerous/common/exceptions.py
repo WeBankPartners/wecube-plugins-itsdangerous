@@ -7,6 +7,7 @@ wecube_plugins_itsdangerous.common.exceptions
 
 """
 
+from talos.core.i18n import _
 from talos.core import exceptions as core_ex
 
 
