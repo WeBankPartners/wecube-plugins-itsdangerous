@@ -10,7 +10,7 @@ LABEL maintainer = "Webank CTB Team"
 ADD requirements.txt /tmp/requirements.txt
 ADD dist/* /tmp/
 # Install && Clean up
-RUN apt-get -y install gcc python3-dev && \
+RUN apt update && apt-get -y install gcc python3-dev && \
     pip3 install -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com -r /tmp/requirements.txt && \
     pip3 install /tmp/*.whl && \
     find /usr/local/lib/python3.6 -name '*.pyc' -delete && \
