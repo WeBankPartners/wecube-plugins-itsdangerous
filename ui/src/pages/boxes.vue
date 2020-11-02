@@ -6,46 +6,26 @@
 </template>
 
 <script>
-import { addRule, getTableData, editRule, deleteRule } from '@/api/server'
+import { addBoxes, getTableData, editBoxes, deleteBoxes } from '@/api/server'
 let tableEle = [
   {
-    title: 'hr_name',
-    value: 'name',
+    title: 'service',
+    value: 'service',
     display: true
   },
   {
-    title: 'hr_description',
-    value: 'description',
+    title: 'content_type',
+    value: 'content_type',
     display: true
   },
   {
-    title: 'hr_enabled',
-    value: 'enabled',
+    title: 'content_field',
+    value: 'content_field',
     display: true
   },
   {
-    title: 'hr_level',
-    value: 'level',
-    display: true
-  },
-  {
-    title: 'effect_on',
-    value: 'effect_on',
-    display: true
-  },
-  {
-    title: 'match_type',
-    value: 'match_type',
-    display: true
-  },
-  {
-    title: 'match_value',
-    value: 'match_value',
-    display: true
-  },
-  {
-    title: 'match_param_id',
-    value: 'match_param_id',
+    title: 'endpoint_field',
+    value: 'endpoint_field',
     display: true
   }
 ]
@@ -58,7 +38,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: '/rules',
+        CRUD: '/boxes',
         researchConfig: {
           input_conditions: [
             {
@@ -103,39 +83,31 @@ export default {
       },
       modelConfig: {
         modalId: 'add_edit_Modal',
-        modalTitle: 'hr_policies',
+        modalTitle: '试盒',
         isAdd: true,
         config: [
           {
-            label: 'hr_name',
-            value: 'name',
+            label: 'service',
+            value: 'service',
             placeholder: 'tips.inputRequired',
             v_validate: 'required:true|min:2|max:60',
             disabled: false,
             type: 'text'
           },
-          { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          { label: 'hr_level', value: 'level', placeholder: '', disabled: false, type: 'text' },
-          { label: 'effect_on', value: 'effect_on', placeholder: '', disabled: false, type: 'text' },
-          { label: 'match_type', value: 'match_type', placeholder: '', disabled: false, type: 'text' },
-          { label: 'match_value', value: 'match_value', placeholder: '', disabled: false, type: 'text' },
-          { label: 'match_param_id', value: 'match_param_id', placeholder: '', disabled: false, type: 'text' },
-          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
+          { label: 'content_type', value: 'content_type', placeholder: '', disabled: false, type: 'text' },
+          { label: 'content_field', value: 'content_field', placeholder: '', disabled: false, type: 'text' },
+          { label: 'endpoint_field', value: 'endpoint_field', placeholder: '', disabled: false, type: 'text' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
-          name: null,
-          description: null,
-          enabled: false,
-          level: 0,
-          effect_on: '',
-          match_type: '',
-          match_value: '',
-          match_param_id: ''
+          service: null,
+          content_type: null,
+          content_field: null,
+          endpoint_field: null
         }
       },
       modelTip: {
-        key: 'name',
+        key: 'service',
         value: null
       },
       id: ''
@@ -175,7 +147,7 @@ export default {
     },
     async addPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
-      const { status, message } = await addRule([this.modelConfig.addRow])
+      const { status, message } = await addBoxes([this.modelConfig.addRow])
       if (status === 'OK') {
         this.initData()
         this.$Message.success(message)
@@ -193,7 +165,7 @@ export default {
     },
     async editPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
-      const { status, message } = await editRule(this.id, this.modelConfig.addRow)
+      const { status, message } = await editBoxes(this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initData()
         this.$Message.success(message)
@@ -202,10 +174,10 @@ export default {
     },
     deleteConfirmModal (rowData) {
       this.$Modal.confirm({
-        title: 123,
+        title: this.$t(this.modelConfig.modalTitle),
         'z-index': 1000000,
         onOk: async () => {
-          const { status, message } = await deleteRule(rowData.id)
+          const { status, message } = await deleteBoxes(rowData.id)
           if (status === 'OK') {
             this.initData()
             this.$Message.success(message)

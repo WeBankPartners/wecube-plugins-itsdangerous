@@ -194,5 +194,6 @@
   "hr_policies": "策略",
   "hr_enabled": "启用",
   "hr_description": "描述",
-  "hr_name": "名称"
+  "hr_name": "名称",
+  "hr_level": "级别"
 }

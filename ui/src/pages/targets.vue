@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { addRule, getTableData, editRule, deleteRule } from '@/api/server'
+import { addTargets, getTableData, editTargets, deleteTargets } from '@/api/server'
 let tableEle = [
   {
     title: 'hr_name',
@@ -14,38 +14,18 @@ let tableEle = [
     display: true
   },
   {
-    title: 'hr_description',
-    value: 'description',
+    title: 'args_scope',
+    value: 'args_scope',
+    display: true
+  },
+  {
+    title: 'entity_scope',
+    value: 'entity_scope',
     display: true
   },
   {
     title: 'hr_enabled',
     value: 'enabled',
-    display: true
-  },
-  {
-    title: 'hr_level',
-    value: 'level',
-    display: true
-  },
-  {
-    title: 'effect_on',
-    value: 'effect_on',
-    display: true
-  },
-  {
-    title: 'match_type',
-    value: 'match_type',
-    display: true
-  },
-  {
-    title: 'match_value',
-    value: 'match_value',
-    display: true
-  },
-  {
-    title: 'match_param_id',
-    value: 'match_param_id',
     display: true
   }
 ]
@@ -58,7 +38,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: '/rules',
+        CRUD: '/targets',
         researchConfig: {
           input_conditions: [
             {
@@ -103,7 +83,7 @@ export default {
       },
       modelConfig: {
         modalId: 'add_edit_Modal',
-        modalTitle: 'hr_policies',
+        modalTitle: '目标对象',
         isAdd: true,
         config: [
           {
@@ -114,24 +94,16 @@ export default {
             disabled: false,
             type: 'text'
           },
-          { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          { label: 'hr_level', value: 'level', placeholder: '', disabled: false, type: 'text' },
-          { label: 'effect_on', value: 'effect_on', placeholder: '', disabled: false, type: 'text' },
-          { label: 'match_type', value: 'match_type', placeholder: '', disabled: false, type: 'text' },
-          { label: 'match_value', value: 'match_value', placeholder: '', disabled: false, type: 'text' },
-          { label: 'match_param_id', value: 'match_param_id', placeholder: '', disabled: false, type: 'text' },
+          { label: 'args_scope', value: 'args_scope', placeholder: '', disabled: false, type: 'text' },
+          { label: 'entity_scope', value: 'entity_scope', placeholder: '', disabled: false, type: 'text' },
           { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           name: null,
-          description: null,
-          enabled: false,
-          level: 0,
-          effect_on: '',
-          match_type: '',
-          match_value: '',
-          match_param_id: ''
+          args_scope: null,
+          entity_scope: null,
+          enabled: false
         }
       },
       modelTip: {
@@ -175,7 +147,7 @@ export default {
     },
     async addPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
-      const { status, message } = await addRule([this.modelConfig.addRow])
+      const { status, message } = await addTargets([this.modelConfig.addRow])
       if (status === 'OK') {
         this.initData()
         this.$Message.success(message)
@@ -187,13 +159,14 @@ export default {
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
       this.modelConfig.addRow.name = rowData.name
-      this.modelConfig.addRow.description = rowData.description
+      this.modelConfig.addRow.args_scope = rowData.args_scope
+      this.modelConfig.addRow.entity_scope = rowData.entity_scope
       this.modelConfig.addRow.enabled = rowData.enabled
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
-      const { status, message } = await editRule(this.id, this.modelConfig.addRow)
+      const { status, message } = await editTargets(this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initData()
         this.$Message.success(message)
@@ -202,10 +175,10 @@ export default {
     },
     deleteConfirmModal (rowData) {
       this.$Modal.confirm({
-        title: 123,
+        title: this.$t(this.modelConfig.modalTitle),
         'z-index': 1000000,
         onOk: async () => {
-          const { status, message } = await deleteRule(rowData.id)
+          const { status, message } = await deleteTargets(rowData.id)
           if (status === 'OK') {
             this.initData()
             this.$Message.success(message)

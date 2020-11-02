@@ -167,7 +167,7 @@ export default {
     },
     deleteConfirmModal (rowData) {
       this.$Modal.confirm({
-        title: 123,
+        title: this.$t(this.modelConfig.modalTitle),
         'z-index': 1000000,
         onOk: async () => {
           const { status, message } = await deletePolicies(rowData.id)

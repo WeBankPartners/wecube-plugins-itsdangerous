@@ -32,32 +32,32 @@ export default new Router({
               component: () => import('@/pages/rule')
             },
             {
-              path: 'test3',
-              name: 'test3',
+              path: 'subjects',
+              name: 'subjects',
               title: '阈值配置',
               meta: {},
-              component: () => import('@/pages/test3')
+              component: () => import('@/pages/subjects')
             },
             {
-              path: 'test4',
-              name: 'test4',
+              path: 'targets',
+              name: 'targets',
               title: '关键字配置',
               meta: {},
-              component: () => import('@/pages/test4')
+              component: () => import('@/pages/targets')
             },
             {
-              path: 'test5',
-              name: 'test5',
+              path: 'match-params',
+              name: 'match-params',
               title: '资源层级',
               meta: {},
-              component: () => import('@/pages/test5')
+              component: () => import('@/pages/match-params')
             },
             {
-              path: 'test6',
-              name: 'test6',
+              path: 'boxes',
+              name: 'boxes',
               title: '资源层级',
               meta: {},
-              component: () => import('@/pages/test6')
+              component: () => import('@/pages/boxes')
             }
           ]
         }

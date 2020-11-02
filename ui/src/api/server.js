@@ -167,3 +167,23 @@ export const getTableData = url => req.get(url)
 export const addPolicies = data => req.post('/policies', data)
 export const editPolicies = (id, data) => req.patch(`/policies/${id}`, data)
 export const deletePolicies = id => req.delete(`/policies/${id}`)
+
+export const addRule = data => req.post('/rules', data)
+export const editRule = (id, data) => req.patch(`/rules/${id}`, data)
+export const deleteRule = id => req.delete(`/rules/${id}`)
+
+export const addSubjects = data => req.post('/subjects', data)
+export const editSubjects = (id, data) => req.patch(`/subjects/${id}`, data)
+export const deleteSubjects = id => req.delete(`/subjects/${id}`)
+
+export const addTargets = data => req.post('/targets', data)
+export const editTargets = (id, data) => req.patch(`/targets/${id}`, data)
+export const deleteTargets = id => req.delete(`/targets/${id}`)
+
+export const addMatchParams = data => req.post('/matchparams', data)
+export const editMatchParams = (id, data) => req.patch(`/matchparams/${id}`, data)
+export const deleteMatchParams = id => req.delete(`/matchparams/${id}`)
+
+export const addBoxes = data => req.post('/boxes', data)
+export const editBoxes = (id, data) => req.patch(`/boxes/${id}`, data)
+export const deleteBoxes = id => req.delete(`/boxes/${id}`)
