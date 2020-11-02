@@ -65,7 +65,7 @@ def error_serializer(req, resp, exception):
 
 application = base.initialize_server('wecube_plugins_itsdangerous',
                                      os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF',
-                                                    './etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
+                                                    '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
                                      conf_dir=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
                                                              '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'),
                                      middlewares=[auth.JWTAuth()])
