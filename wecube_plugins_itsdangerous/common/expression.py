@@ -10,6 +10,7 @@ import json
 import re
 
 from talos.core import utils
+from wecube_plugins_itsdangerous.common import exceptions
 
 R_SINGLE_FILTER = re.compile('\{([_a-zA-Z][_a-zA-Z0-9.]*)\s+([a-zA-Z]+)\s+([^}]+)\}')
 R_SEG_EXPRESSION = re.compile(
@@ -121,7 +122,7 @@ def expr_seg_parse(expr):
         }
         result['filters'] = expr_filter_parse(result['filters'])
         return result
-    raise ValueError('invalid expression: ' + expr)
+    raise exceptions.PluginError('invalid expression: ' + expr)
 
 
 def expr_parse(expr):
