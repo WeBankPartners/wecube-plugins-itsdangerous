@@ -120,6 +120,7 @@ setup(
     entry_points={
         'console_scripts': [
             'wecube_plugins_itsdangerous_server=wecube_plugins_itsdangerous.server.simple_server:main',
+            'wecube_plugins_itsdangerous_scheduler=wecube_plugins_itsdangerous.server.scheduler:main',
         ],
     },
 )
