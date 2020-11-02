@@ -16,6 +16,8 @@ import tempfile
 import time
 import requests
 import functools
+import base64
+import binascii
 
 from talos.core import config
 from talos.core import exceptions as base_ex
@@ -176,3 +178,16 @@ class RestfulJson(object):
         resp = requests.put(url, **kwargs)
         resp.raise_for_status()
         return RestfulJson.get_response_json(resp)
+
+
+def b64decode_key(key):
+    new_key = key
+    max_padding = 3
+    while max_padding > 0:
+        try:
+            return base64.b64decode(new_key)
+        except binascii.Error as e:
+            new_key += '='
+            max_padding -= 1
+            if max_padding <= 0:
+                raise e

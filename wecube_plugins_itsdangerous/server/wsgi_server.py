@@ -9,7 +9,6 @@ wecube_plugins_itsdangerous.server.wsgi_server
 
 from __future__ import absolute_import
 
-import base64
 import os
 import json
 from Crypto import Random
@@ -19,6 +18,7 @@ from talos.server import base
 from talos.core import utils
 from talos.core import config
 
+from wecube_plugins_itsdangerous.common import utils
 from wecube_plugins_itsdangerous.middlewares import auth
 
 RAS_KEY_PATH = '/certs/ras_key'
@@ -28,7 +28,7 @@ def decrypt_ras(secret_key, encrypt_text):
     rsakey = RSA.importKey(secret_key)
     cipher = Cipher_pkcs1_v1_5.new(rsakey)
     random_generator = Random.new().read
-    text = cipher.decrypt(base64.b64decode(encrypt_text), random_generator)
+    text = cipher.decrypt(utils.b64decode_key(encrypt_text), random_generator)
     return text.decode('utf-8')
 
 
@@ -57,7 +57,7 @@ def error_serializer(req, resp, exception):
     if 'error_code' in representation:
         representation['code'] = representation.pop('error_code')
     representation['status'] = 'ERROR'
-    representation['data'] = None
+    representation['data'] = representation.get('data', None)
     representation['message'] = representation.pop('description', '')
     resp.body = json.dumps(representation, cls=utils.ComplexEncoder)
     resp.content_type = 'application/json'
