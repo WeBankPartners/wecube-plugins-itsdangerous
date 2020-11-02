@@ -11,15 +11,15 @@ export const req = axios.create({
 const throwError = res => new Error(res.message || 'error')
 req.interceptors.response.use(
   res => {
-    if (res.data.code === 200) {
+    if (res.status === 200) {
       if (res.data.status.startsWith('ERR')) {
         const errorMes = Array.isArray(res.data.data)
-          ? res.data.data.map(_ => _.errorMessage).join('<br/>')
-          : res.data.statusMessage
+          ? res.data.data.map(_ => _.message).join('<br/>')
+          : res.data.message
         Vue.prototype.$Notice.error({
           title: 'Error',
           desc: errorMes,
-          duration: 0
+          duration: 10
         })
       }
       return {

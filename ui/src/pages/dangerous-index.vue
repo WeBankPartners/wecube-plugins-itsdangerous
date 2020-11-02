@@ -17,14 +17,14 @@ export default {
   name: '',
   data () {
     return {
-      activeTab: '/homepage/policy',
+      activeTab: '/dangerousIndex/policy',
       tabs: [
-        { label: '策略', path: '/homepage/policy' },
-        { label: '规则', path: '/homepage/rule' },
-        { label: '角色', path: '/homepage/subjects' },
-        { label: '目标对象', path: '/homepage/targets' },
-        { label: '调用参数', path: '/homepage/match-params' },
-        { label: '试盒', path: '/homepage/boxes' }
+        { label: '策略', path: '/dangerousIndex/policy' },
+        { label: '规则', path: '/dangerousIndex/rule' },
+        { label: '角色', path: '/dangerousIndex/subjects' },
+        { label: '目标对象', path: '/dangerousIndex/targets' },
+        { label: '调用参数', path: '/dangerousIndex/match-params' },
+        { label: '试盒', path: '/dangerousIndex/boxes' }
       ]
     }
   },

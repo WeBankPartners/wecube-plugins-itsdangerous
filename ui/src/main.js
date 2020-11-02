@@ -32,22 +32,6 @@ Vue.use(ViewUI, {
   locale
 })
 
-// Vue.use(VueHighlightJS)
-
-router.beforeEach((to, from, next) => {
-  if (window.myMenus) {
-    let hasPermission = [].concat(...window.myMenus.map(_ => _.submenus)).find(_ => _.link === to.path)
-    if (hasPermission || to.path === '/homepage' || to.path.startsWith('/setting') || to.path === '/404') {
-      /* has permission */
-      next()
-    } else {
-      /* has no permission */
-      next('/404')
-    }
-  } else {
-    next()
-  }
-})
 new Vue({
   router,
   render: h => h(App)

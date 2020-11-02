@@ -6,14 +6,14 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'IndexPage',
-      redirect: '/homepage/policy',
+      name: 'dangerousIndex',
+      redirect: '/dangerousIndex/policy',
       component: () => import('@/pages/index'),
       children: [
         {
-          path: '/homepage',
-          name: 'homepage',
-          component: () => import('@/pages/home-page'),
+          path: '/dangerousIndex',
+          name: 'dangerousIndex',
+          component: () => import('@/pages/dangerous-index'),
           params: {},
           props: true,
           children: [
