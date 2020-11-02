@@ -1,9 +1,5 @@
-import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import Vue from 'vue'
-import VueHighlightJS from 'vue-highlight.js'
-import 'vue-highlight.js/lib/allLanguages'
-import 'highlight.js/styles/default.css'
 import App from './App.vue'
 import router from './router'
 import ViewUI from 'view-design'
@@ -36,7 +32,7 @@ Vue.use(ViewUI, {
   locale
 })
 
-Vue.use(VueHighlightJS)
+// Vue.use(VueHighlightJS)
 
 router.beforeEach((to, from, next) => {
   if (window.myMenus) {

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { addPolicies, getTableData, editPolicies, deletePolicies } from '@/api/server'
+import { getTableData, addTableRow, editTableRow, deleteTableRow } from '@/api/server'
 let tableEle = [
   {
     title: 'hr_name',
@@ -33,7 +33,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: '/policies',
+        CRUD: 'policies',
         researchConfig: {
           input_conditions: [
             {
@@ -140,7 +140,7 @@ export default {
     },
     async addPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
-      const { status, message } = await addPolicies([this.modelConfig.addRow])
+      const { status, message } = await addTableRow(this.pageConfig.CRUD, [this.modelConfig.addRow])
       if (status === 'OK') {
         this.initData()
         this.$Message.success(message)
@@ -158,7 +158,7 @@ export default {
     },
     async editPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
-      const { status, message } = await editPolicies(this.id, this.modelConfig.addRow)
+      const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initData()
         this.$Message.success(message)
@@ -170,7 +170,7 @@ export default {
         title: this.$t(this.modelConfig.modalTitle),
         'z-index': 1000000,
         onOk: async () => {
-          const { status, message } = await deletePolicies(rowData.id)
+          const { status, message } = await deleteTableRow(this.pageConfig.CRUD, rowData.id)
           if (status === 'OK') {
             this.initData()
             this.$Message.success(message)
