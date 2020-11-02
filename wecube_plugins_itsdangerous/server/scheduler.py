@@ -88,8 +88,10 @@ def rotate_log():
 
 
 def main():
-    config.setup(os.environ.get('ARTIFACTS_COREPY_CONF', '/etc/artifacts_corepy/artifacts_corepy.conf'),
-                 dir_path=os.environ.get('ARTIFACTS_COREPY_CONF_DIR', '/etc/artifacts_corepy/artifacts_corepy.conf.d'))
+    config.setup(os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF',
+                                '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
+                 dir_path=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
+                                         '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'))
     mylogger.setup()
     scheduler = BlockingScheduler(jobstores=jobstores,
                                   executors=executors,
