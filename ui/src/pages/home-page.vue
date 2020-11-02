@@ -17,10 +17,10 @@ export default {
   name: '',
   data () {
     return {
-      activeTab: '/homepage/test1',
+      activeTab: '/homepage/policy',
       tabs: [
-        { label: '策略', path: '/homepage/test1' },
-        { label: '规则', path: '/homepage/test2' },
+        { label: '策略', path: '/homepage/policy' },
+        { label: '规则', path: '/homepage/rule' },
         { label: '角色', path: '/homepage/test3' },
         { label: '目标对象', path: '/homepage/test4' },
         { label: '调用参数', path: '/homepage/test5' },

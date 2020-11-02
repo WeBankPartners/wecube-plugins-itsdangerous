@@ -7,7 +7,7 @@ export default new Router({
     {
       path: '/',
       name: 'IndexPage',
-      redirect: '/homepage/test1',
+      redirect: '/homepage/policy',
       component: () => import('@/pages/index'),
       children: [
         {
@@ -18,18 +18,18 @@ export default new Router({
           props: true,
           children: [
             {
-              path: 'test1',
-              name: 'test1',
+              path: 'policy',
+              name: 'policy',
               title: '对象管理',
               meta: {},
-              component: () => import('@/pages/test1')
+              component: () => import('@/pages/policy')
             },
             {
-              path: 'test2',
-              name: 'test2',
+              path: 'rule',
+              name: 'rule',
               title: '组管理',
               meta: {},
-              component: () => import('@/pages/test2')
+              component: () => import('@/pages/rule')
             },
             {
               path: 'test3',

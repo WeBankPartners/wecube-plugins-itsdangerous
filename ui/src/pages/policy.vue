@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { addPolicies, getTableData } from '@/api/server'
+import { addPolicies, getTableData, editPolicies, deletePolicies } from '@/api/server'
 let tableEle = [
   {
     title: 'hr_name',
@@ -24,7 +24,10 @@ let tableEle = [
     display: true
   }
 ]
-const btn = []
+const btn = [
+  { btn_name: 'button.edit', btn_func: 'editF' },
+  { btn_name: 'button.remove', btn_func: 'deleteConfirmModal' }
+]
 export default {
   name: '',
   data () {
@@ -61,7 +64,7 @@ export default {
         table: {
           tableData: [],
           tableEle: tableEle,
-          filterMoreBtn: 'filterMoreBtn',
+          // filterMoreBtn: 'filterMoreBtn',
           primaryKey: 'guid',
           btn: btn,
           pagination: this.pagination,
@@ -75,7 +78,7 @@ export default {
       },
       modelConfig: {
         modalId: 'add_edit_Modal',
-        modalTitle: 'title.groupAdd',
+        modalTitle: 'hr_policies',
         isAdd: true,
         config: [
           {
@@ -95,7 +98,12 @@ export default {
           description: null,
           enabled: false
         }
-      }
+      },
+      modelTip: {
+        key: 'name',
+        value: null
+      },
+      id: ''
     }
   },
   mounted () {
@@ -127,15 +135,49 @@ export default {
       }
     },
     add () {
+      this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
+      this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
       const { status, message } = await addPolicies([this.modelConfig.addRow])
       if (status === 'OK') {
         this.initData()
         this.$Message.success(message)
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
+    },
+    editF (rowData) {
+      this.id = rowData.id
+      this.modelConfig.isAdd = false
+      this.modelTip.value = rowData[this.modelTip.key]
+      this.modelConfig.addRow.name = rowData.name
+      this.modelConfig.addRow.description = rowData.description
+      this.modelConfig.addRow.enabled = rowData.enabled
+      this.$root.JQ('#add_edit_Modal').modal('show')
+    },
+    async editPost () {
+      this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
+      const { status, message } = await editPolicies(this.id, this.modelConfig.addRow)
+      if (status === 'OK') {
+        this.initData()
+        this.$Message.success(message)
+        this.$root.JQ('#add_edit_Modal').modal('hide')
+      }
+    },
+    deleteConfirmModal (rowData) {
+      this.$Modal.confirm({
+        title: 123,
+        'z-index': 1000000,
+        onOk: async () => {
+          const { status, message } = await deletePolicies(rowData.id)
+          if (status === 'OK') {
+            this.initData()
+            this.$Message.success(message)
+          }
+        },
+        onCancel: () => {}
+      })
     }
   },
   components: {}

@@ -191,6 +191,7 @@
   "realTimeAlarm": "Real-time Alarm",
   "clearAll": "Clear All",
 
+  "hr_policies": "Policies",
   "hr_enabled": "Enabled",
   "hr_description": "Description",
   "hr_name": "Name"

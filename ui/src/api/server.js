@@ -165,3 +165,5 @@ export const getWecubeRoles = () => window.request.get('platform/v1/roles/retrie
 
 export const getTableData = url => req.get(url)
 export const addPolicies = data => req.post('/policies', data)
+export const editPolicies = (id, data) => req.patch(`/policies/${id}`, data)
+export const deletePolicies = id => req.delete(`/policies/${id}`)
