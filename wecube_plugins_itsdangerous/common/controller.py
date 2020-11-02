@@ -106,7 +106,10 @@ class Item(ItemController):
     def on_patch(self, req, resp, **kwargs):
         self._validate_method(req)
         self._validate_data(req)
-        ref_before, ref_after = self.update(req, req.json, **kwargs)
+        data = req.json
+        if data is not None and not isinstance(data, dict):
+            raise exceptions.PluginError(_('data must be dict type'))
+        ref_before, ref_after = self.update(req, data, **kwargs)
         if ref_after is not None:
             resp.json = {'code': 200, 'status': 'OK', 'data': ref_after, 'message': 'success'}
         else:

@@ -76,7 +76,7 @@ class NotFoundError(PluginError):
 
 class BatchPartialError(PluginError):
     """批量数据操作异常"""
-    code = 400
+    code = 200
     error_code = 40005
 
     @property

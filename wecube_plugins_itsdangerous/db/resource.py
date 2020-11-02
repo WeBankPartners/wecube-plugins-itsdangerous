@@ -12,7 +12,6 @@ from wecube_plugins_itsdangerous.db import validator as my_validator
 
 
 class BackRefValidator(validator.NullValidator):
-
     def __init__(self, cls_res):
         self.cls_res = cls_res
 
