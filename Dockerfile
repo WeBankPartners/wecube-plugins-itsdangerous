@@ -1,12 +1,12 @@
 FROM python:3.6-slim
 LABEL maintainer = "Webank CTB Team"
 # Install logrotate
-RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
-RUN sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
-RUN apt update && apt -y install --no-install-recommends logrotate
+# RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+# RUN sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+# RUN apt update && apt -y install --no-install-recommends logrotate
 # Copy logrotate configuration
-COPY build/logrotate.d/itsdangerous /etc/logrotate.d/
-RUN service cron start
+# COPY build/logrotate.d/itsdangerous /etc/logrotate.d/
+# RUN service cron start
 ADD requirements.txt /tmp/requirements.txt
 ADD dist/* /tmp/
 # Install && Clean up
@@ -25,4 +25,6 @@ ADD etc/* /etc/itsdangerous/
 # RUN chown -R app:app /etc/itsdangerous/
 # RUN chown -R app:app /var/log/itsdangerous/
 # USER app
-CMD ["/usr/local/bin/gunicorn", "--config", "/etc/itsdangerous/gunicorn.py", "wecube_plugins_itsdangerous.server.wsgi_server:application"]
+ADD build/start_all.sh /scripts/start_all.sh
+RUN chmod +x /scripts/start_all.sh
+CMD ["/bin/sh","-c","/scripts/start_all.sh"]
