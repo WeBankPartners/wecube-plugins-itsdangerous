@@ -1,8 +1,8 @@
 FROM python:3.6-slim
 LABEL maintainer = "Webank CTB Team"
 # Install logrotate
-# RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
-# RUN sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+RUN sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
 # RUN apt update && apt -y install --no-install-recommends logrotate
 # Copy logrotate configuration
 # COPY build/logrotate.d/itsdangerous /etc/logrotate.d/
