@@ -6,7 +6,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'dangerousIndex',
+      name: '/',
       redirect: '/dangerousIndex/policy',
       component: () => import('@/pages/index'),
       children: [

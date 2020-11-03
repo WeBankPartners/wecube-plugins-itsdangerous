@@ -19,13 +19,13 @@ export default {
     return {
       activeTab: '/dangerousIndex/policy',
       tabs: [
+        { label: 'hr_box', path: '/dangerousIndex/boxes' },
         { label: 'hr_policies', path: '/dangerousIndex/policy' },
         { label: 'hr_rule', path: '/dangerousIndex/rule' },
+        { label: 'hr_match_params', path: '/dangerousIndex/match-params' },
         { label: 'hr_subject', path: '/dangerousIndex/subjects' },
         { label: 'hr_target', path: '/dangerousIndex/targets' },
-        { label: 'hr_match_params', path: '/dangerousIndex/match-params' },
-        { label: 'hr_plugin_params', path: '/dangerousIndex/plugin-params' },
-        { label: 'hr_box', path: '/dangerousIndex/boxes' }
+        { label: 'hr_plugin_params', path: '/dangerousIndex/plugin-params' }
       ]
     }
   },

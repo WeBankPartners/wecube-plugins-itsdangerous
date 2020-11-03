@@ -67,7 +67,6 @@
   },
   "button": {
     "MoM": "同环比",
-    "Logout": "注销",
     "search": "搜索",
     "add": "新增",
     "edit": "编辑",
@@ -209,5 +208,9 @@
   "entity_scope": "实体类型",
   "hr_match_params": "调用参数",
   "hr_plugin_params": "插件参数",
-  "params": "参数"
+  "params": "参数",
+  "service": "插件",
+  "content_type": "脚本类型",
+  "content_field": "脚本字段",
+  "endpoint_field": "脚本地址"
 }

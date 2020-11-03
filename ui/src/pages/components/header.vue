@@ -1,6 +1,5 @@
 <template>
   <Header>
-    <span class="header-title">{{ $t('header_title') }}</span>
     <div class="menus">
       <Menu mode="horizontal" theme="dark">
         <Submenu v-for="menu in menus" :name="menu.code" :key="menu.code">
@@ -14,20 +13,6 @@
       </Menu>
     </div>
     <div class="header-right_container">
-      <div class="profile">
-        <Dropdown>
-          <span style="color: white">{{ user }}</span>
-          <Icon :size="18" type="md-arrow-dropdown"></Icon>
-          <DropdownMenu slot="list">
-            <DropdownItem name="logout" to="/wecmdb/logout">
-              <a href="/wecmdb/logout" style="width: 100%; display: block">{{ $t('logout') }}</a>
-            </DropdownItem>
-            <DropdownItem name="changePassword">
-              <router-link to="/setting/change-password">{{ $t('password_edit') }}</router-link>
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-      </div>
       <div class="language">
         <Dropdown>
           <a href="javascript:void(0)">

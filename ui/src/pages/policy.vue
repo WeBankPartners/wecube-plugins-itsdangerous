@@ -105,7 +105,7 @@ export default {
           name: null,
           rules: [],
           description: null,
-          enabled: false
+          enabled: true
         },
         v_select_configs: {
           ruleOptions: []
@@ -146,7 +146,7 @@ export default {
         this.pageConfig.pagination.total = data.count
       }
     },
-    async add () {
+    async getConfigData () {
       const params = 'rules'
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
@@ -156,9 +156,12 @@ export default {
             value: item.id
           }
         })
-        this.modelConfig.isAdd = true
-        this.$root.JQ('#add_edit_Modal').modal('show')
       }
+    },
+    async add () {
+      await this.getConfigData()
+      this.modelConfig.isAdd = true
+      this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
@@ -169,13 +172,15 @@ export default {
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
     },
-    editF (rowData) {
+    async editF (rowData) {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
       this.modelConfig.addRow.name = rowData.name
+      this.modelConfig.addRow.rules = rowData.rules.map(item => item.id)
       this.modelConfig.addRow.description = rowData.description
       this.modelConfig.addRow.enabled = rowData.enabled
+      await this.getConfigData()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {

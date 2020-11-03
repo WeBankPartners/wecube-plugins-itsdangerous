@@ -103,7 +103,7 @@ export default {
           name: null,
           args_scope: null,
           entity_scope: null,
-          enabled: false
+          enabled: true
         }
       },
       modelTip: {

@@ -10,21 +10,21 @@ import { getTableData, addTableRow, editTableRow, deleteTableRow } from '@/api/s
 let tableEle = [
   {
     title: 'service',
-    value: 'service',
+    value: 'service', // 插件
     display: true
   },
   {
     title: 'content_type', // 不必
-    value: 'content_type',
+    value: 'content_type', // 脚本类型
     display: true
   },
   {
     title: 'content_field',
-    value: 'content_field',
+    value: 'content_field', // 脚本字段
     display: true
   },
   {
-    title: 'endpoint_field',
+    title: 'endpoint_field', // 脚本地址
     value: 'endpoint_field',
     display: true
   }
@@ -94,16 +94,43 @@ export default {
             disabled: false,
             type: 'text'
           },
-          { label: 'content_type', value: 'content_type', placeholder: '', disabled: false, type: 'text' },
-          { label: 'content_field', value: 'content_field', placeholder: '', disabled: false, type: 'text' },
-          { label: 'endpoint_field', value: 'endpoint_field', placeholder: '', disabled: false, type: 'text' }
+          {
+            label: 'content_type',
+            value: 'content_type',
+            option: 'contentTypeOptions',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
+          {
+            label: 'content_field',
+            value: 'content_field',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'text'
+          },
+          {
+            label: 'endpoint_field',
+            value: 'endpoint_field',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'text'
+          }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           service: null,
-          content_type: '',
+          content_type: null,
           content_field: null,
           endpoint_field: ''
+        },
+        v_select_configs: {
+          contentTypeOptions: [
+            { label: 'shell', value: 'shell' },
+            { label: 'sql', value: 'sql' }
+          ]
         }
       },
       modelTip: {
@@ -143,11 +170,9 @@ export default {
     },
     add () {
       this.modelConfig.isAdd = true
-      this.modelConfig.addRow.type = 'regex'
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
-      this.modelConfig.addRow.params = JSON.parse(this.modelConfig.addRow.params)
       const { status, message } = await addTableRow(this.pageConfig.CRUD, [this.modelConfig.addRow])
       if (status === 'OK') {
         this.initData()
@@ -156,18 +181,16 @@ export default {
       }
     },
     editF (rowData) {
-      console.log(rowData.params)
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
-      this.modelConfig.addRow.name = rowData.name
-      this.modelConfig.addRow.description = rowData.description
-      this.modelConfig.addRow.type = rowData.type
-      this.modelConfig.addRow.params = JSON.stringify(rowData.params)
+      this.modelConfig.addRow.service = rowData.service
+      this.modelConfig.addRow.content_type = rowData.content_type
+      this.modelConfig.addRow.content_field = rowData.content_field
+      this.modelConfig.addRow.endpoint_field = rowData.endpoint_field
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
-      this.modelConfig.addRow.params = JSON.parse(this.modelConfig.addRow.params)
       const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initData()

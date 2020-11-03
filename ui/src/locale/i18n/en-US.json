@@ -67,7 +67,6 @@
   },
   "button": {
     "MoM": "MoM",
-    "Logout": "Logout",
     "search": "Search",
     "add": "Add",
     "edit": "Edit",
@@ -209,5 +208,9 @@
   "entity_scope": "Entity Scope",
   "hr_match_params": "Match Params",
   "hr_plugin_params": "Plugin Params",
-  "params": "Params"
+  "params": "Params",
+  "service": "Service",
+  "content_type": "Content Type",
+  "content_field": "Content Field",
+  "endpoint_field": "Endpoint Field"
 }

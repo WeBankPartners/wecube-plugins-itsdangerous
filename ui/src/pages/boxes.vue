@@ -9,23 +9,23 @@
 import { getTableData, addTableRow, editTableRow, deleteTableRow } from '@/api/server'
 let tableEle = [
   {
-    title: 'name',
+    title: 'hr_name',
     value: 'name', //
     display: true
   },
   {
-    title: 'description', // 不必
+    title: 'hr_description', // 不必
     value: 'description', //
     display: true
   },
   {
-    title: 'policy',
-    value: 'policy.name', //
+    title: 'hr_policies',
+    value: 'policy.id', //
     display: true
   },
   {
-    title: 'subject',
-    value: 'subject.name', //
+    title: 'hr_subject',
+    value: 'subject.id', //
     display: true
   }
 ]
@@ -87,16 +87,30 @@ export default {
         isAdd: true,
         config: [
           {
-            label: 'service',
+            label: 'hr_name',
             value: 'service',
             placeholder: 'tips.inputRequired',
             v_validate: 'required:true|min:2|max:60',
             disabled: false,
             type: 'text'
           },
-          { label: 'content_type', value: 'content_type', placeholder: '', disabled: false, type: 'text' },
-          { label: 'content_field', value: 'content_field', placeholder: '', disabled: false, type: 'text' },
-          { label: 'endpoint_field', value: 'endpoint_field', placeholder: '', disabled: false, type: 'text' }
+          { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
+          {
+            label: 'hr_policies',
+            value: 'policy_id',
+            option: 'policyOptions',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
+          {
+            label: 'hr_subject',
+            value: 'subject_id',
+            option: 'subjectOptions',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
@@ -104,6 +118,10 @@ export default {
           content_type: null,
           content_field: null,
           endpoint_field: null
+        },
+        v_select_configs: {
+          policyOptions: [],
+          subjectOptions: []
         }
       },
       modelTip: {
@@ -141,7 +159,30 @@ export default {
         this.pageConfig.pagination.total = data.count
       }
     },
-    add () {
+    async getConfigData () {
+      const params = 'policies'
+      const { status, data } = await getTableData(params)
+      if (status === 'OK') {
+        this.modelConfig.v_select_configs.policyOptions = data.data.map(item => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+      }
+      const url = 'subjects'
+      const res = await getTableData(url)
+      if (res.status === 'OK') {
+        this.modelConfig.v_select_configs.subjectOptions = res.data.data.map(item => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+      }
+    },
+    async add () {
+      await this.getConfigData()
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
@@ -154,13 +195,14 @@ export default {
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
     },
-    editF (rowData) {
+    async editF (rowData) {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
       this.modelConfig.addRow.name = rowData.name
       this.modelConfig.addRow.description = rowData.description
       this.modelConfig.addRow.enabled = rowData.enabled
+      await this.getConfigData()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
