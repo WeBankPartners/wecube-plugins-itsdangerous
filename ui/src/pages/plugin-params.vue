@@ -9,18 +9,23 @@
 import { getTableData, addTableRow, editTableRow, deleteTableRow } from '@/api/server'
 let tableEle = [
   {
-    title: 'hr_name',
-    value: 'name',
+    title: 'service',
+    value: 'service',
     display: true
   },
   {
-    title: 'hr_description', // 不必
-    value: 'description',
+    title: 'content_type', // 不必
+    value: 'content_type',
     display: true
   },
   {
-    title: 'hr_enabled',
-    value: 'enabled',
+    title: 'content_field',
+    value: 'content_field',
+    display: true
+  },
+  {
+    title: 'endpoint_field',
+    value: 'endpoint_field',
     display: true
   }
 ]
@@ -33,7 +38,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'subjects',
+        CRUD: 'service-scripts',
         researchConfig: {
           input_conditions: [
             {
@@ -78,41 +83,31 @@ export default {
       },
       modelConfig: {
         modalId: 'add_edit_Modal',
-        modalTitle: 'hr_subject',
+        modalTitle: 'hr_plugin_params',
         isAdd: true,
         config: [
           {
-            label: 'hr_name',
-            value: 'name',
+            label: 'service',
+            value: 'service',
             placeholder: 'tips.inputRequired',
             v_validate: 'required:true|min:2|max:60',
             disabled: false,
             type: 'text'
           },
-          {
-            label: 'hr_target',
-            value: 'targets',
-            option: 'targetOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'multiSelect'
-          },
-          { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
+          { label: 'content_type', value: 'content_type', placeholder: '', disabled: false, type: 'text' },
+          { label: 'content_field', value: 'content_field', placeholder: '', disabled: false, type: 'text' },
+          { label: 'endpoint_field', value: 'endpoint_field', placeholder: '', disabled: false, type: 'text' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
-          name: null,
-          targets: [],
-          description: null,
-          enabled: false
-        },
-        v_select_configs: {
-          targetOptions: []
+          service: null,
+          content_type: '',
+          content_field: null,
+          endpoint_field: ''
         }
       },
       modelTip: {
-        key: 'name',
+        key: 'service',
         value: null
       },
       id: ''
@@ -146,22 +141,13 @@ export default {
         this.pageConfig.pagination.total = data.count
       }
     },
-    async add () {
-      const params = 'targets'
-      const { status, data } = await getTableData(params)
-      if (status === 'OK') {
-        this.modelConfig.v_select_configs.targetOptions = data.data.map(item => {
-          return {
-            label: item.name,
-            value: item.id
-          }
-        })
-        this.modelConfig.isAdd = true
-        this.$root.JQ('#add_edit_Modal').modal('show')
-      }
+    add () {
+      this.modelConfig.isAdd = true
+      this.modelConfig.addRow.type = 'regex'
+      this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
-      this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
+      this.modelConfig.addRow.params = JSON.parse(this.modelConfig.addRow.params)
       const { status, message } = await addTableRow(this.pageConfig.CRUD, [this.modelConfig.addRow])
       if (status === 'OK') {
         this.initData()
@@ -170,16 +156,18 @@ export default {
       }
     },
     editF (rowData) {
+      console.log(rowData.params)
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
       this.modelConfig.addRow.name = rowData.name
       this.modelConfig.addRow.description = rowData.description
-      this.modelConfig.addRow.enabled = rowData.enabled
+      this.modelConfig.addRow.type = rowData.type
+      this.modelConfig.addRow.params = JSON.stringify(rowData.params)
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
-      this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
+      this.modelConfig.addRow.params = JSON.parse(this.modelConfig.addRow.params)
       const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initData()

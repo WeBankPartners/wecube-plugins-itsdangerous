@@ -14,7 +14,7 @@ let tableEle = [
     display: true
   },
   {
-    title: 'hr_description',
+    title: 'hr_description', // 不必
     value: 'description',
     display: true
   },
@@ -25,27 +25,27 @@ let tableEle = [
   },
   {
     title: 'hr_level',
-    value: 'level',
+    value: 'level', // 优先级
     display: true
   },
   {
     title: 'effect_on',
-    value: 'effect_on',
+    value: 'effect_on', // 作用域
     display: true
   },
   {
     title: 'match_type',
-    value: 'match_type',
+    value: 'match_type', // 匹配方式
     display: true
   },
   {
     title: 'match_value',
-    value: 'match_value',
+    value: 'match_value', // 匹配表达式
     display: true
   },
   {
-    title: 'match_param_id',
-    value: 'match_param_id',
+    title: 'match_param_id', // 不必
+    value: 'match_param_id', // 调用参数
     display: true
   }
 ]
@@ -103,7 +103,7 @@ export default {
       },
       modelConfig: {
         modalId: 'add_edit_Modal',
-        modalTitle: 'hr_policies',
+        modalTitle: 'hr_rule',
         isAdd: true,
         config: [
           {
@@ -115,10 +115,33 @@ export default {
             type: 'text'
           },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          { label: 'hr_level', value: 'level', placeholder: '', disabled: false, type: 'text' },
-          { label: 'effect_on', value: 'effect_on', placeholder: '', disabled: false, type: 'text' },
-          { label: 'match_type', value: 'match_type', placeholder: '', disabled: false, type: 'text' },
-          { label: 'match_value', value: 'match_value', placeholder: '', disabled: false, type: 'text' },
+          { label: 'hr_level', value: 'level', max: 10, min: 0, placeholder: '', disabled: false, type: 'inputNumber' },
+          {
+            label: 'effect_on',
+            value: 'effect_on',
+            option: 'effectOptions',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
+          {
+            label: 'match_type',
+            value: 'match_type',
+            option: 'matchOptions',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
+          {
+            label: 'match_value',
+            value: 'match_value',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'text'
+          },
           { label: 'match_param_id', value: 'match_param_id', placeholder: '', disabled: false, type: 'text' },
           { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
         ],
@@ -128,10 +151,23 @@ export default {
           description: null,
           enabled: false,
           level: 0,
-          effect_on: '',
+          effect_on: 'param',
           match_type: '',
           match_value: '',
           match_param_id: ''
+        },
+        v_select_configs: {
+          effectOptions: [
+            { label: 'param', value: 'param' },
+            { label: 'script', value: 'script' }
+          ],
+          matchOptions: [
+            { label: 'filter', value: 'filter' },
+            { label: 'cli', value: 'cli' },
+            { label: 'sql', value: 'sql' },
+            { label: 'text', value: 'text' },
+            { label: 'fulltext', value: 'fulltext' }
+          ]
         }
       },
       modelTip: {
@@ -170,6 +206,7 @@ export default {
       }
     },
     add () {
+      this.modelConfig.addRow.effect_on = 'param'
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
@@ -183,6 +220,14 @@ export default {
       }
     },
     editF (rowData) {
+      // name: null,
+      //     description: null,
+      //     enabled: false,
+      //     level: 0,
+      //     effect_on: 'param',
+      //     match_type: '',
+      //     match_value: '',
+      //     match_param_id: ''
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]

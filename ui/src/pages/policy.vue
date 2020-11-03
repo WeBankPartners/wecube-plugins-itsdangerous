@@ -89,14 +89,26 @@ export default {
             disabled: false,
             type: 'text'
           },
+          {
+            label: 'hr_rule',
+            value: 'rules',
+            option: 'ruleOptions',
+            placeholder: '',
+            disabled: false,
+            type: 'multiSelect'
+          },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
           { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           name: null,
+          rules: [],
           description: null,
           enabled: false
+        },
+        v_select_configs: {
+          ruleOptions: []
         }
       },
       modelTip: {
@@ -134,9 +146,19 @@ export default {
         this.pageConfig.pagination.total = data.count
       }
     },
-    add () {
-      this.modelConfig.isAdd = true
-      this.$root.JQ('#add_edit_Modal').modal('show')
+    async add () {
+      const params = 'rules'
+      const { status, data } = await getTableData(params)
+      if (status === 'OK') {
+        this.modelConfig.v_select_configs.ruleOptions = data.data.map(item => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+        this.modelConfig.isAdd = true
+        this.$root.JQ('#add_edit_Modal').modal('show')
+      }
     },
     async addPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)

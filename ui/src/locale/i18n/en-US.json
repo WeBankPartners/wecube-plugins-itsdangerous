@@ -192,8 +192,22 @@
   "clearAll": "Clear All",
 
   "hr_policies": "Policies",
+  "hr_box": "Boxes",
   "hr_enabled": "Enabled",
   "hr_description": "Description",
   "hr_name": "Name",
-  "hr_level": "Level"
+  "hr_level": "Level",
+  "hr_type": "Type",
+  "hr_rule": "Rules",
+  "effect_on": "Effect On",
+  "match_type": "Match Type",
+  "match_value": "Match Value",
+  "match_param_id": "Match Param",
+  "hr_subject": "Subjects",
+  "hr_target": "Targets",
+  "args_scope": "Args Scope",
+  "entity_scope": "Entity Scope",
+  "hr_match_params": "Match Params",
+  "hr_plugin_params": "Plugin Params",
+  "params": "Params"
 }

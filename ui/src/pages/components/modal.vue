@@ -89,17 +89,42 @@
                   :class="item.isError ? 'red-border textareaSty' : 'textareaSty'"
                   :disabled="item.disabled"
                 />
-                <v-select
-                  v-if="item.type === 'select' && isHide(item.hide)"
-                  v-model="modelConfig.v_select_configs[item.value]"
+                <InputNumber
+                  v-if="item.type === 'inputNumber' && isHide(item.hide)"
                   :disabled="modelConfig.isAdd ? false : item.disabled"
-                  label="name"
-                  :name="item.showName ? item.showName : 'name'"
-                  :multiple="item.multiple ? item.multiple : false"
-                  class="col-md-7 v-selectss "
-                  :options="modelConfig.v_select_configs[item.option]"
+                  class="col-md-7 v-selectss"
+                  :max="modelConfig.addRow[item.max] || 10"
+                  :min="modelConfig.addRow[item.min] || 0"
+                  v-model="modelConfig.addRow[item.value]"
                 >
-                </v-select>
+                </InputNumber>
+                <Select
+                  v-if="item.type === 'select' && isHide(item.hide)"
+                  :disabled="modelConfig.isAdd ? false : item.disabled"
+                  class="col-md-7 v-selectss"
+                  v-model="modelConfig.addRow[item.value]"
+                >
+                  <Option
+                    v-for="item in modelConfig.v_select_configs[item.option]"
+                    :value="item.value"
+                    :key="item.value"
+                    >{{ item.label }}</Option
+                  >
+                </Select>
+                <Select
+                  v-if="item.type === 'multiSelect' && isHide(item.hide)"
+                  :disabled="modelConfig.isAdd ? false : item.disabled"
+                  multiple
+                  class="col-md-7 v-selectss"
+                  v-model="modelConfig.addRow[item.value]"
+                >
+                  <Option
+                    v-for="item in modelConfig.v_select_configs[item.option]"
+                    :value="item.value"
+                    :key="item.value"
+                    >{{ item.label }}</Option
+                  >
+                </Select>
 
                 <slot v-if="item.type === 'slot' && isHide(item.hide) && !item.ishide" :name="item.name"></slot>
                 <label class="required-tip  isRequired_s" v-if="isRequired_s(item.v_validate) && isHide(item.hide)"

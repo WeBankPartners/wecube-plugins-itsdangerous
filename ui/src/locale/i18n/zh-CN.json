@@ -192,8 +192,22 @@
   "clearAll": "清空",
 
   "hr_policies": "策略",
+  "hr_box": "试盒",
   "hr_enabled": "启用",
   "hr_description": "描述",
   "hr_name": "名称",
-  "hr_level": "级别"
+  "hr_level": "优先级",
+  "hr_type": "类型",
+  "hr_rule": "规则",
+  "effect_on": "作用域",
+  "match_type": "匹配方式",
+  "match_value": "表达式",
+  "match_param_id": "调用参数",
+  "hr_subject": "角色",
+  "hr_target": "目标对象",
+  "args_scope": "过滤规则",
+  "entity_scope": "实体类型",
+  "hr_match_params": "调用参数",
+  "hr_plugin_params": "插件参数",
+  "params": "参数"
 }

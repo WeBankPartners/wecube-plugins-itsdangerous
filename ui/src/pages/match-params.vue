@@ -14,7 +14,7 @@ let tableEle = [
     display: true
   },
   {
-    title: 'hr_description',
+    title: 'hr_description', // 不必
     value: 'description',
     display: true
   },
@@ -24,7 +24,7 @@ let tableEle = [
     display: true
   },
   {
-    title: 'type',
+    title: 'hr_type',
     value: 'type',
     display: true
   }
@@ -83,7 +83,7 @@ export default {
       },
       modelConfig: {
         modalId: 'add_edit_Modal',
-        modalTitle: '调用参数',
+        modalTitle: 'hr_match_params',
         isAdd: true,
         config: [
           {
@@ -95,14 +95,28 @@ export default {
             type: 'text'
           },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          { label: 'params', value: 'params', placeholder: '', disabled: false, type: 'text' },
-          { label: 'type', value: 'type', placeholder: '', disabled: false, type: 'text' }
+          {
+            label: 'params',
+            value: 'params',
+            v_validate: 'required:true|min:2|max:60',
+            placeholder: '',
+            disabled: false,
+            type: 'text'
+          },
+          { label: 'hr_type', value: 'type', option: 'typeOptions', placeholder: '', disabled: false, type: 'select' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           name: null,
+          description: '',
           params: null,
-          type: ''
+          type: 'regex'
+        },
+        v_select_configs: {
+          typeOptions: [
+            { label: 'regex', value: 'regex' },
+            { label: 'cli', value: 'cli' }
+          ]
         }
       },
       modelTip: {
@@ -142,10 +156,11 @@ export default {
     },
     add () {
       this.modelConfig.isAdd = true
+      this.modelConfig.addRow.type = 'regex'
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
-      this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
+      this.modelConfig.addRow.params = JSON.parse(this.modelConfig.addRow.params)
       const { status, message } = await addTableRow(this.pageConfig.CRUD, [this.modelConfig.addRow])
       if (status === 'OK') {
         this.initData()
@@ -154,16 +169,18 @@ export default {
       }
     },
     editF (rowData) {
+      console.log(rowData.params)
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
       this.modelConfig.addRow.name = rowData.name
       this.modelConfig.addRow.description = rowData.description
-      this.modelConfig.addRow.enabled = rowData.enabled
+      this.modelConfig.addRow.type = rowData.type
+      this.modelConfig.addRow.params = JSON.stringify(rowData.params)
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
-      this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
+      this.modelConfig.addRow.params = JSON.parse(this.modelConfig.addRow.params)
       const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initData()

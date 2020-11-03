@@ -14,13 +14,13 @@ let tableEle = [
     display: true
   },
   {
-    title: 'args_scope',
-    value: 'args_scope',
+    title: 'args_scope', // 不必
+    value: 'args_scope', // 过滤规则  *****
     display: true
   },
   {
-    title: 'entity_scope',
-    value: 'entity_scope',
+    title: 'entity_scope', // 不必
+    value: 'entity_scope', // 实体类型
     display: true
   },
   {
@@ -38,7 +38,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: '/targets',
+        CRUD: 'targets',
         researchConfig: {
           input_conditions: [
             {
@@ -83,7 +83,7 @@ export default {
       },
       modelConfig: {
         modalId: 'add_edit_Modal',
-        modalTitle: '目标对象',
+        modalTitle: 'hr_target',
         isAdd: true,
         config: [
           {

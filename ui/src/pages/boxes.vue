@@ -9,23 +9,23 @@
 import { getTableData, addTableRow, editTableRow, deleteTableRow } from '@/api/server'
 let tableEle = [
   {
-    title: 'service',
-    value: 'service',
+    title: 'name',
+    value: 'name', //
     display: true
   },
   {
-    title: 'content_type',
-    value: 'content_type',
+    title: 'description', // 不必
+    value: 'description', //
     display: true
   },
   {
-    title: 'content_field',
-    value: 'content_field',
+    title: 'policy',
+    value: 'policy.name', //
     display: true
   },
   {
-    title: 'endpoint_field',
-    value: 'endpoint_field',
+    title: 'subject',
+    value: 'subject.name', //
     display: true
   }
 ]
@@ -83,7 +83,7 @@ export default {
       },
       modelConfig: {
         modalId: 'add_edit_Modal',
-        modalTitle: '试盒',
+        modalTitle: 'hr_box',
         isAdd: true,
         config: [
           {

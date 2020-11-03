@@ -19,12 +19,13 @@ export default {
     return {
       activeTab: '/dangerousIndex/policy',
       tabs: [
-        { label: '策略', path: '/dangerousIndex/policy' },
-        { label: '规则', path: '/dangerousIndex/rule' },
-        { label: '角色', path: '/dangerousIndex/subjects' },
-        { label: '目标对象', path: '/dangerousIndex/targets' },
-        { label: '调用参数', path: '/dangerousIndex/match-params' },
-        { label: '试盒', path: '/dangerousIndex/boxes' }
+        { label: 'hr_policies', path: '/dangerousIndex/policy' },
+        { label: 'hr_rule', path: '/dangerousIndex/rule' },
+        { label: 'hr_subject', path: '/dangerousIndex/subjects' },
+        { label: 'hr_target', path: '/dangerousIndex/targets' },
+        { label: 'hr_match_params', path: '/dangerousIndex/match-params' },
+        { label: 'hr_plugin_params', path: '/dangerousIndex/plugin-params' },
+        { label: 'hr_box', path: '/dangerousIndex/boxes' }
       ]
     }
   },
