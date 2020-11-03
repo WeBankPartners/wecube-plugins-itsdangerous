@@ -45,7 +45,6 @@ class BoxManage(resource.BoxManage):
 
 
 class Box(resource.Box):
-
     def _get_rules(self, data, boxes=None):
         boxes = boxes or self.list(filters={'policy.enabled': 1, 'subject.enabled': 1})
         rules = {}
@@ -63,17 +62,18 @@ class Box(resource.Box):
                 cached = cache.get(key, 30)
                 if cache.validate(cached):
                     target_included = cached
-                    LOG.debug('scope test of target[%s - %s]: %s', target['id'], target['name'], ('accepted' if cached else 'rejected'))
+                    LOG.debug('scope test of target[%s - %s]: %s', target['id'], target['name'],
+                              ('accepted' if cached else 'rejected'))
                 else:
                     LOG.debug('scope test of target[%s - %s]', target['id'], target['name'])
                     if target['enabled']:
-                        if target['args_scope'] is not None:
+                        if target['args_scope']:
                             target_included = scope.JsonScope(target['args_scope']).is_match(data)
                         else:
                             target_included = True
                         if target_included:
                             LOG.debug('args scope: accepted')
-                            if target['entity_scope'] is not None:
+                            if target['entity_scope']:
                                 target_included = scope.WeCMDBScope(target['entity_scope']).is_match(
                                     data['entityInstances'])
                             else:

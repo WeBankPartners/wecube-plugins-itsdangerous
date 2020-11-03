@@ -57,16 +57,20 @@ class Policy(crud.ResourceBase):
         if 'rules' in resource:
             refs = resource['rules']
             for ref in refs:
-                ref['policy_id'] = created['id']
-                PolicyRule(transaction=session).create(ref)
+                new_ref = {}
+                new_ref['policy_id'] = created['id']
+                new_ref['rule_id'] = ref
+                PolicyRule(transaction=session).create(new_ref)
 
     def _addtional_update(self, session, rid, resource, before_updated, after_updated):
         if 'rules' in resource:
             refs = resource['rules']
             PolicyRule(transaction=session).delete_all(filters={'policy_id': before_updated['id']})
             for ref in refs:
-                ref['policy_id'] = before_updated['id']
-                PolicyRule(transaction=session).create(ref)
+                new_ref = {}
+                new_ref['policy_id'] = before_updated['id']
+                new_ref['rule_id'] = ref
+                PolicyRule(transaction=session).create(new_ref)
 
 
 class Rule(crud.ResourceBase):
@@ -122,16 +126,20 @@ class Subject(crud.ResourceBase):
         if 'targets' in resource:
             refs = resource['targets']
             for ref in refs:
-                ref['subject_id'] = created['id']
-                SubjectTarget(transaction=session).create(ref)
+                new_ref = {}
+                new_ref['subject_id'] = created['id']
+                new_ref['target_id'] = ref
+                SubjectTarget(transaction=session).create(new_ref)
 
     def _addtional_update(self, session, rid, resource, before_updated, after_updated):
         if 'targets' in resource:
             refs = resource['targets']
             SubjectTarget(transaction=session).delete_all(filters={'subject_id': before_updated['id']})
             for ref in refs:
-                ref['subject_id'] = before_updated['id']
-                SubjectTarget(transaction=session).create(ref)
+                new_ref = {}
+                new_ref['subject_id'] = before_updated['id']
+                new_ref['target_id'] = ref
+                SubjectTarget(transaction=session).create(new_ref)
 
 
 class Target(crud.ResourceBase):
@@ -142,11 +150,11 @@ class Target(crud.ResourceBase):
                              validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='enabled', rule_type='in', rule=[0, 1], validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='args_scope',
-                             rule=my_validator.LengthValidator(1, 512),
+                             rule=my_validator.LengthValidator(0, 512),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='entity_scope',
-                             rule=my_validator.LengthValidator(1, 512),
+                             rule=my_validator.LengthValidator(0, 512),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
     ]
@@ -196,7 +204,8 @@ class ServiceScript(crud.ResourceBase):
                              rule=my_validator.LengthValidator(1, 63),
                              validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='content_type',
-                             rule=my_validator.LengthValidator(1, 36),
+                             rule_type='in',
+                             rule=['shell', 'sql'],
                              validate_on=['create:O', 'update:O'],
                              nullable=True),
         crud.ColumnValidator(field='content_field',
