@@ -105,7 +105,7 @@ export default {
           name: null,
           targets: [],
           description: null,
-          enabled: false
+          enabled: true
         },
         v_select_configs: {
           targetOptions: []

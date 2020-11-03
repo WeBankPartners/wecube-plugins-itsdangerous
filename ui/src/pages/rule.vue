@@ -149,7 +149,7 @@ export default {
           // [通用]-保存用户新增、编辑时数据
           name: null,
           description: null,
-          enabled: false,
+          enabled: true,
           level: 0,
           effect_on: 'param',
           match_type: '',
