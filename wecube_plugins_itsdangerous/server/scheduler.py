@@ -34,15 +34,16 @@ def cleanup_cached_dir():
     try:
         max_delta = 24 * 60 * 60
         base_dir = CONF.pakcage_cache_dir
-        for name in list(os.listdir(base_dir)):
-            fullpath = os.path.join(base_dir, name)
-            path_stat = os.stat(fullpath)
-            if time.time() - path_stat.st_atime > max_delta:
-                LOG.info('remove dir/file: %s, last access: %s', fullpath, path_stat.st_atime)
-                if os.path.isdir(fullpath):
-                    shutil.rmtree(fullpath, ignore_errors=True)
-                elif os.path.isfile(fullpath):
-                    os.remove(fullpath)
+        if os.path.exists(base_dir):
+            for name in list(os.listdir(base_dir)):
+                fullpath = os.path.join(base_dir, name)
+                path_stat = os.stat(fullpath)
+                if time.time() - path_stat.st_atime > max_delta:
+                    LOG.info('remove dir/file: %s, last access: %s', fullpath, path_stat.st_atime)
+                    if os.path.isdir(fullpath):
+                        shutil.rmtree(fullpath, ignore_errors=True)
+                    elif os.path.isfile(fullpath):
+                        os.remove(fullpath)
     except Exception as e:
         LOG.exception(e)
 
