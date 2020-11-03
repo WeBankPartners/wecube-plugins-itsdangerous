@@ -5,11 +5,24 @@ from __future__ import absolute_import
 import falcon
 from talos.common.controller import CollectionController
 from talos.common.controller import ItemController
+from talos.common.controller import Controller as BaseController
 from talos.core import exceptions as base_ex
 from talos.core import utils
 from talos.core.i18n import _
 
 from wecube_plugins_itsdangerous.common import exceptions
+
+
+class Controller(BaseController):
+    def on_post(self, req, resp, **kwargs):
+        self._validate_method(req)
+        self._validate_data(req)
+        data = req.json
+        resp.json = {'code': 200, 'status': 'OK', 'data': self.create(req, data, **kwargs), 'message': 'success'}
+        resp.status = falcon.HTTP_200
+
+    def create(self, req, data, **kwargs):
+        return self.make_resource(req).create(data, **kwargs)
 
 
 class Collection(CollectionController):

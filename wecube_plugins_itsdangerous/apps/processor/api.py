@@ -11,6 +11,7 @@ from talos.common import cache
 from wecube_plugins_itsdangerous.apps.processor import detector
 from wecube_plugins_itsdangerous.common import reader
 from wecube_plugins_itsdangerous.common import scope
+from wecube_plugins_itsdangerous.common import exceptions
 from wecube_plugins_itsdangerous.db import resource
 
 LOG = logging.getLogger(__name__)
@@ -108,6 +109,12 @@ class Box(resource.Box):
             rs = results.setdefault(r['match_type'], [])
             rs.append(r)
         return results
+
+    def run(self, data, rid):
+        refs = Box().list({'id': rid})
+        if len(refs) == 0:
+            raise exceptions.NotFoundError(resource='Box')
+        return self.check(data, boxes=refs)
 
     def check(self, data, boxes=None):
         '''
