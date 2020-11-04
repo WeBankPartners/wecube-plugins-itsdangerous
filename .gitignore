@@ -22,3 +22,4 @@ tmptests/reader.py
 build/lib/*
 build/bdist.win-amd64/*
 build/bdist.linux-x86_64/*
+ui/node_modules
