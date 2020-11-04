@@ -25,14 +25,14 @@ package: image
 	cd ui/dist && zip -9 -r ui.zip .
 	cd package && mv ../ui/dist/ui.zip .
 	cd package && cp ../init.sql ./init.sql
-	zip -9 $(project_name)-$(version).zip image.tar register.xml ui.zip init.sql
-	rm -f image.tar
-	rm -f register.xml
-	rm -f ui.zip
-	rm -f init.sql
+	cd package && zip -9 $(project_name)-$(version).zip image.tar register.xml ui.zip init.sql
+	cd package && rm -f image.tar
+	cd package && rm -f register.xml
+	cd package && rm -f ui.zip
+	cd package && rm -f init.sql
 
 upload: package
-	$(eval container_id:=$(shell docker run -v $(current_dir):/package -itd --entrypoint=/bin/sh minio/mc))
+	$(eval container_id:=$(shell docker run -v $(current_dir)/package:/package -itd --entrypoint=/bin/sh minio/mc))
 	docker exec $(container_id) mc config host add wecubeS3 $(s3_server_url) $(s3_access_key) $(s3_secret_key) wecubeS3
 	docker exec $(container_id) mc cp /package/$(project_name)-$(version).zip wecubeS3/wecube-plugin-package-bucket
 	docker stop $(container_id)
