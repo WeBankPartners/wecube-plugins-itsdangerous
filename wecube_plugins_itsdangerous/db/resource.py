@@ -37,6 +37,13 @@ class MatchParam(crud.ResourceBase):
         crud.ColumnValidator(field='params', rule=validator.TypeValidator(dict), validate_on=('create:M', 'update:O')),
     ]
 
+    def delete(self, rid, filters=None, detail=True):
+        refs = Rule().list({'match_param_id': rid})
+        if refs:
+            names = '|'.join([i['name'] for i in refs])
+            raise exceptions.ConflictError(name=names)
+        return super().delete(rid, filters, detail)
+
 
 class Policy(crud.ResourceBase):
     orm_meta = models_manage.Policy
@@ -75,7 +82,7 @@ class Policy(crud.ResourceBase):
                 new_ref['rule_id'] = ref
                 PolicyRule(transaction=session).create(new_ref)
 
-    def delete(self, rid, filters, detail):
+    def delete(self, rid, filters=None, detail=True):
         with self.transaction() as session:
             refs = BoxManage(session=session).list({'policy_id': rid})
             if refs:
@@ -155,7 +162,7 @@ class Subject(crud.ResourceBase):
                 new_ref['target_id'] = ref
                 SubjectTarget(transaction=session).create(new_ref)
 
-    def delete(self, rid, filters, detail):
+    def delete(self, rid, filters=None, detail=True):
         with self.transaction() as session:
             refs = BoxManage(session=session).list({'subject_id': rid})
             if refs:
