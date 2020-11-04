@@ -2,11 +2,21 @@
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
     <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <ModalComponent :modelConfig="detectConfig">
+      <div slot="detectBtn">
+        <div style="text-align: right">
+          <button type="button" @click="exectDetect" style="margin: 8px 122px" class="btn btn-sm btn-confirm-f">
+            {{ $t('detect') }}
+          </button>
+        </div>
+        <PageTable :pageConfig="exectPageConfig"></PageTable>
+      </div>
+    </ModalComponent>
   </div>
 </template>
 
 <script>
-import { getTableData, addTableRow, editTableRow, deleteTableRow } from '@/api/server'
+import { getTableData, addTableRow, editTableRow, deleteTableRow, boxDetect } from '@/api/server'
 let tableEle = [
   {
     title: 'hr_name',
@@ -20,17 +30,18 @@ let tableEle = [
   },
   {
     title: 'hr_policies',
-    value: 'policy.id', //
+    value: 'policy.name', //
     display: true
   },
   {
     title: 'hr_subject',
-    value: 'subject.id', //
+    value: 'subject.name', //
     display: true
   }
 ]
 const btn = [
   { btn_name: 'button.edit', btn_func: 'editF' },
+  { btn_name: 'detect', btn_func: 'detectF' },
   { btn_name: 'button.remove', btn_func: 'deleteConfirmModal' }
 ]
 export default {
@@ -81,6 +92,41 @@ export default {
           size: 10
         }
       },
+      exectPageConfig: {
+        table: {
+          tableData: [],
+          tableEle: [
+            {
+              title: 'hr_level',
+              value: 'level', //
+              display: true
+            },
+            {
+              title: 'lineno',
+              value: 'lineno', //
+              display: true
+            },
+            {
+              title: 'message',
+              value: 'message', //
+              display: true,
+              style: 'width:90px'
+            },
+            {
+              title: 'script_name',
+              value: 'script_name', //
+              display: true
+            },
+            {
+              title: 'content',
+              value: 'content', //
+              display: true
+            }
+          ],
+          primaryKey: 'guid',
+          btn: []
+        }
+      },
       modelConfig: {
         modalId: 'add_edit_Modal',
         modalTitle: 'hr_box',
@@ -88,7 +134,7 @@ export default {
         config: [
           {
             label: 'hr_name',
-            value: 'service',
+            value: 'name',
             placeholder: 'tips.inputRequired',
             v_validate: 'required:true|min:2|max:60',
             disabled: false,
@@ -114,18 +160,58 @@ export default {
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
-          service: null,
-          content_type: null,
-          content_field: null,
-          endpoint_field: null
+          name: null,
+          description: null,
+          policy_id: null,
+          subject_id: null
         },
         v_select_configs: {
           policyOptions: [],
           subjectOptions: []
         }
       },
+      detectConfig: {
+        modalId: 'detect_Modal',
+        modalTitle: 'detect',
+        isAdd: true,
+        noBtn: true,
+        modalStyle: 'max-width:1000px',
+        config: [
+          {
+            label: 'hr_type',
+            value: 'type',
+            option: 'typeOptions',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
+          {
+            label: 'script',
+            value: 'content',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'textarea'
+          },
+          { name: 'detectBtn', type: 'slot' }
+        ],
+        addRow: {
+          // [通用]-保存用户新增、编辑时数据
+          name: null,
+          type: 'None',
+          content: null,
+          entityInstances: []
+        },
+        v_select_configs: {
+          typeOptions: [
+            { label: 'None', value: 'None' },
+            { label: 'shell', value: 'shell' },
+            { label: 'sql', value: 'sql' }
+          ]
+        }
+      },
       modelTip: {
-        key: 'service',
+        key: 'name',
         value: null
       },
       id: ''
@@ -135,28 +221,34 @@ export default {
     this.initData()
   },
   methods: {
-    managementUrl () {
-      let tableParams = this.pageConfig.CRUD
-      const pp = {
-        __offset: (this.pageConfig.pagination.page - 1) * this.pageConfig.pagination.size,
-        __limit: this.pageConfig.pagination.size
-      }
-      const params = Object.assign({}, pp, this.pageConfig.researchConfig.filters)
-      if (params) {
-        let tmp = ''
-        for (let key in params) {
-          tmp = tmp + key + '=' + params[key] + '&'
-        }
-        tableParams = tableParams + '?' + tmp
-      }
-      return tableParams
-    },
     async initData () {
-      const params = this.managementUrl()
+      const params = this.$commonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.pageConfig.table.tableData = data.data
         this.pageConfig.pagination.total = data.count
+      }
+    },
+    detectF (rowData) {
+      this.id = rowData.id
+      this.detectConfig.addRow.name = rowData.name
+      this.$root.JQ('#detect_Modal').modal('show')
+    },
+    async exectDetect () {
+      this.exectPageConfig.table.tableData = []
+      const params = {
+        scripts: [
+          {
+            type: this.detectConfig.addRow.type,
+            content: this.detectConfig.addRow.content,
+            name: this.detectConfig.addRow.name
+          }
+        ],
+        entityInstances: this.detectConfig.addRow.entityInstances
+      }
+      const { status, data } = await boxDetect(this.id, params)
+      if (status === 'OK') {
+        this.exectPageConfig.table.tableData = data
       }
     },
     async getConfigData () {
@@ -187,7 +279,6 @@ export default {
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
-      this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
       const { status, message } = await addTableRow(this.pageConfig.CRUD, [this.modelConfig.addRow])
       if (status === 'OK') {
         this.initData()
@@ -199,14 +290,11 @@ export default {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
-      this.modelConfig.addRow.name = rowData.name
-      this.modelConfig.addRow.description = rowData.description
-      this.modelConfig.addRow.enabled = rowData.enabled
+      this.modelConfig.addRow = this.$commonUtil.manageEditParams(this.modelConfig.addRow, rowData)
       await this.getConfigData()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
-      this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
       const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initData()
@@ -216,7 +304,7 @@ export default {
     },
     deleteConfirmModal (rowData) {
       this.$Modal.confirm({
-        title: this.$t(this.modelConfig.modalTitle),
+        title: this.$t('delete_confirm') + rowData.name,
         'z-index': 1000000,
         onOk: async () => {
           const { status, message } = await deleteTableRow(this.pageConfig.CRUD, rowData.id)

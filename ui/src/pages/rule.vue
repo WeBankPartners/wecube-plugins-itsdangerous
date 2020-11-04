@@ -142,7 +142,14 @@ export default {
             disabled: false,
             type: 'text'
           },
-          { label: 'match_param_id', value: 'match_param_id', placeholder: '', disabled: false, type: 'text' },
+          {
+            label: 'match_param_id',
+            value: 'match_param_id',
+            option: 'matchParamOption',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
           { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
         ],
         addRow: {
@@ -152,9 +159,9 @@ export default {
           enabled: true,
           level: 0,
           effect_on: 'param',
-          match_type: '',
+          match_type: 'filter',
           match_value: '',
-          match_param_id: ''
+          match_param_id: []
         },
         v_select_configs: {
           effectOptions: [
@@ -167,7 +174,8 @@ export default {
             { label: 'sql', value: 'sql' },
             { label: 'text', value: 'text' },
             { label: 'fulltext', value: 'fulltext' }
-          ]
+          ],
+          matchParamOption: []
         }
       },
       modelTip: {
@@ -181,31 +189,28 @@ export default {
     this.initData()
   },
   methods: {
-    managementUrl () {
-      let tableParams = this.pageConfig.CRUD
-      const pp = {
-        __offset: (this.pageConfig.pagination.page - 1) * this.pageConfig.pagination.size,
-        __limit: this.pageConfig.pagination.size
-      }
-      const params = Object.assign({}, pp, this.pageConfig.researchConfig.filters)
-      if (params) {
-        let tmp = ''
-        for (let key in params) {
-          tmp = tmp + key + '=' + params[key] + '&'
-        }
-        tableParams = tableParams + '?' + tmp
-      }
-      return tableParams
-    },
     async initData () {
-      const params = this.managementUrl()
+      const params = this.$commonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.pageConfig.table.tableData = data.data
         this.pageConfig.pagination.total = data.count
       }
     },
-    add () {
+    async getConfigData () {
+      const params = 'matchparams'
+      const { status, data } = await getTableData(params)
+      if (status === 'OK') {
+        this.modelConfig.v_select_configs.matchParamOption = data.data.map(item => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+      }
+    },
+    async add () {
+      await this.getConfigData()
       this.modelConfig.addRow.effect_on = 'param'
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')
@@ -219,21 +224,12 @@ export default {
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
     },
-    editF (rowData) {
-      // name: null,
-      //     description: null,
-      //     enabled: false,
-      //     level: 0,
-      //     effect_on: 'param',
-      //     match_type: '',
-      //     match_value: '',
-      //     match_param_id: ''
+    async editF (rowData) {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
-      this.modelConfig.addRow.name = rowData.name
-      this.modelConfig.addRow.description = rowData.description
-      this.modelConfig.addRow.enabled = rowData.enabled
+      this.modelConfig.addRow = this.$commonUtil.manageEditParams(this.modelConfig.addRow, rowData)
+      await this.getConfigData()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {

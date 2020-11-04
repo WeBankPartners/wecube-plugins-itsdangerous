@@ -10,9 +10,9 @@
         <div class="modal-content c-dark">
           <div class="modal-header c-dark">
             <h4 class="modal-title" v-if="modelConfig.modalTitle">
-              {{ $t(modelConfig.modalTitle) }}:
+              {{ $t(modelConfig.modalTitle) }}
               <template v-if="!modelConfig.isAdd"
-                >【<span style="color: red">{{ interceptParams() }}</span
+                >:【<span style="color: red">{{ interceptParams() }}</span
                 >】
               </template>
             </h4>

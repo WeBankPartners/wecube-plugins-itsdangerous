@@ -1,19 +1,4 @@
 {
-  "common": {
-    "changeLanguage": "中文"
-  },
-  "menu": {
-    "systemName": "Open-Monitor (功能演示版)",
-    "homepageName": "监控平台",
-    "view": "视图",
-    "endpointView": "对象视图",
-    "systemMonitoring": "系统监控",
-    "metricConfiguration": "指标配置",
-    "customViews": "自定义视图",
-    "templateManagement": "模板管理",
-    "configuration": "配置",
-    "alert": "告警"
-  },
   "placeholder": {
     "input": "请输入",
     "endpointSearch": "请输入后选择对象",
@@ -28,7 +13,6 @@
     "viewChart": "查看视图",
     "deleteChart": "删除监控图"
   },
-  "requestMoreData": "搜索获得更多数据…",
   "field": {
     "endpoint": "对象",
     "group": "组",
@@ -52,18 +36,6 @@
     "guid": "GUID",
     "displayName": "显示名",
     "type": "类型"
-  },
-  "title": {
-    "viewConfiguration": "视图配置",
-    "metricConfiguration": "指标配置",
-    "templateName": "模板名称",
-    "viewTemplate": "视图模板",
-    "updateTime": "更新时间",
-    "endpointAdd": "对象新增",
-    "groupAdd": "组新增",
-    "logAdd": "关键字新增",
-    "theme": "主题",
-    "setUp": "设置"
   },
   "button": {
     "MoM": "同环比",
@@ -117,33 +89,6 @@
     "action": "操作",
     "noDataTip": "当前查询条件尚无数据"
   },
-  "tableKey": {
-    "endpoint": "对象",
-    "group": "组",
-    "status": "状态",
-    "s_metric": "指标",
-    "start_value": "异常值",
-    "s_cond": "阈值",
-    "threshold": "阈值",
-    "s_last": "持续时间",
-    "s_priority": "级别",
-    "start": "开始时间",
-    "end": "结束时间",
-    "activeDate": "生效时间",
-    "name": "名称",
-    "nickname": "昵称",
-    "email": "邮箱",
-    "phone": "电话",
-    "role": "角色",
-    "description": "描述",
-    "expr": "表达式",
-    "content": "通知内容",
-    "path": "路径",
-    "keyword": "关键字",
-    "condition": "条件",
-    "systemName": "系统名称",
-    "logPath": "日志路径"
-  },
   "tips": {
     "required": " 必填",
     "inputRequired": "必填,2-60字符",
@@ -156,40 +101,8 @@
     "emptyToadd": "存在空项，无法新增！",
     "emptyToSave": "存在空项，无法保存！"
   },
-  "metricConfigTipsone": "1、请先搜索主机作为输入源并选择监控指标",
-  "metricConfigTipstwo": "2、点击 '查询' 可查看当前对象及指标下监控视图；",
-  "metricConfigTipsthree": "3、使用 '新增指标' 增加指标项，并在点击 '保存修改' 后将配置保存；",
-  "delConfirm": {
-    "title": "删除确认",
-    "tip": "即将被删除",
-    "button": "删除"
-  },
-  "resourceLevel": {
-    "addPanel": "新增层级对象",
-    "addAssociatedRole": "配置关联角色",
-    "addAssociatedObject": "配置关联对象",
-    "alarmCallback": "告警回调",
-    "levelMsg": "节点信息",
-    "associatedRole": "关联角色",
-    "role": "角色",
-    "associatedObject": "关联对象",
-    "endpoint": "对象",
-    "alarmFiring": "告警异常",
-    "alarmRecover": "告警恢复"
-  },
-  "alarmEmpty": "WoW !! 无任何报警！",
-  "details": "详细信息",
-  "visualAlarm": "可视化告警展示",
-  "processName": "进程名",
-  "processTags": "进程标签",
-  "displayName": "别名",
-  "alarmHistory": "历史告警",
-  "startDatePlaceholder": "请选择开始时间",
-  "endDatePlaceholder": "请选择结束时间",
-  "timeIntervalWarn": "时间区间选择错误",
-  "realTimeAlarm": "实时告警",
-  "clearAll": "清空",
 
+  "delete_confirm": "确认删除：",
   "hr_policies": "策略",
   "hr_box": "试盒",
   "hr_enabled": "启用",
@@ -212,5 +125,11 @@
   "service": "插件",
   "content_type": "脚本类型",
   "content_field": "脚本字段",
-  "endpoint_field": "脚本地址"
+  "endpoint_field": "脚本地址",
+  "detect": "检测",
+  "script": "脚本",
+  "lineno": "行号",
+  "message": "信息",
+  "script_name": "脚本名",
+  "content": "脚本内容"
 }

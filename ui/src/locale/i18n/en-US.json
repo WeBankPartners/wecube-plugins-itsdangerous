@@ -1,19 +1,4 @@
 {
-  "common": {
-    "changeLanguage": "English"
-  },
-  "menu": {
-    "systemName": "Open-Monitor (Demo Version)",
-    "homepageName": "Open-Monitor",
-    "view": "Views",
-    "endpointView": "Endpoint Views",
-    "systemMonitoring": "System Monitoring",
-    "metricConfiguration": "Metrics Configuration",
-    "customViews": "Customize Views",
-    "templateManagement": "Template Management",
-    "configuration": "Configuration",
-    "alert": "Alerting"
-  },
   "placeholder": {
     "input": "Please input",
     "endpointSearch": "Please input",
@@ -28,7 +13,6 @@
     "viewChart": "View chart",
     "deleteChart": "Delete chart"
   },
-  "requestMoreData": "Search for more data…",
   "field": {
     "group": "Group",
     "threshold": "Threshold",
@@ -52,18 +36,6 @@
     "guid": "GUID",
     "displayName": "Display Name",
     "type": "Type"
-  },
-  "title": {
-    "viewConfiguration": "View Configuration",
-    "metricConfiguration": "Metrics Configuration",
-    "templateName": "Template",
-    "viewTemplate": "View Template",
-    "updateTime": "Updated Time",
-    "endpointAdd": "Endpoint Add",
-    "groupAdd": "Group",
-    "logAdd": "Keyword",
-    "theme": "Theme",
-    "setUp": "Set up"
   },
   "button": {
     "MoM": "MoM",
@@ -117,33 +89,6 @@
     "action": "Action",
     "noDataTip": "No Data"
   },
-  "tableKey": {
-    "endpoint": "Endpoint",
-    "group": "Group",
-    "status": "Status",
-    "s_metric": "Metric",
-    "start_value": "Alarm value",
-    "s_cond": "Cond",
-    "threshold": "Threshold",
-    "s_last": "Last",
-    "s_priority": "Priority",
-    "start": "Start time",
-    "end": "End time",
-    "activeDate": "Active date",
-    "name": "Name",
-    "nickname": "Nickname",
-    "email": "Email",
-    "phone": "Phone",
-    "role": "Role",
-    "description": "Description",
-    "expr": "Expression",
-    "content": "Content",
-    "path": "Path",
-    "keyword": "Keyword",
-    "condition": "Condition",
-    "systemName": "System Name",
-    "logPath": "Log Path"
-  },
   "tips": {
     "required": " Required!",
     "inputRequired": "Required,2-60",
@@ -156,40 +101,8 @@
     "emptyToadd": "There are empty items and cannot be added!",
     "emptyToSave": "There are empty items and cannot be saved!"
   },
-  "metricConfigTipsone": "1. Input endpoint as data source and select the metric from the dropdown list.",
-  "metricConfigTipstwo": "2. Click 'Search' button to view the monitor graph based on the selected metric.",
-  "metricConfigTipsthree": "3. Click 'Add metric' button to config the metric, then click Save button to save the configuration.",
-  "delConfirm": {
-    "title": "Delete confirmation",
-    "tip": "will be deleted soon",
-    "button": "Delete"
-  },
-  "resourceLevel": {
-    "addPanel": "Add Panel",
-    "addAssociatedRole": "Add Associated Role",
-    "addAssociatedObject": "Add Associated Endpoint",
-    "alarmCallback": "Alarm Callback",
-    "levelMsg": "Node Information",
-    "associatedRole": "Associated Role",
-    "role": "Role",
-    "associatedObject": "Associated Endpoint",
-    "endpoint": "Endpoint",
-    "alarmFiring": "Alarm Firing",
-    "alarmRecover": "Alarm Recover"
-  },
-  "alarmEmpty": "WoW !!No alarm!",
-  "details": "Details",
-  "visualAlarm": "Visual Alarm Display",
-  "processName": "Process Name",
-  "processTags": "Process Tags",
-  "displayName": "Display Name",
-  "alarmHistory": "History alarm",
-  "startDatePlaceholder": "Start Date",
-  "endDatePlaceholder": "End Date",
-  "timeIntervalWarn": "Wrong Time Interval Selection",
-  "realTimeAlarm": "Real-time Alarm",
-  "clearAll": "Clear All",
 
+  "delete_confirm": "Confirm the deletion：",
   "hr_policies": "Policies",
   "hr_box": "Boxes",
   "hr_enabled": "Enabled",
@@ -212,5 +125,11 @@
   "service": "Service",
   "content_type": "Content Type",
   "content_field": "Content Field",
-  "endpoint_field": "Endpoint Field"
+  "endpoint_field": "Endpoint Field",
+  "detect": "Detect",
+  "script": "Script",
+  "lineno": "Line No",
+  "message": "Message",
+  "script_name": "Script Name",
+  "content": "Content"
 }

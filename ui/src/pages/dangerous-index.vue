@@ -1,6 +1,5 @@
 <template>
   <div class="monitor-config-index">
-    <Title :title="$t('menu.configuration')"></Title>
     <section>
       <Tabs :value="activeTab" @on-click="changeTab">
         <template v-for="(tabItem, tabIndex) in tabs">

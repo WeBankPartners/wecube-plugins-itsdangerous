@@ -8,6 +8,7 @@ import VueI18n from 'vue-i18n'
 import locale from 'view-design/dist/locale/en-US'
 import './locale/i18n'
 import { validate } from '@/assets/js/validate.js'
+import { commonUtil } from '@/pages/util/common-util.js'
 import '@/assets/css/local.bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'font-awesome/css/font-awesome.css'
@@ -18,6 +19,7 @@ import PageTable from '@/pages/components/table-page/page'
 import ModalComponent from '@/pages/components/modal'
 
 Vue.prototype.$validate = validate
+Vue.prototype.$commonUtil = commonUtil
 Vue.prototype.JQ = jquery
 Vue.component('PageTable', PageTable)
 Vue.component('ModalComponent', ModalComponent)

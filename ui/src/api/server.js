@@ -14,3 +14,5 @@ export const getTableData = url => req.get(url)
 export const addTableRow = (url, data) => req.post(`${url}`, data)
 export const editTableRow = (url, id, data) => req.patch(`/${url}/${id}`, data)
 export const deleteTableRow = (url, id) => req.delete(`/${url}/${id}`)
+
+export const boxDetect = (id, data) => req.post(`boxes/${id}/run`, data)

@@ -21,7 +21,10 @@ let tableEle = [
   {
     title: 'params',
     value: 'params',
-    display: true
+    display: true,
+    render: item => {
+      return JSON.stringify(item.params)
+    }
   },
   {
     title: 'hr_type',
@@ -130,24 +133,8 @@ export default {
     this.initData()
   },
   methods: {
-    managementUrl () {
-      let tableParams = this.pageConfig.CRUD
-      const pp = {
-        __offset: (this.pageConfig.pagination.page - 1) * this.pageConfig.pagination.size,
-        __limit: this.pageConfig.pagination.size
-      }
-      const params = Object.assign({}, pp, this.pageConfig.researchConfig.filters)
-      if (params) {
-        let tmp = ''
-        for (let key in params) {
-          tmp = tmp + key + '=' + params[key] + '&'
-        }
-        tableParams = tableParams + '?' + tmp
-      }
-      return tableParams
-    },
     async initData () {
-      const params = this.managementUrl()
+      const params = this.$commonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.pageConfig.table.tableData = data.data
@@ -169,13 +156,10 @@ export default {
       }
     },
     editF (rowData) {
-      console.log(rowData.params)
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
-      this.modelConfig.addRow.name = rowData.name
-      this.modelConfig.addRow.description = rowData.description
-      this.modelConfig.addRow.type = rowData.type
+      this.modelConfig.addRow = this.$commonUtil.manageEditParams(this.modelConfig.addRow, rowData)
       this.modelConfig.addRow.params = JSON.stringify(rowData.params)
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
@@ -190,7 +174,7 @@ export default {
     },
     deleteConfirmModal (rowData) {
       this.$Modal.confirm({
-        title: this.$t(this.modelConfig.modalTitle),
+        title: this.$t('delete_confirm') + rowData.name,
         'z-index': 1000000,
         onOk: async () => {
           const { status, message } = await deleteTableRow(this.pageConfig.CRUD, rowData.id)
