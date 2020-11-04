@@ -12,10 +12,12 @@ import tempfile
 import requests
 from talos.core import config, utils
 from talos.core.i18n import _
+from talos.db import crud
 from talos.utils import scoped_globals
 from wecube_plugins_itsdangerous.apps.processor import api as processor_api
 from wecube_plugins_itsdangerous.common import exceptions, s3
 from wecube_plugins_itsdangerous.common import utils as plugin_utils
+from wecube_plugins_itsdangerous.db import validator as my_validator
 from wecube_plugins_itsdangerous.db import resource
 
 LOG = logging.getLogger(__name__)
@@ -97,9 +99,13 @@ class ServiceScript(resource.ServiceScript):
                 unzip_path = filepath + '__unpack'
                 plugin_utils.unpack_file(filepath, unzip_path)
                 for name in glob.glob(os.path.join(unzip_path, '**/*' + shell_extension), recursive=True):
+                    if not os.path.isfile(name):
+                        continue
                     with open(name, 'r') as f:
                         scripts.append({'type': 'shell', 'content': f.read(), 'name': name[len(unzip_path) + 1:]})
                 for name in glob.glob(os.path.join(unzip_path, '**/*' + sql_extension), recursive=True):
+                    if not os.path.isfile(name):
+                        continue
                     with open(name, 'r') as f:
                         scripts.append({'type': 'sql', 'content': f.read(), 'name': name[len(unzip_path) + 1:]})
             elif filepath.endswith(shell_extension):
@@ -112,6 +118,33 @@ class ServiceScript(resource.ServiceScript):
 
 
 class Box(object):
+    data_rules = [
+        crud.ColumnValidator(field='requestId',
+                             rule=my_validator.LengthValidator(0, 63),
+                             validate_on=['check:O'],
+                             nullable=True),
+        crud.ColumnValidator(field='operator',
+                             rule=my_validator.LengthValidator(0, 63),
+                             validate_on=['check:O'],
+                             nullable=True),
+        crud.ColumnValidator(field='serviceName',
+                             rule=my_validator.LengthValidator(1, 255),
+                             validate_on=['check:M'],
+                             nullable=False),
+        crud.ColumnValidator(field='servicePath',
+                             rule=my_validator.LengthValidator(0, 255),
+                             validate_on=['check:O'],
+                             nullable=True),
+        crud.ColumnValidator(field='entityInstances',
+                             rule=my_validator.TypeValidator(list),
+                             validate_on=['check:M'],
+                             nullable=False),
+        crud.ColumnValidator(field='inputs',
+                             rule=my_validator.TypeValidator(list),
+                             validate_on=['check:M'],
+                             nullable=False),
+    ]
+
     def check(self, data):
         '''
         input data:
@@ -119,8 +152,9 @@ class Box(object):
             "requestId": "request-001",  //仅异步调用需要用到
             "operator": "admin",  //操作人
             "serviceName": "a/b(c)/d"
-            "entityInstances": [{"data": {"guid": "xxx_xxxxxx"}}]
-            "inputs": [  
+            "servicePath": "a/b/run"
+            "entityInstances": [{"guid": "xxx_xxxxxx"}]
+            "inputs": [
                 {"callbackParameter": "", "xml define prop": xxx},
                 {},
                 {}
@@ -129,12 +163,14 @@ class Box(object):
         '''
         results = []
         box = processor_api.Box()
-        service = data['serviceName']
-        entity_instances = data['entityInstances']
-        input_params = data['inputs']
+        clean_data = crud.ColumnValidator.get_clean_data(self.data_rules, data, 'check')
+        service = clean_data['serviceName']
+        entity_instances = clean_data['entityInstances']
+        input_params = clean_data['inputs']
         for input_param in input_params:
             detect_data = {
                 'serviceName': service,
+                'servicePath': clean_data['servicePath'],
                 'inputParams': input_param,
                 'scripts': ServiceScript().get_contents(service, input_param),
                 'entityInstances': entity_instances

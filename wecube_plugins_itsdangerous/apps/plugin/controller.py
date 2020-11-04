@@ -25,7 +25,8 @@ class ControllerBox(controller.Controller):
             "requestId": "request-001",  //仅异步调用需要用到
             "operator": "admin",  //操作人
             "serviceName": "a/b(c)/d"
-            "inputs": [  
+            "entityInstances": [{"data": {"guid": "xxx_xxxxxx"}}]
+            "inputs": [
                 {"callbackParameter": "", "xml define prop": xxx},
                 {},
                 {}

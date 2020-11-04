@@ -75,7 +75,7 @@ class Box(resource.Box):
                         if target_included:
                             LOG.debug('args scope: accepted')
                             if target['entity_scope']:
-                                target_included = scope.WeCMDBScope(target['entity_scope']).is_match(
+                                target_included = scope.WeCubeScope(target['entity_scope']).is_match(
                                     data['entityInstances'])
                             else:
                                 target_included = True
@@ -122,7 +122,7 @@ class Box(resource.Box):
             (Optional - JsonScope check)"serviceName": "xxx", 
             (Optional - JsonScope check)"inputParams": {...service input params}, 
             (Must - script check)"scripts": [{"type": None/"sql"/"shell", "content": "...", "name": "additional name info"}], 
-            (Must - WeCMDBScope check)"entityInstances": [{"guid": "xxx"}, {...}]}
+            (Must - WeCMDBScope check)"entityInstances": [{"guid": "xxx_xxxxxx"}]}
         '''
 
         results = []

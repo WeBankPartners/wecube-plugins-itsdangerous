@@ -114,6 +114,7 @@ def expr_seg_parse(expr):
     res = R_SEG_EXPRESSION.match(expr)
     if (res):
         result = {
+            'expr': expr,
             'backref_attribute': res.groups()[0] or '',
             'plugin': res.groups()[1] or '',
             'ci': res.groups()[2] or '',

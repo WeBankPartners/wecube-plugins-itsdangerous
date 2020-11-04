@@ -17,7 +17,6 @@ WECUBE_TOKEN = 'wecube_platform_token'
 
 
 class JsonScope(object):
-
     def __init__(self, expr):
         self.filters = expression.expr_filter_parse(expr)
 
@@ -45,76 +44,57 @@ def get_token(base_url):
     return token
 
 
-def wecmdb_ci_getter(expr_data, is_backref, guids, ci_mapping):
-    if expr_data['plugin'].lower() != 'wecmdb'.lower():
-        LOG.warning('wecmdb_ci_getter is for wecmdb only, but we got %s instead', expr_data['plugin'])
-        return []
+def wecube_ci_getter(expr_data, is_backref, guids, ci_mapping=None):
     base_url = CONF.wecube_platform.base_url
     token = get_token(base_url)
     data = {'filters': expr_data['filters']}
     # build json filters
     if guids is not None:
         if is_backref:
-            data['filters'].append({'name': expr_data['backref_attribute'] + '.guid', 'operator': 'in', 'value': guids})
+            data['filters'].append({'name': expr_data['backref_attribute'], 'operator': 'in', 'value': guids})
         else:
-            data['filters'].append({'name': 'guid', 'operator': 'in', 'value': guids})
-    ci_data_key = 'wecmdb/ci-types/%(ci)s' % {'ci': ci_mapping[expr_data['ci']]}
-    results = cache.get(ci_data_key, exipres=30)
+            data['filters'].append({'name': 'id', 'operator': 'in', 'value': guids})
+    ci_data_key = 'wecube/ci/%(ci)s' % {'ci': expr_data['ci']}
+    results = cache.get(ci_data_key, exipres=3)
     if not cache.validate(results):
-        LOG.debug('wecmdb_ci_getter POST /wecmdb/ui/v2/ci-types/%s/ci-data/query' % expr_data['ci'])
-        LOG.debug('wecmdb_ci_getter     filters: %s', data)
-        resp = requests.post(base_url + '/wecmdb/ui/v2/ci-types/%s/ci-data/query' % ci_mapping[expr_data['ci']],
-                             json={},
+        LOG.debug('wecube_ci_getter POST /platform/v1/data-model/dme/integrated-query with %s' % expr_data['ci'])
+        LOG.debug('wecube_ci_getter     filters: %s', data)
+        resp = requests.post(base_url + '/platform/v1/data-model/dme/integrated-query',
+                             json={
+                                 'dataModelExpression': expr_data['expr'],
+                                 'filters': []
+                             },
                              headers={'Authorization': 'Bearer ' + token})
-        results = resp.json()['data']['contents']
-        LOG.debug('wecmdb_ci_getter get %s result(all) length: %s' % (expr_data['ci'], len(results)))
+        results = resp.json()['data'] or []
+        LOG.debug('wecube_ci_getter get %s result(all) length: %s' % (expr_data['ci'], len(results)))
         cache.set(ci_data_key, results)
     results = [ret for ret in results if jsonfilter.match_all(data['filters'], ret['data'])]
-    LOG.debug('wecmdb_ci_getter get %s result(filter) length: %s' % (expr_data['ci'], len(results)))
+    LOG.debug('wecube_ci_getter get %s result(filter) length: %s' % (expr_data['ci'], len(results)))
     return results
 
 
-def wecmdb_ci_mapping():
-    base_url = CONF.wecube_platform.base_url
-    token = get_token(base_url)
-    resp = requests.get(base_url + '/wecmdb/ui/v2/ci-types', headers={'Authorization': 'Bearer ' + token})
-    results = {}
-    for data in resp.json()['data']:
-        results[data['tableName']] = data['ciTypeId']
-    return results
-
-
-class WeCMDBScope(object):
-
+class WeCubeScope(object):
     def __init__(self, expr):
         self.expression = expr
 
     def is_match(self, data):
         '''
-        check if wecmdb data(from expression) contains any item from data 
+        check if wecube data(from expression) contains any item from data 
         :param data: [{...}]
         '''
         if data is None:
             return False
-        ci_mapping = wecmdb_ci_mapping()
-        input_guids = [d['data']['guid'] for d in data]
+        # NOTE: (roy) change this if instance structure changed
+        input_guids = [d['id'] for d in data]
         input_ci_id = None
         if input_guids:
-            # NOTICE: may be bug, assume all data is the same ci type
-            input_ci_id = str(int(input_guids[0].split('_')[0]))
             try:
                 expr_groups = expression.expr_parse(self.expression)
             except ValueError as e:
                 LOG.exception(e)
             else:
-                expect_ci_id = ci_mapping[expr_groups[-1]['data']['ci']]
-                # only if input ci type == expr result ci type
-                if input_ci_id == str(expect_ci_id):
-                    results = expression.expr_query(self.expression, wecmdb_ci_getter, ci_mapping)
-                    expr_guids = [d['data']['guid'] for d in results]
-                    if set(input_guids) & set(expr_guids):
-                        return True
-                else:
-                    LOG.debug('input ci(%s) is not the same as expression require(%s), passthrough...', input_ci_id,
-                              expect_ci_id)
+                results = expression.expr_query(self.expression, wecube_ci_getter, None)
+                expr_guids = [d['id'] for d in results]
+                if set(input_guids) & set(expr_guids):
+                    return True
         return False

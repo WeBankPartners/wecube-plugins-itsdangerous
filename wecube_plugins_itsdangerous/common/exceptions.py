@@ -86,3 +86,17 @@ class BatchPartialError(PluginError):
     @property
     def message_format(self):
         return _('Fail to %(action)s [%(num)s] record, detail error in the data block')
+
+
+class ConflictError(PluginError):
+    """约束冲突错误异常"""
+    code = 200
+    error_code = 40009
+
+    @property
+    def title(self):
+        return _('Conflict')
+
+    @property
+    def message_format(self):
+        return _('Object is used by %(name)s')
