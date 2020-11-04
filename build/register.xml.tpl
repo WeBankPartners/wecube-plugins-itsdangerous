@@ -8,7 +8,7 @@
 
     <!-- 2.菜单注入 - 描述运行本插件包需要注入的菜单 -->
     <menus>
-        <menu code='ITS_DANGEROUS_CONFIG' cat='INTELLIGENCE_OPS' displayName="Its Dangerous Config" localDisplayName="高危规则配置">/dangerousIndex</menu>
+        <menu code='ADMIN_ITS_DANGEROUS_CONFIG' cat='ADMIN' displayName="Its Dangerous Config" localDisplayName="高危规则配置">/dangerousIndex</menu>
     </menus>
 
     <!-- 3.数据模型 - 描述本插件包的数据模型,并且描述和Framework数据模型的关系 -->
@@ -18,7 +18,11 @@
     <systemParameters></systemParameters>
 
     <!-- 5.权限设定 -->
-    <authorities></authorities>
+    <authorities>
+        <authority systemRoleName="SUPER_ADMIN" >
+            <menu code="ADMIN_ITS_DANGEROUS_CONFIG" />
+        </authority >
+    </authorities>
 
     <!-- 6.运行资源 - 描述部署运行本插件包需要的基础资源(如主机、虚拟机、容器、数据库等) -->
     <resourceDependencies>
