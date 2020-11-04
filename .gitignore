@@ -8,3 +8,17 @@ htmlcov/*
 unit_test_report.html
 .vscode/settings.json
 wecube_plugins_itsdangerous.egg-info
+main.py
+server.log
+simple_server.py
+sql.log
+test_token.py
+test.py
+.vscode/launch.json
+tmptests/__init__.py
+tmptests/clisim.py
+tmptests/expr.py
+tmptests/reader.py
+build/lib/*
+build/bdist.win-amd64/*
+build/bdist.linux-x86_64/*
