@@ -8,3 +8,5 @@ htmlcov/*
 unit_test_report.html
 .vscode/settings.json
 wecube_plugins_itsdangerous.egg-info
+
+ui/node_modules
