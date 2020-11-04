@@ -8,7 +8,7 @@
 
     <!-- 2.菜单注入 - 描述运行本插件包需要注入的菜单 -->
     <menus>
-        <menu code='ITS_DANGEROUS' cat='INTELLIGENCE_OPS' displayName="Its Dangerous" localDisplayName="高危检测">/dangerousIndex</menu>
+        <menu code='ITS_DANGEROUS_CONFIG' cat='INTELLIGENCE_OPS' displayName="Its Dangerous Config" localDisplayName="高危规则配置">/dangerousIndex</menu>
     </menus>
 
     <!-- 3.数据模型 - 描述本插件包的数据模型,并且描述和Framework数据模型的关系 -->
