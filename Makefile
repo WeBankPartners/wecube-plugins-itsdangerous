@@ -8,7 +8,8 @@ clean:
 build: clean
 	pip3 install wheel
 	python3 setup.py bdist_wheel
-	cd ui && npm install
+	cd ui && npm --registry https://registry.npm.taobao.org  install --unsafe-perm
+	cd ui && npm rebuild node-sass
 	cd ui && npm run build
 
 image: build
