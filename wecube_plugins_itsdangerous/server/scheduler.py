@@ -97,7 +97,7 @@ def main():
     scheduler = BlockingScheduler(jobstores=jobstores,
                                   executors=executors,
                                   job_defaults=job_defaults,
-                                  timezone=timezone('Asia/Shanghai'))
+                                  timezone=timezone(CONF.timezone))
     scheduler.add_job(cleanup_cached_dir, 'cron', hour='*')
     scheduler.add_job(rotate_log, 'cron', hour=3, minute=5)
     try:
