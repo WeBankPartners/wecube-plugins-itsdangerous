@@ -10,7 +10,7 @@ build: clean
 	python3 setup.py bdist_wheel
 	cd ui && npm --registry https://registry.npm.taobao.org  install --unsafe-perm
 	cd ui && npm rebuild node-sass
-	cd ui && npm run build
+	cd ui && npm run plugin
 
 image: build
 	docker build -t $(project_name):$(version) .
