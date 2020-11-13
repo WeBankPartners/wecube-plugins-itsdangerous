@@ -1,7 +1,6 @@
 # coding=utf-8
 
 from __future__ import absolute_import
-
 from wecube_plugins_itsdangerous.apps.processor import api as processor_api
 from wecube_plugins_itsdangerous.common import controller
 
@@ -74,3 +73,21 @@ class CollectionBox(controller.Collection):
 class ItemBox(controller.Item):
     name = 'wecube_plugins_itsdangerous.processor.box'
     resource = processor_api.BoxManage
+
+
+class BoxRun(controller.Controller):
+    allow_methods = ('POST', )
+    name = 'wecube_plugins_itsdangerous.processor.boxrun'
+    resource = processor_api.Box
+
+    def create(self, req, data, **kwargs):
+        return self.make_resource(req).run(data, **kwargs)
+
+
+class Run(controller.Controller):
+    allow_methods = ('POST', )
+    name = 'wecube_plugins_itsdangerous.processor.run'
+    resource = processor_api.Box
+
+    def create(self, req, data, **kwargs):
+        return self.make_resource(req).runall(data, **kwargs)

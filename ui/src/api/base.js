@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
-export const baseURL = '/itsdangerous/ui/v1'
+export const baseURL = '/itsdangerous/ui/v1/'
 export const req = axios.create({
   withCredentials: true,
   baseURL,

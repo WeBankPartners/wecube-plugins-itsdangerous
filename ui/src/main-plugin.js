@@ -27,5 +27,14 @@ window.use(VeeValidate)
 
 window.locale('zh-CN', zhCN)
 window.locale('en-US', enUS)
-
+const implicitRoute = {
+  'dangerousIndex/boxes': { 'zh-CN': '高危规则配置', 'en-US': 'Dangerous Config' },
+  'dangerousIndex/policy': { 'zh-CN': '高危规则配置', 'en-US': 'Dangerous Config' },
+  'dangerousIndex/rule': { 'zh-CN': '高危规则配置', 'en-US': 'Dangerous Config' },
+  'dangerousIndex/subjects': { 'zh-CN': '高危规则配置', 'en-US': 'Dangerous Config' },
+  'dangerousIndex/targets': { 'zh-CN': '高危规则配置', 'en-US': 'Dangerous Config' },
+  'dangerousIndex/match-params': { 'zh-CN': '高危规则配置', 'en-US': 'Dangerous Config' },
+  'dangerousIndex/plugin-params': { 'zh-CN': '高危规则配置', 'en-US': 'Dangerous Config' }
+}
+window.addImplicitRoute(implicitRoute)
 window.addRoutes && window.addRoutes(router, 'dangerous')

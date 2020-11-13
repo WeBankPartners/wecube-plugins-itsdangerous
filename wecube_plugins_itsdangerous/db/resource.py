@@ -1,6 +1,7 @@
 # coding=utf-8
 
 from __future__ import absolute_import
+from wecube_plugins_itsdangerous.common import exceptions
 
 from talos.core.i18n import _
 from talos.db import crud
@@ -12,7 +13,6 @@ from wecube_plugins_itsdangerous.db import validator as my_validator
 
 
 class BackRefValidator(validator.NullValidator):
-
     def __init__(self, cls_res):
         self.cls_res = cls_res
 
@@ -24,6 +24,7 @@ class BackRefValidator(validator.NullValidator):
 
 class MatchParam(crud.ResourceBase):
     orm_meta = models_manage.MatchParam
+    _default_order = ['-id']
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
@@ -36,9 +37,17 @@ class MatchParam(crud.ResourceBase):
         crud.ColumnValidator(field='params', rule=validator.TypeValidator(dict), validate_on=('create:M', 'update:O')),
     ]
 
+    def delete(self, rid, filters=None, detail=True):
+        refs = Rule().list({'match_param_id': rid})
+        if refs:
+            names = '|'.join([i['name'] for i in refs])
+            raise exceptions.ConflictError(name=names)
+        return super().delete(rid, filters, detail)
+
 
 class Policy(crud.ResourceBase):
     orm_meta = models_manage.Policy
+    _default_order = ['-id']
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
@@ -58,20 +67,34 @@ class Policy(crud.ResourceBase):
         if 'rules' in resource:
             refs = resource['rules']
             for ref in refs:
-                ref['policy_id'] = created['id']
-                PolicyRule(transaction=session).create(ref)
+                new_ref = {}
+                new_ref['policy_id'] = created['id']
+                new_ref['rule_id'] = ref
+                PolicyRule(transaction=session).create(new_ref)
 
     def _addtional_update(self, session, rid, resource, before_updated, after_updated):
         if 'rules' in resource:
             refs = resource['rules']
             PolicyRule(transaction=session).delete_all(filters={'policy_id': before_updated['id']})
             for ref in refs:
-                ref['policy_id'] = before_updated['id']
-                PolicyRule(transaction=session).create(ref)
+                new_ref = {}
+                new_ref['policy_id'] = before_updated['id']
+                new_ref['rule_id'] = ref
+                PolicyRule(transaction=session).create(new_ref)
+
+    def delete(self, rid, filters=None, detail=True):
+        with self.transaction() as session:
+            refs = BoxManage(session=session).list({'policy_id': rid})
+            if refs:
+                names = '|'.join([i['name'] for i in refs])
+                raise exceptions.ConflictError(name=names)
+            PolicyRule(transaction=session).delete_all(filters={'policy_id': rid})
+            return super().delete(rid, filters, detail)
 
 
 class Rule(crud.ResourceBase):
     orm_meta = models_manage.Rule
+    _default_order = ['-id']
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
@@ -104,6 +127,7 @@ class Rule(crud.ResourceBase):
 
 class Subject(crud.ResourceBase):
     orm_meta = models_manage.Subject
+    _default_order = ['-id']
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
@@ -123,31 +147,45 @@ class Subject(crud.ResourceBase):
         if 'targets' in resource:
             refs = resource['targets']
             for ref in refs:
-                ref['subject_id'] = created['id']
-                SubjectTarget(transaction=session).create(ref)
+                new_ref = {}
+                new_ref['subject_id'] = created['id']
+                new_ref['target_id'] = ref
+                SubjectTarget(transaction=session).create(new_ref)
 
     def _addtional_update(self, session, rid, resource, before_updated, after_updated):
         if 'targets' in resource:
             refs = resource['targets']
             SubjectTarget(transaction=session).delete_all(filters={'subject_id': before_updated['id']})
             for ref in refs:
-                ref['subject_id'] = before_updated['id']
-                SubjectTarget(transaction=session).create(ref)
+                new_ref = {}
+                new_ref['subject_id'] = before_updated['id']
+                new_ref['target_id'] = ref
+                SubjectTarget(transaction=session).create(new_ref)
+
+    def delete(self, rid, filters=None, detail=True):
+        with self.transaction() as session:
+            refs = BoxManage(session=session).list({'subject_id': rid})
+            if refs:
+                names = '|'.join([i['name'] for i in refs])
+                raise exceptions.ConflictError(name=names)
+            SubjectTarget(transaction=session).delete_all(filters={'subject_id': rid})
+            return super().delete(rid, filters, detail)
 
 
 class Target(crud.ResourceBase):
     orm_meta = models_manage.Target
+    _default_order = ['-id']
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
                              validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='enabled', rule_type='in', rule=[0, 1], validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='args_scope',
-                             rule=my_validator.LengthValidator(1, 512),
+                             rule=my_validator.LengthValidator(0, 512),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='entity_scope',
-                             rule=my_validator.LengthValidator(1, 512),
+                             rule=my_validator.LengthValidator(0, 512),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
     ]
@@ -156,11 +194,13 @@ class Target(crud.ResourceBase):
 class Box(crud.ResourceBase):
     # optimize for box query
     orm_meta = models_box.Box
+    _default_order = ['-id']
     _dynamic_relationship = False
 
 
 class BoxManage(crud.ResourceBase):
     orm_meta = models_manage.Box
+    _default_order = ['-id']
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
@@ -192,12 +232,14 @@ class SubjectTarget(crud.ResourceBase):
 
 class ServiceScript(crud.ResourceBase):
     orm_meta = models_manage.ServiceScript
+    _default_order = ['-id']
     _validate = [
         crud.ColumnValidator(field='service',
                              rule=my_validator.LengthValidator(1, 63),
                              validate_on=['create:M', 'update:O']),
         crud.ColumnValidator(field='content_type',
-                             rule=my_validator.LengthValidator(1, 36),
+                             rule_type='in',
+                             rule=['shell', 'sql'],
                              validate_on=['create:O', 'update:O'],
                              nullable=True),
         crud.ColumnValidator(field='content_field',

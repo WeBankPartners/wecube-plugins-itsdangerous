@@ -27,3 +27,5 @@ def add_routes(api):
     # box
     api.add_route('/itsdangerous/ui/v1/boxes', controller.CollectionBox())
     api.add_route('/itsdangerous/ui/v1/boxes/{rid}', controller.ItemBox())
+    api.add_route('/itsdangerous/ui/v1/boxes/{rid}/run', controller.BoxRun())
+    api.add_route('/itsdangerous/v1/batch_execution_detection', controller.Run())

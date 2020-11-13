@@ -1,7 +1,7 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent> -->
   </div>
 </template>
 
@@ -94,14 +94,14 @@ export default {
             disabled: false,
             type: 'text'
           },
-          {
-            label: 'content_type',
-            value: 'content_type',
-            option: 'contentTypeOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          },
+          // {
+          //   label: 'content_type',
+          //   value: 'content_type',
+          //   option: 'contentTypeOptions',
+          //   placeholder: '',
+          //   disabled: false,
+          //   type: 'select'
+          // },
           {
             label: 'content_field',
             value: 'content_field',
