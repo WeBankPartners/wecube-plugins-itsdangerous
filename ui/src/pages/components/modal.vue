@@ -219,15 +219,17 @@ export default {
   },
   props: ['modelConfig'],
   mounted () {
+    console.log(1)
     let _this = this
     let modalId = !this.$root.$validate.isEmpty(this.modelConfig.modalId) ? 'add_edit_Modal' : this.modelConfig.modalId
 
     this.$root.JQ('#' + modalId).on('hidden.bs.modal', () => {
       // 清理表单验证错误信息
       _this.veeErrors.clear()
+      console.log(2)
       // 清除表单缓存内容  下面把清空switch的数据补全
       this.$root.$validate.emptyJson(_this.modelConfig.addRow)
-
+      console.log(3)
       // 清除表单缓存的selected数据
       // for (let p in _this.modelConfig.v_select_configs) {
       //   if (p.endsWith('selected')) {
@@ -268,7 +270,9 @@ export default {
       return interceptParams(this.$parent.modelTip.value, 20)
     },
     formValidate () {
+      console.log(4)
       return this.$validator.validate().then(result => {
+        console.log(5)
         // result 为false插件验证input没有填写完整,true为验证填写完整
         /** 验证 select是否进行了选填 实例可参照 [manage][authorizations]user-authorized.vue **/
         let flag = true
@@ -319,6 +323,7 @@ export default {
           // }
         }
         this.modelConfig.config = JSON.parse(JSON.stringify(this.modelConfig.config))
+        console.log(6)
         return result && flag
       })
     },

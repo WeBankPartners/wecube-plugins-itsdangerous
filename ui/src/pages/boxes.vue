@@ -1,7 +1,7 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
     <ModalComponent :modelConfig="detectConfig">
       <div slot="detectBtn">
         <div style="text-align: right">
@@ -11,7 +11,7 @@
         </div>
         <PageTable :pageConfig="exectPageConfig"></PageTable>
       </div>
-    </ModalComponent> -->
+    </ModalComponent>
   </div>
 </template>
 
