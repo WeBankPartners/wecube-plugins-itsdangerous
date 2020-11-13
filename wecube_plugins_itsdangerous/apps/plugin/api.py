@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 CONF = config.CONF
 
 
-def download_from_url(self, dir_path, url, random_name=False):
+def download_from_url(dir_path, url, random_name=False):
     filename = url.rsplit('/', 1)[-1]
     if random_name:
         filename = '%s_%s' % (utils.generate_uuid(), filename)
@@ -32,7 +32,7 @@ def download_from_url(self, dir_path, url, random_name=False):
     if url.startswith(CONF.wecube.server):
         # nexus url
         token = CONF.wecube_platform.token or scoped_globals.GLOBALS.request.auth_token
-        resp = requests.get(url, headers={'Authorization': 'Bearer ' + self.token}, stream=True)
+        resp = requests.get(url, headers={'Authorization': 'Bearer ' + token}, stream=True)
         chunk_size = 1024 * 1024
         stream = resp.raw
         chunk = stream.read(chunk_size)
@@ -46,7 +46,7 @@ def download_from_url(self, dir_path, url, random_name=False):
     return filepath, filename
 
 
-def ensure_url_cached(self, url):
+def ensure_url_cached(url):
     cache_dir = CONF.pakcage_cache_dir
     filename = url.rsplit('/', 1)[-1]
     new_filename = hashlib.sha1(url.encode()).hexdigest() + '-' + filename
@@ -58,7 +58,7 @@ def ensure_url_cached(self, url):
             else:
                 with tempfile.TemporaryDirectory() as download_path:
                     LOG.info('download from: %s for pakcage: %s', url, url)
-                    filepath = self.download_from_url(download_path, url)
+                    filepath = download_from_url(download_path, url)
                     LOG.info('download complete')
                     os.rename(filepath, cached_file_path)
         else:
