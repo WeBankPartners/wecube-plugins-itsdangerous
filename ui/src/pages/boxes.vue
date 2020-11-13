@@ -140,23 +140,23 @@ export default {
             disabled: false,
             type: 'text'
           },
-          { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' }
-          // {
-          //   label: 'hr_policies',
-          //   value: 'policy_id',
-          //   option: 'policyOptions',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // },
-          // {
-          //   label: 'hr_subject',
-          //   value: 'subject_id',
-          //   option: 'subjectOptions',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // }
+          { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
+          {
+            label: 'hr_policies',
+            value: 'policy_id',
+            option: 'policyOptions',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
+          {
+            label: 'hr_subject',
+            value: 'subject_id',
+            option: 'subjectOptions',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据

@@ -1,7 +1,7 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent> -->
   </div>
 </template>
 
