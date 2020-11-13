@@ -7,12 +7,14 @@ import json
 import logging
 
 from talos.common import cache
+from talos.db import crud
 
 from wecube_plugins_itsdangerous.apps.processor import detector
 from wecube_plugins_itsdangerous.common import reader
 from wecube_plugins_itsdangerous.common import scope
 from wecube_plugins_itsdangerous.common import exceptions
 from wecube_plugins_itsdangerous.db import resource
+from wecube_plugins_itsdangerous.db import validator as my_validator
 
 LOG = logging.getLogger(__name__)
 
@@ -46,6 +48,29 @@ class BoxManage(resource.BoxManage):
 
 
 class Box(resource.Box):
+    runall_rules = [
+        crud.ColumnValidator(field='operator',
+                             rule=my_validator.LengthValidator(0, 63),
+                             validate_on=['check:O'],
+                             nullable=True),
+        crud.ColumnValidator(field='serviceName',
+                             rule=my_validator.LengthValidator(1, 255),
+                             validate_on=['check:M'],
+                             nullable=False),
+        crud.ColumnValidator(field='servicePath',
+                             rule=my_validator.LengthValidator(0, 255),
+                             validate_on=['check:O'],
+                             nullable=True),
+        crud.ColumnValidator(field='entityInstances',
+                             rule=my_validator.TypeValidator(list),
+                             validate_on=['check:M'],
+                             nullable=False),
+        crud.ColumnValidator(field='inputs',
+                             rule=my_validator.TypeValidator(list),
+                             validate_on=['check:M'],
+                             nullable=False),
+    ]
+
     def _get_rules(self, data, boxes=None):
         boxes = boxes or self.list(filters={'policy.enabled': 1, 'subject.enabled': 1})
         rules = {}
@@ -116,10 +141,46 @@ class Box(resource.Box):
             raise exceptions.NotFoundError(resource='Box')
         return self.check(data, boxes=refs)
 
+    def runall(self, data):
+        '''
+        input data:
+        {
+            // 操作人
+            "operator": "admin",
+            "serviceName": "a/b(c)/d",
+            "servicePath": "a/b/run",
+            "entityInstances": [{"id": "xxx_xxxxxx"}],
+            // inputs param for serviceName
+            "inputs": [/
+                {"callbackParameter": "", "xml define prop": xxx},
+                {},
+                {}
+            ]
+        }
+        '''
+        from wecube_plugins_itsdangerous.apps.plugin import api as plugin_api
+        results = []
+        clean_data = crud.ColumnValidator.get_clean_data(self.runall_rules, data, 'check')
+        service = clean_data['serviceName']
+        entity_instances = clean_data['entityInstances']
+        input_params = clean_data['inputs']
+        for input_param in input_params:
+            detect_data = {
+                'serviceName': service,
+                'servicePath': clean_data.get('servicePath', None),
+                'inputParams': input_param,
+                'scripts': plugin_api.ServiceScript().get_contents(service, input_param),
+                'entityInstances': entity_instances
+            }
+            input_results = self.check(detect_data)
+            results.append({'is_danger': True if len(input_results) > 0 else False, 'details': input_results})
+        return results
+
     def check(self, data, boxes=None):
         '''
         data: {
-            (Optional - JsonScope check)"serviceName": "xxx", 
+            (Optional - JsonScope check)"serviceName": "a/b(c)/d", 
+            (Optional - JsonScope check)"servicePath": "a/b/run", 
             (Optional - JsonScope check)"inputParams": {...service input params}, 
             (Must - script check)"scripts": [{"type": None/"sql"/"shell", "content": "...", "name": "additional name info"}], 
             (Must - WeCMDBScope check)"entityInstances": [{"guid": "xxx_xxxxxx"}]}

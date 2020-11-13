@@ -100,38 +100,6 @@ def test_expression_advance():
     }]
 
 
-def test_expression_match(mocker):
-    mocker.patch.object(scope,
-                        'wecube_ci_getter',
-                        return_value=[{
-                            'data': {
-                                'guid': '0032_0000000022',
-                                'host_resource_instance': {
-                                    'guid': '1'
-                                }
-                            }
-                        }, {
-                            'data': {
-                                'guid': '0032_0000000023',
-                                'host_resource_instance': {
-                                    'guid': '1'
-                                }
-                            }
-                        }])
-    expr1 = "wecmdb:deploy_environment{guid eq '0003_0000000001'}~(deploy_environment)wecmdb:app_system~(app_system)wecmdb:subsys{key_name eq 'PRD_TaDEMO_CORE'}~(subsys)wecmdb:unit~(unit)wecmdb:app_instance.host_resource_instance>wecmdb:host_resource_instance"
-    ret = expression.expr_match_input(expression.expr_parse(expr1), scope.wecube_ci_getter, [{
-        'data': {
-            'guid': '0003_0000000001'
-        }
-    }], None)
-    LOG.info(ret)
-    for env_guid, vals in ret.items():
-        assert env_guid == '0003_0000000001'
-        assert len(vals) == 2
-        for v in vals:
-            assert v['data']['guid'] in ['0032_0000000022', '0032_0000000023']
-
-
 def test_expression_error():
     expr1 = "cmdb:a:b>c.d"
     expr2 = "cmdb:a{not filter}.b>b.c"

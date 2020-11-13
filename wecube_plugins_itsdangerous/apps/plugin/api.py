@@ -14,7 +14,6 @@ from talos.core import config, utils
 from talos.core.i18n import _
 from talos.db import crud
 from talos.utils import scoped_globals
-from wecube_plugins_itsdangerous.apps.processor import api as processor_api
 from wecube_plugins_itsdangerous.common import exceptions, s3
 from wecube_plugins_itsdangerous.common import utils as plugin_utils
 from wecube_plugins_itsdangerous.db import validator as my_validator
@@ -29,9 +28,9 @@ def download_from_url(dir_path, url, random_name=False):
     if random_name:
         filename = '%s_%s' % (utils.generate_uuid(), filename)
     filepath = os.path.join(dir_path, filename)
-    if url.startswith(CONF.wecube.server):
+    if url.startswith(CONF.wecube.base_url):
         # nexus url
-        token = CONF.wecube_platform.token or scoped_globals.GLOBALS.request.auth_token
+        token = CONF.wecube.token or scoped_globals.GLOBALS.request.auth_token
         resp = requests.get(url, headers={'Authorization': 'Bearer ' + token}, stream=True)
         chunk_size = 1024 * 1024
         stream = resp.raw
@@ -42,8 +41,8 @@ def download_from_url(dir_path, url, random_name=False):
                 chunk = stream.read(chunk_size)
     else:
         client = s3.S3Downloader(url)
-        client.download_file(filepath, CONF.wecube_platform.s3.access_key, CONF.wecube_platform.s3.secret_key)
-    return filepath, filename
+        client.download_file(filepath, CONF.wecube.s3.access_key, CONF.wecube.s3.secret_key)
+    return filepath
 
 
 def ensure_url_cached(url):
@@ -153,7 +152,7 @@ class Box(object):
             "operator": "admin",  //操作人
             "serviceName": "a/b(c)/d"
             "servicePath": "a/b/run"
-            "entityInstances": [{"guid": "xxx_xxxxxx"}]
+            "entityInstances": [{"id": "xxx_xxxxxx"}]
             "inputs": [
                 {"callbackParameter": "", "xml define prop": xxx},
                 {},
@@ -161,6 +160,7 @@ class Box(object):
             ]
         }
         '''
+        from wecube_plugins_itsdangerous.apps.processor import api as processor_api
         results = []
         box = processor_api.Box()
         clean_data = crud.ColumnValidator.get_clean_data(self.data_rules, data, 'check')
@@ -170,7 +170,7 @@ class Box(object):
         for input_param in input_params:
             detect_data = {
                 'serviceName': service,
-                'servicePath': clean_data['servicePath'],
+                'servicePath': clean_data.get('servicePath', None),
                 'inputParams': input_param,
                 'scripts': ServiceScript().get_contents(service, input_param),
                 'entityInstances': entity_instances

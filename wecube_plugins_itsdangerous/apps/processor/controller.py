@@ -82,3 +82,12 @@ class BoxRun(controller.Controller):
 
     def create(self, req, data, **kwargs):
         return self.make_resource(req).run(data, **kwargs)
+
+
+class Run(controller.Controller):
+    allow_methods = ('POST', )
+    name = 'wecube_plugins_itsdangerous.processor.run'
+    resource = processor_api.Box
+
+    def create(self, req, data, **kwargs):
+        return self.make_resource(req).runall(data, **kwargs)

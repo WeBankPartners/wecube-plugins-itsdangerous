@@ -7,4 +7,4 @@ from wecube_plugins_itsdangerous.apps.plugin import controller
 
 def add_routes(api):
     # plugin box
-    api.add_route('/itsdangerous/v1/batch_execution_detection', controller.ControllerBox())
+    api.add_route('/itsdangerous/v1/detection', controller.ControllerBox())
