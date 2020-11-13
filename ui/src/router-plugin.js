@@ -14,6 +14,7 @@ const router = [
     component: dangerousIndex,
     params: {},
     props: true,
+    redirect: '/dangerousIndex/boxes',
     children: [
       {
         path: 'policy',

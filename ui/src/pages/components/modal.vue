@@ -229,34 +229,34 @@ export default {
       this.$root.$validate.emptyJson(_this.modelConfig.addRow)
 
       // 清除表单缓存的selected数据
-      for (let p in _this.modelConfig.v_select_configs) {
-        if (p.endsWith('selected')) {
-          _this.modelConfig.v_select_configs[p] = null
-        }
-      }
+      // for (let p in _this.modelConfig.v_select_configs) {
+      //   if (p.endsWith('selected')) {
+      //     _this.modelConfig.v_select_configs[p] = null
+      //   }
+      // }
       // 清除表单selected
-      for (let i = 0; i < this.modelConfig.config.length; i++) {
-        // 这里不能清空switch绑定的数据，不然会报错
-        if (this.modelConfig.config[i].type === 'switch') {
-          this.modelConfig.addRow[this.modelConfig.config[i].value] = false
-        }
-        if (this.modelConfig.config[i].type === 'textarea' && this.modelConfig.config[i].v_validate) {
-          this.modelConfig.config[i].isError = false
-        }
-        if (this.modelConfig.config[i].type === 'select' && this.modelConfig.config[i].v_validate) {
-          this.modelConfig.config[i].isError = false
-        }
-        if (this.modelConfig.config[i].type === 'slot') {
-          let arr = this.modelConfig.config[i].v_validate ? this.modelConfig.config[i].v_validate : []
-          for (let j = 0; j < arr.length; j++) {
-            let key = arr[j].isError
-            let value = arr[j].value
-            if (arr[j].type === 'select' && !this.modelConfig.v_select_configs[value]) {
-              this.modelConfig.v_select_configs[key] = false
-            }
-          }
-        }
-      }
+      // for (let i = 0; i < this.modelConfig.config.length; i++) {
+      //   // 这里不能清空switch绑定的数据，不然会报错
+      //   if (this.modelConfig.config[i].type === 'switch') {
+      //     this.modelConfig.addRow[this.modelConfig.config[i].value] = false
+      //   }
+      //   if (this.modelConfig.config[i].type === 'textarea' && this.modelConfig.config[i].v_validate) {
+      //     this.modelConfig.config[i].isError = false
+      //   }
+      //   if (this.modelConfig.config[i].type === 'select' && this.modelConfig.config[i].v_validate) {
+      //     this.modelConfig.config[i].isError = false
+      //   }
+      //   if (this.modelConfig.config[i].type === 'slot') {
+      //     let arr = this.modelConfig.config[i].v_validate ? this.modelConfig.config[i].v_validate : []
+      //     for (let j = 0; j < arr.length; j++) {
+      //       let key = arr[j].isError
+      //       let value = arr[j].value
+      //       if (arr[j].type === 'select' && !this.modelConfig.v_select_configs[value]) {
+      //         this.modelConfig.v_select_configs[key] = false
+      //       }
+      //     }
+      //   }
+      // }
     })
   },
   watch: {},
