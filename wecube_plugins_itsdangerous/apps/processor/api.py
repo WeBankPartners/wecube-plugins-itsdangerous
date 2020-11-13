@@ -188,19 +188,17 @@ class Box(resource.Box):
 
         results = []
         scripts = data['scripts']
+        rules = self._get_rules(data, boxes=boxes)
+        rules = self._rule_grouping(rules)
         for item in scripts:
             script_name = item.get('name', '') or ''
             script_content = item.get('content', '') or ''
             script_type = item.get('type', None)
-            rules = self._get_rules(data, boxes=boxes)
-            rules = self._rule_grouping(rules)
             for key, values in rules.items():
                 script_results = []
                 if not script_type:
                     script_type = reader.guess(script_content) or 'text'
-                if key == 'filter':
-                    script_results = detector.JsonFilterDetector(data, values).check()
-                elif key == 'cli' and script_type == 'shell':
+                if key == 'cli' and script_type == 'shell':
                     script_results = detector.BashCliDetector(script_content, values).check()
                 elif key == 'sql' and script_type == 'sql':
                     script_results = detector.SqlDetector(script_content, values).check()
@@ -211,4 +209,6 @@ class Box(resource.Box):
                 for r in script_results:
                     r['script_name'] = script_name
                 results.extend(script_results)
+        # check filter rules global
+        results.extend(detector.JsonFilterDetector(data, rules.get('filter', [])).check())
         return results
