@@ -3,7 +3,7 @@ import logging
 
 import pytest
 
-from wecube_plugins_itsdangerous.common import expression, scope
+from wecube_plugins_itsdangerous.common import expression
 from wecube_plugins_itsdangerous.common import exceptions
 
 LOG = logging.getLogger(__name__)

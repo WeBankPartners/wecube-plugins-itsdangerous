@@ -77,17 +77,17 @@ class ItemBox(controller.Item):
 
 class BoxRun(controller.Controller):
     allow_methods = ('POST', )
-    name = 'wecube_plugins_itsdangerous.processor.boxrun'
+    name = 'wecube_plugins_itsdangerous.processor.box.run'
     resource = processor_api.Box
 
     def create(self, req, data, **kwargs):
-        return self.make_resource(req).run(data, **kwargs)
+        return self.make_resource(req).simplerun(data, **kwargs)
 
 
-class Run(controller.Controller):
+class PluginCheck(controller.Controller):
     allow_methods = ('POST', )
-    name = 'wecube_plugins_itsdangerous.processor.run'
+    name = 'wecube_plugins_itsdangerous.processor.box.plugin_check'
     resource = processor_api.Box
 
     def create(self, req, data, **kwargs):
-        return self.make_resource(req).runall(data, **kwargs)
+        return self.make_resource(req).plugin_check(data, **kwargs)
