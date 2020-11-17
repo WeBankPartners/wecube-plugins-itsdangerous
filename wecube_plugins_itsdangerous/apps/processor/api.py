@@ -69,6 +69,9 @@ def ensure_url_cached(url):
     :rtype: tuple(str, str)
     '''
     cache_dir = CONF.pakcage_cache_dir
+    # make dir if not exist
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir, exist_ok=True)
     filename = url.rsplit('/', 1)[-1]
     new_filename = hashlib.sha1(url.encode()).hexdigest() + '-' + filename
     cached_file_path = os.path.join(cache_dir, new_filename)
