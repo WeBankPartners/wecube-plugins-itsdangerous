@@ -177,14 +177,14 @@ export default {
         noBtn: true,
         modalStyle: 'max-width:1000px',
         config: [
-          // {
-          //   label: 'hr_type',
-          //   value: 'type',
-          //   option: 'typeOptions',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // },
+          {
+            label: 'hr_type',
+            value: 'type',
+            option: 'typeOptions',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
           {
             label: 'script',
             value: 'content',

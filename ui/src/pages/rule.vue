@@ -1,7 +1,7 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent> -->
+    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
   </div>
 </template>
 
@@ -116,40 +116,40 @@ export default {
           },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
           { label: 'hr_level', value: 'level', max: 10, min: 0, placeholder: '', disabled: false, type: 'inputNumber' },
-          // {
-          //   label: 'effect_on',
-          //   value: 'effect_on',
-          //   option: 'effectOptions',
-          //   v_validate: 'required:true',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // },
-          // {
-          //   label: 'match_type',
-          //   value: 'match_type',
-          //   option: 'matchOptions',
-          //   v_validate: 'required:true',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // },
-          // {
-          //   label: 'match_value',
-          //   value: 'match_value',
-          //   v_validate: 'required:true',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'text'
-          // },
-          // {
-          //   label: 'match_param_id',
-          //   value: 'match_param_id',
-          //   option: 'matchParamOption',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // },
+          {
+            label: 'effect_on',
+            value: 'effect_on',
+            option: 'effectOptions',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
+          {
+            label: 'match_type',
+            value: 'match_type',
+            option: 'matchOptions',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
+          {
+            label: 'match_value',
+            value: 'match_value',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'text'
+          },
+          {
+            label: 'match_param_id',
+            value: 'match_param_id',
+            option: 'matchParamOption',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
           { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
         ],
         addRow: {

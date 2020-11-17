@@ -1,7 +1,7 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent> -->
+    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
   </div>
 </template>
 
@@ -105,8 +105,8 @@ export default {
             placeholder: '',
             disabled: false,
             type: 'text'
-          }
-          // { label: 'hr_type', value: 'type', option: 'typeOptions', placeholder: '', disabled: false, type: 'select' }
+          },
+          { label: 'hr_type', value: 'type', option: 'typeOptions', placeholder: '', disabled: false, type: 'select' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
