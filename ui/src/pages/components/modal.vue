@@ -45,9 +45,7 @@
                   :disabled="modelConfig.isAdd ? false : item.disabled"
                   :placeholder="$t(item.placeholder)"
                   type="text"
-                  v-validate="item.v_validate"
                   :name="item.value"
-                  :class="{ 'red-border': veeErrors.has(item.value) }"
                   class="col-md-7 form-control model-input"
                 />
                 <input
@@ -58,7 +56,6 @@
                   :placeholder="$t(item.placeholder)"
                   type="text"
                   :name="item.value"
-                  v-validate="item.v_validate"
                   class="col-md-7 form-control model-input"
                 />
                 <input
@@ -69,7 +66,6 @@
                   type="password"
                   :placeholder="$t(item.placeholder)"
                   :name="item.value"
-                  v-validate="item.v_validate"
                   class="col-md-7 form-control model-input"
                 />
                 <input
@@ -85,7 +81,6 @@
                   v-if="item.type === 'textarea' && isHide(item.hide)"
                   v-model="modelConfig.addRow[item.value]"
                   :placeholder="$t(item.placeholder)"
-                  v-validate="item.v_validate"
                   :class="item.isError ? 'red-border textareaSty' : 'textareaSty'"
                   :disabled="item.disabled"
                 />
@@ -160,15 +155,6 @@
                     <div v-html="item.tips"></div>
                   </div>
                 </Poptip>
-
-                <label v-show="veeErrors.has(item.value) && isHide(item.hide)" class="col-md-7 help is-danger"
-                  >{{ $t(item.label) }} {{ veeErrors.first(item.value) }}</label
-                >
-                <label
-                  v-if="(item.type === 'select' || item.type === 'textarea') && item.isError"
-                  class="col-md-7 help is-danger"
-                  >{{ $t(item.label) }} {{ $t('tips.required') }}</label
-                >
               </div>
             </form>
           </div>
@@ -223,7 +209,6 @@ export default {
     let modalId = !this.$root.$validate.isEmpty(this.modelConfig.modalId) ? 'add_edit_Modal' : this.modelConfig.modalId
     this.$root.JQ('#' + modalId).on('hidden.bs.modal', () => {
       // 清理表单验证错误信息
-      _this.veeErrors.clear()
       // 清除表单缓存内容  下面把清空switch的数据补全
       this.$root.$validate.emptyJson(_this.modelConfig.addRow)
       // 清除表单缓存的selected数据
@@ -321,25 +306,31 @@ export default {
       })
     },
     save (val) {
-      let resultPromise = this.formValidate()
-      resultPromise.then(result => {
-        if (result) {
-          if (val) {
-            this.$parent.addPost()
-          } else {
-            this.$parent.editPost()
-          }
-        }
-      })
+      // let resultPromise = this.formValidate()
+      // resultPromise.then(result => {
+      //   if (result) {
+      //     if (val) {
+      //       this.$parent.addPost()
+      //     } else {
+      //       this.$parent.editPost()
+      //     }
+      //   }
+      // })
+      if (val) {
+        this.$parent.addPost()
+      } else {
+        this.$parent.editPost()
+      }
     },
     // 自定义模态框保存响应函数
     customFunc (func) {
-      let val = this.formValidate()
-      val.then(result => {
-        if (result) {
-          this.$parent[func]()
-        }
-      })
+      // let val = this.formValidate()
+      // val.then(result => {
+      //   if (result) {
+      //     this.$parent[func]()
+      //   }
+      // })
+      this.$parent[func]()
     },
     // 控制是否显示必填'*'
     isRequired_s (item) {
