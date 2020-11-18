@@ -7,7 +7,6 @@ import { commonUtil } from '@/pages/util/common-util.js'
 import '@/assets/css/local.bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'font-awesome/css/font-awesome.css'
-import VeeValidate from '@/assets/veeValidate/VeeValidate'
 import jquery from 'jquery'
 import zhCN from '@/locale/i18n/zh-CN.json'
 import enUS from '@/locale/i18n/en-US.json'
@@ -23,7 +22,6 @@ window.addOptions({
 
 window.component('PageTable', PageTable)
 window.component('ModalComponent', ModalComponent)
-window.use(VeeValidate)
 
 window.locale('zh-CN', zhCN)
 window.locale('en-US', enUS)

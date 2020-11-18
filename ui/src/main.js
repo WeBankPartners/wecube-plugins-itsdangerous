@@ -12,7 +12,6 @@ import { commonUtil } from '@/pages/util/common-util.js'
 import '@/assets/css/local.bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'font-awesome/css/font-awesome.css'
-import VeeValidate from '@/assets/veeValidate/VeeValidate'
 import jquery from 'jquery'
 
 import PageTable from '@/pages/components/table-page/page'
@@ -23,7 +22,6 @@ Vue.prototype.$commonUtil = commonUtil
 Vue.prototype.JQ = jquery
 Vue.component('PageTable', PageTable)
 Vue.component('ModalComponent', ModalComponent)
-Vue.use(VeeValidate)
 
 Vue.config.productionTip = false
 
