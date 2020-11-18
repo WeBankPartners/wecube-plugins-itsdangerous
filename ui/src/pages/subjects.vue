@@ -1,7 +1,18 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="subjects">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_target') }}:</label>
+          <Select v-model="modelConfig.addRow.targets" style="width:338px" multiple>
+            <Option v-for="item in modelConfig.v_select_configs.targetOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+      </div>
+    </ModalComponent>
   </div>
 </template>
 
@@ -89,14 +100,7 @@ export default {
             disabled: false,
             type: 'text'
           },
-          {
-            label: 'hr_target',
-            value: 'targets',
-            option: 'targetOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'multiSelect'
-          },
+          { name: 'subjects', type: 'slot' },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
           { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
         ],

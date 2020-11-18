@@ -1,7 +1,34 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="rule">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('effect_on') }}:</label>
+          <Select v-model="modelConfig.addRow.policy_id" style="width:338px">
+            <Option v-for="item in modelConfig.v_select_configs.effectOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('match_type') }}:</label>
+          <Select v-model="modelConfig.addRow.match_type" style="width:338px">
+            <Option v-for="item in modelConfig.v_select_configs.matchOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('match_param_id') }}:</label>
+          <Select v-model="modelConfig.addRow.match_param_id" style="width:338px">
+            <Option v-for="item in modelConfig.v_select_configs.matchParamOption" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+      </div>
+    </ModalComponent>
   </div>
 </template>
 
@@ -117,24 +144,6 @@ export default {
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
           { label: 'hr_level', value: 'level', max: 10, min: 0, placeholder: '', disabled: false, type: 'inputNumber' },
           {
-            label: 'effect_on',
-            value: 'effect_on',
-            option: 'effectOptions',
-            v_validate: 'required:true',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          },
-          {
-            label: 'match_type',
-            value: 'match_type',
-            option: 'matchOptions',
-            v_validate: 'required:true',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          },
-          {
             label: 'match_value',
             value: 'match_value',
             v_validate: 'required:true',
@@ -142,15 +151,8 @@ export default {
             disabled: false,
             type: 'text'
           },
-          {
-            label: 'match_param_id',
-            value: 'match_param_id',
-            option: 'matchParamOption',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          },
-          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
+          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' },
+          { name: 'rule', type: 'slot' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据

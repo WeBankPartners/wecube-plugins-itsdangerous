@@ -1,7 +1,26 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="boxes">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_policies') }}:</label>
+          <Select v-model="modelConfig.addRow.policy_id" style="width:338px">
+            <Option v-for="item in modelConfig.v_select_configs.policyOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_subject') }}:</label>
+          <Select v-model="modelConfig.addRow.subject_id" style="width:338px">
+            <Option v-for="item in modelConfig.v_select_configs.subjectOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+      </div>
+    </ModalComponent>
     <ModalComponent :modelConfig="detectConfig">
       <div slot="detectBtn">
         <div style="text-align: right">
@@ -141,22 +160,7 @@ export default {
             type: 'text'
           },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          {
-            label: 'hr_policies',
-            value: 'policy_id',
-            option: 'policyOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          },
-          {
-            label: 'hr_subject',
-            value: 'subject_id',
-            option: 'subjectOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          }
+          { name: 'boxes', type: 'slot' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据

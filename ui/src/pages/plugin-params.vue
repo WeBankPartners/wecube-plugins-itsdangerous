@@ -1,7 +1,22 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="plugin-params">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('content_type') }}:</label>
+          <Select v-model="modelConfig.addRow.content_type" style="width:338px">
+            <Option
+              v-for="item in modelConfig.v_select_configs.contentTypeOptions"
+              :value="item.value"
+              :key="item.value"
+            >
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+      </div>
+    </ModalComponent>
   </div>
 </template>
 
@@ -94,14 +109,7 @@ export default {
             disabled: false,
             type: 'text'
           },
-          {
-            label: 'content_type',
-            value: 'content_type',
-            option: 'contentTypeOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          },
+          { name: 'plugin-params', type: 'slot' },
           {
             label: 'content_field',
             value: 'content_field',
