@@ -5,7 +5,7 @@
       <div slot="subjects">
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_target') }}:</label>
-          <Select v-model="modelConfig.addRow.targets" style="width:338px" multiple>
+          <Select v-model="modelConfig.addRow.targets" style="width: 338px" multiple>
             <Option v-for="item in modelConfig.v_select_configs.targetOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -32,6 +32,26 @@ let tableEle = [
   {
     title: 'hr_enabled',
     value: 'enabled',
+    display: true
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]

@@ -5,7 +5,7 @@
       <div slot="rule">
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('effect_on') }}:</label>
-          <Select v-model="modelConfig.addRow.policy_id" style="width:338px">
+          <Select v-model="modelConfig.addRow.policy_id" style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.effectOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -13,7 +13,7 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('match_type') }}:</label>
-          <Select v-model="modelConfig.addRow.match_type" style="width:338px">
+          <Select v-model="modelConfig.addRow.match_type" style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.matchOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -21,7 +21,7 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('match_param_id') }}:</label>
-          <Select v-model="modelConfig.addRow.match_param_id" style="width:338px">
+          <Select v-model="modelConfig.addRow.match_param_id" style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.matchParamOption" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -72,7 +72,27 @@ let tableEle = [
   },
   {
     title: 'match_param_id', // 不必
-    value: 'match_param_id', // 调用参数
+    value: 'match_param.name', // 调用参数
+    display: true
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]

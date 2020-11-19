@@ -101,7 +101,6 @@
     "emptyToadd": "存在空项，无法新增！",
     "emptyToSave": "存在空项，无法保存！"
   },
-
   "delete_confirm": "确认删除：",
   "hr_policies": "策略",
   "hr_box": "试盒",
@@ -131,5 +130,9 @@
   "lineno": "行号",
   "message": "信息",
   "script_name": "脚本名",
-  "content": "脚本内容"
+  "content": "脚本内容",
+  "hr_created_by": "创建用户",
+  "hr_created_time": "创建时间",
+  "hr_updated_by": "更新用户",
+  "hr_updated_time": "更新时间"
 }

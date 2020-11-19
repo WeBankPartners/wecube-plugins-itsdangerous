@@ -101,7 +101,6 @@
     "emptyToadd": "There are empty items and cannot be added!",
     "emptyToSave": "There are empty items and cannot be saved!"
   },
-
   "delete_confirm": "Confirm the deletion：",
   "hr_policies": "Policies",
   "hr_box": "Boxes",
@@ -131,5 +130,9 @@
   "lineno": "Line No",
   "message": "Message",
   "script_name": "Script Name",
-  "content": "Content"
+  "content": "Content",
+  "hr_created_by": "Created By",
+  "hr_created_time": "Created Time",
+  "hr_updated_by": "Updated By",
+  "hr_updated_time": "Updated Time"
 }
