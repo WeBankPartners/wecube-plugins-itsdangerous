@@ -4,6 +4,10 @@
     <ModalComponent :modelConfig="modelConfig">
       <div slot="rule">
         <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_level') }}:</label>
+          <InputNumber style="width:338px" :max="10" :min="0" v-model="modelConfig.addRow.level"> </InputNumber>
+        </div>
+        <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('effect_on') }}:</label>
           <Select v-model="modelConfig.addRow.policy_id" style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.effectOptions" :value="item.value" :key="item.value">
@@ -162,7 +166,6 @@ export default {
             type: 'text'
           },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          { label: 'hr_level', value: 'level', max: 10, min: 0, placeholder: '', disabled: false, type: 'inputNumber' },
           {
             label: 'match_value',
             value: 'match_value',
