@@ -135,11 +135,11 @@
               </th>
             </template>
 
-            <th style="width: 140px;font-size: 13px;" class="th-border-bottom c-dark" v-if="table.btn.length != 0">
+            <th style="width: 140px;" class="th-border-bottom c-dark" v-if="table.btn.length != 0">
               <div style="width:130px">{{ $t('table.action') }}</div>
             </th>
             <th
-              style="width: 151px;font-size: 13px;"
+              style="width: 151px;"
               class="th-border-bottom c-dark handleSty"
               v-if="table.btn.length != 0 && table.handleFloat"
             >
