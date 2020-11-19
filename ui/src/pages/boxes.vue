@@ -222,13 +222,12 @@ export default {
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           name: null,
-          type: 'None',
+          type: 'shell',
           content: null,
           entityInstances: []
         },
         v_select_configs: {
           typeOptions: [
-            { label: 'None', value: 'None' },
             { label: 'shell', value: 'shell' },
             { label: 'sql', value: 'sql' }
           ]
