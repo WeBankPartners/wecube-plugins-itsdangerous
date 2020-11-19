@@ -64,7 +64,7 @@ class Rule(Base, DictBase):
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
     description = Column(String(63), server_default=text("''"), nullable=True)
-    level = Column(INTEGER(11), nullable=False)
+    level = Column(String(36), nullable=False)
     effect_on = Column(String(36), nullable=False)
     match_type = Column(String(36), nullable=False)
     match_param_id = Column(ForeignKey('match_param.id'), nullable=True)

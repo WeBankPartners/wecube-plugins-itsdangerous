@@ -17,11 +17,11 @@ DROP TABLE IF EXISTS `box`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `box` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
   `description` varchar(63) DEFAULT '',
-  `policy_id` int(11) unsigned NOT NULL,
-  `subject_id` int(11) unsigned NOT NULL,
+  `policy_id` bigint(20) unsigned NOT NULL,
+  `subject_id` bigint(20) unsigned NOT NULL,
   `created_by` varchar(36) DEFAULT NULL,
   `created_time` datetime DEFAULT NULL,
   `updated_by` varchar(36) DEFAULT NULL,
@@ -52,7 +52,7 @@ DROP TABLE IF EXISTS `match_param`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `match_param` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
   `description` varchar(63) DEFAULT '',
   `params` varchar(512) NOT NULL,
@@ -83,7 +83,7 @@ DROP TABLE IF EXISTS `policy`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `policy` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
   `description` varchar(63) DEFAULT '',
   `enabled` tinyint(4) NOT NULL,
@@ -113,9 +113,9 @@ DROP TABLE IF EXISTS `policy_rule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `policy_rule` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `policy_id` int(11) unsigned NOT NULL,
-  `rule_id` int(11) unsigned NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `policy_id` bigint(20) unsigned NOT NULL,
+  `rule_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fkey_policy_rule_policy_id` (`policy_id`),
   KEY `fkey_policy_rule_rule_id` (`rule_id`),
@@ -142,14 +142,14 @@ DROP TABLE IF EXISTS `rule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `rule` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
   `description` varchar(63) DEFAULT '',
-  `level` int(11) unsigned NOT NULL,
+  `level` varchar(36) NOT NULL,
   `effect_on` varchar(36) NOT NULL,
   `match_type` varchar(36) NOT NULL,
   `match_value` varchar(512) NOT NULL,
-  `match_param_id` int(11) unsigned DEFAULT NULL,
+  `match_param_id` bigint(20) unsigned DEFAULT NULL,
   `enabled` tinyint(4) NOT NULL,
   `created_by` varchar(36) DEFAULT NULL,
   `created_time` datetime DEFAULT NULL,
@@ -165,7 +165,7 @@ CREATE TABLE `rule` (
 
 LOCK TABLES `rule` WRITE;
 /*!40000 ALTER TABLE `rule` DISABLE KEYS */;
-INSERT INTO `rule` VALUES (1,'删除*批量文件','全量文件删除',1,'script','cli','[{\"name\": \"force\", \"operator\": \"set\"}, {\"name\": \"recursive\", \"operator\": \"set\"}, {\"name\": \"help\", \"operator\": \"notset\"}, {\"name\": \"version\", \"operator\": \"notset\"}, {\"name\": \"path\", \"operator\": \"ilike\", \"value\": \"*\"}]',2,1,NULL,NULL,NULL,NULL),(2,'系统重启','系统重启',1,'script','cli','[{\"name\": \"help\", \"operator\": \"notset\"}]',4,1,NULL,NULL,NULL,NULL),(3,'修改系统参数','修改系统参数',3,'script','text','sysctl',NULL,0,NULL,NULL,NULL,NULL),(4,'删除数据表','drop table',0,'script','sql','^drop\\s+table\\s+.*$',1,1,NULL,NULL,NULL,NULL),(5,'销毁主机','danger destroy',1,'param','filter','{serviceName eq \'qcloud/vm(resource)/action\'}{inputParams.name eq \'destroy\'}',NULL,1,NULL,NULL,NULL,NULL),(6,'删除根分区','删除根分区',0,'script','cli','[{\"name\": \"force\", \"operator\": \"set\"}, {\"name\": \"recursive\", \"operator\": \"set\"}, {\"name\": \"help\", \"operator\": \"notset\"}, {\"name\": \"version\", \"operator\": \"notset\"}, {\"name\": \"path\", \"operator\": \"eq\", \"value\": \"/\"}]',2,1,NULL,NULL,NULL,NULL),(7,'清空数据表truncate','turnc table',0,'script','sql','^truncate\\s+table\\s+.*$',1,1,NULL,NULL,NULL,NULL),(8,'清空数据表delete','delete table without where',0,'script','sql','^delete\\s+from\\s+(?:(?!where).)*$',1,1,NULL,NULL,NULL,NULL),(9,'更改外键限制','SET FOREIGN_KEY_CHECKS',3,'script','sql','^SET\\s+FOREIGN_KEY_CHECKS=\\d;$',1,1,NULL,NULL,NULL,NULL),(10,'更改表结构','ALTER TABLE',2,'script','sql','^ALTER\\s+TABLE\\s+.*$',1,1,NULL,NULL,NULL,NULL),(11,'更新全量数据表','update table without where',0,'script','sql','^update\\s+(?:(?!where).)*$',1,1,NULL,NULL,NULL,NULL),(12,'强制kill(cli-s)','kill -9',2,'script','cli','[{\"name\": \"name\", \"operator\": \"in\", \"value\": [\"KILL\", \"TERM\"]}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,NULL,NULL,NULL,NULL),(13,'强制kill(cli-n)','kill -9',2,'script','cli','[{\"name\": \"number\", \"operator\": \"in\", \"value\": [\"9\", \"15\"]}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,NULL,NULL,NULL,NULL),(14,'强制kill(cli-9/15)','kill -9',2,'script','cli','[{\"name\": \"s_kill\", \"operator\": \"set\"}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,NULL,NULL,NULL,NULL),(15,'创建表结构','CREATE TABLE',2,'script','sql','^CREATE\\s+TABLE\\s+.*$',1,1,NULL,NULL,NULL,NULL),(16,'反弹shell(nc)','nc',0,'script','cli','[{\"name\": \"N/A\", \"operator\": \"notset\"}]',5,1,NULL,NULL,NULL,NULL),(17,'反弹shell(socat)','socat',0,'script','cli','[{\"name\": \"N/A\", \"operator\": \"notset\"}]',6,1,NULL,NULL,NULL,NULL),(18,'反弹shell(bash)','bash',0,'script','cli','[{\"name\": \"interact\", \"operator\": \"set\"}, {\"name\": \"command\", \"operator\": \"ilike\", \"value\": \"/dev/tcp/\"}]',7,1,NULL,NULL,NULL,NULL);
+INSERT INTO `rule` VALUES (1,'删除*批量文件','全量文件删除','high','script','cli','[{\"name\": \"force\", \"operator\": \"set\"}, {\"name\": \"recursive\", \"operator\": \"set\"}, {\"name\": \"help\", \"operator\": \"notset\"}, {\"name\": \"version\", \"operator\": \"notset\"}, {\"name\": \"path\", \"operator\": \"ilike\", \"value\": \"*\"}]',2,1,NULL,NULL,NULL,NULL),(2,'系统重启','系统重启','medium','script','cli','[{\"name\": \"help\", \"operator\": \"notset\"}]',4,1,NULL,NULL,NULL,NULL),(3,'修改系统参数','修改系统参数','low','script','text','sysctl',NULL,0,NULL,NULL,NULL,NULL),(4,'删除数据表','drop table','critical','script','sql','^drop\\s+table\\s+.*$',1,1,NULL,NULL,NULL,NULL),(5,'销毁主机','danger destroy','critical','param','filter','{serviceName eq \'qcloud/vm(resource)/action\'}{inputParams.name eq \'destroy\'}',NULL,1,NULL,NULL,NULL,NULL),(6,'删除根分区','删除根分区','critical','script','cli','[{\"name\": \"force\", \"operator\": \"set\"}, {\"name\": \"recursive\", \"operator\": \"set\"}, {\"name\": \"help\", \"operator\": \"notset\"}, {\"name\": \"version\", \"operator\": \"notset\"}, {\"name\": \"path\", \"operator\": \"eq\", \"value\": \"/\"}]',2,1,NULL,NULL,NULL,NULL),(7,'清空数据表truncate','turnc table','critical','script','sql','^truncate\\s+table\\s+.*$',1,1,NULL,NULL,NULL,NULL),(8,'清空数据表delete','delete table without where','critical','script','sql','^delete\\s+from\\s+(?:(?!where).)*$',1,1,NULL,NULL,NULL,NULL),(9,'更改外键限制','SET FOREIGN_KEY_CHECKS','low','script','sql','^SET\\s+FOREIGN_KEY_CHECKS=\\d;$',1,1,NULL,NULL,NULL,NULL),(10,'更改表结构','ALTER TABLE','low','script','sql','^ALTER\\s+TABLE\\s+.*$',1,1,NULL,NULL,NULL,NULL),(11,'更新全量数据表','update table without where','high','script','sql','^update\\s+(?:(?!where).)*$',1,1,NULL,NULL,NULL,NULL),(12,'强制kill(cli-s)','kill -9','medium','script','cli','[{\"name\": \"name\", \"operator\": \"in\", \"value\": [\"KILL\", \"TERM\"]}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,NULL,NULL,NULL,NULL),(13,'强制kill(cli-n)','kill -9','medium','script','cli','[{\"name\": \"number\", \"operator\": \"in\", \"value\": [\"9\", \"15\"]}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,NULL,NULL,NULL,NULL),(14,'强制kill(cli-9/15)','kill -9','medium','script','cli','[{\"name\": \"s_kill\", \"operator\": \"set\"}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,NULL,NULL,NULL,NULL),(15,'创建表结构','CREATE TABLE','low','script','sql','^CREATE\\s+TABLE\\s+.*$',1,1,NULL,NULL,NULL,NULL),(16,'反弹shell(nc)','nc','high','script','cli','[{\"name\": \"N/A\", \"operator\": \"notset\"}]',5,1,NULL,NULL,NULL,NULL),(17,'反弹shell(socat)','socat','high','script','cli','[{\"name\": \"N/A\", \"operator\": \"notset\"}]',6,1,NULL,NULL,NULL,NULL),(18,'反弹shell(bash)','bash','high','script','cli','[{\"name\": \"interact\", \"operator\": \"set\"}, {\"name\": \"command\", \"operator\": \"ilike\", \"value\": \"/dev/tcp/\"}]',7,1,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `rule` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -177,7 +177,7 @@ DROP TABLE IF EXISTS `service_script`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `service_script` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `service` varchar(63) NOT NULL,
   `content_type` varchar(36) DEFAULT NULL,
   `content_field` varchar(63) DEFAULT NULL,
@@ -207,7 +207,7 @@ DROP TABLE IF EXISTS `subject`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `subject` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
   `description` varchar(63) DEFAULT '',
   `enabled` tinyint(4) NOT NULL,
@@ -237,9 +237,9 @@ DROP TABLE IF EXISTS `subject_target`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `subject_target` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `subject_id` int(11) unsigned NOT NULL,
-  `target_id` int(11) unsigned NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `subject_id` bigint(20) unsigned NOT NULL,
+  `target_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fkey_subject_target_subject_id` (`subject_id`),
   KEY `fkey_subject_target_target_id` (`target_id`),
@@ -266,7 +266,7 @@ DROP TABLE IF EXISTS `target`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `target` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(36) NOT NULL,
   `args_scope` varchar(512) DEFAULT NULL,
   `entity_scope` varchar(512) DEFAULT NULL,

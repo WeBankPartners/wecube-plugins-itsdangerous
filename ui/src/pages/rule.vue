@@ -5,7 +5,11 @@
       <div slot="rule">
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_level') }}:</label>
-          <InputNumber style="width:338px" :max="10" :min="0" v-model="modelConfig.addRow.level"> </InputNumber>
+          <Select v-model="modelConfig.addRow.level" style="width: 338px">
+            <Option v-for="item in modelConfig.v_select_configs.levelOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('effect_on') }}:</label>
@@ -182,13 +186,19 @@ export default {
           name: null,
           description: null,
           enabled: true,
-          level: 0,
+          level: 'high',
           effect_on: 'param',
           match_type: 'filter',
           match_value: '',
           match_param_id: []
         },
         v_select_configs: {
+          levelOptions: [
+            { label: 'critical', value: 'critical' },
+            { label: 'high', value: 'high' },
+            { label: 'medium', value: 'medium' },
+            { label: 'low', value: 'low' }
+          ],
           effectOptions: [
             { label: 'param', value: 'param' },
             { label: 'script', value: 'script' }

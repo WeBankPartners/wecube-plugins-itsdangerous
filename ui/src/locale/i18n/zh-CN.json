@@ -107,7 +107,7 @@
   "hr_enabled": "启用",
   "hr_description": "描述",
   "hr_name": "名称",
-  "hr_level": "优先级",
+  "hr_level": "级别",
   "hr_type": "类型",
   "hr_rule": "规则",
   "effect_on": "作用域",
