@@ -92,6 +92,7 @@ req.interceptors.response.use(
     const { response } = error
     Vue.prototype.$Notice.error({
       title: 'error',
+      duration: 10,
       desc:
         (response.data &&
           'status:' +
