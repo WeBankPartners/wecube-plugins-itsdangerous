@@ -12,3 +12,4 @@ gunicorn
 gevent
 pytz
 apscheduler
+texttable

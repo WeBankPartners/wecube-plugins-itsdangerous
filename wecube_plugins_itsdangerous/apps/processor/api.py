@@ -16,6 +16,7 @@ from talos.core import config, utils
 from talos.core.i18n import _
 from talos.db import crud
 from talos.utils import scoped_globals
+import texttable
 from wecube_plugins_itsdangerous.apps.processor import detector
 from wecube_plugins_itsdangerous.common import exceptions, reader, s3, scope
 from wecube_plugins_itsdangerous.common import utils as plugin_utils
@@ -321,7 +322,7 @@ class Box(resource.Box):
             "servicePath": "a/b/run",
             "entityInstances": [{"id": "xxx_xxxxxx"}],
             // inputs param for serviceName
-            "inputs": [/
+            "inputs": [
                 {"callbackParameter": "", "xml define prop": xxx},
                 {},
                 {}
@@ -346,7 +347,15 @@ class Box(resource.Box):
             }
             input_results = self.check(detect_data)
             results.extend(input_results)
-        return results
+        table = texttable.Texttable(max_width=120)
+        # {'lineno': [start, end], 'level': level of rule, 'content': content, 'message': rule name, 'script_name': script name}
+        table.set_cols_align(["c", "l", "l", "l"])
+        table.set_cols_valign(["m", "m", "m", "m"])
+        table.header([_("Line"), _("Content"), _("Message"), _('Source Script')])
+        for ret in results:
+            table.add_row(
+                ['%s-%s' % (ret['lineno'][0], ret['lineno'][1]), ret['content'], ret['message'], ret['script_name']])
+        return {'text': table.draw(), 'data': results}
 
     def check(self, data, boxes=None, without_subject_test=False):
         '''check script & param with boxes, return dangerous contents & rule name
@@ -361,7 +370,7 @@ class Box(resource.Box):
         :type data: dict
         :param boxes: specific boxes if any, defaults to None, mean all boxes
         :type boxes: list of Box, optional
-        :return: list of {'lineno': [start, end], 'level': level of rule, 'content': content, 'message': rule name}
+        :return: list of {'lineno': [start, end], 'level': level of rule, 'content': content, 'message': rule name, 'script_name': script name}
         :rtype: list
         '''
 
@@ -389,5 +398,8 @@ class Box(resource.Box):
                     r['script_name'] = script_name
                 results.extend(script_results)
         # check filter rules global
-        results.extend(detector.JsonFilterDetector(data, rules.get('filter', [])).check())
+        json_results = detector.JsonFilterDetector(data, rules.get('filter', [])).check()
+        for r in json_results:
+            r['script_name'] = ''
+        results.extend(json_results)
         return results

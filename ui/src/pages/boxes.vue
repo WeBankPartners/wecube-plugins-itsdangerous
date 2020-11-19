@@ -5,7 +5,7 @@
       <div slot="boxes">
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_policies') }}:</label>
-          <Select v-model="modelConfig.addRow.policy_id" style="width:338px">
+          <Select v-model="modelConfig.addRow.policy_id" style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.policyOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -13,7 +13,7 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_subject') }}:</label>
-          <Select v-model="modelConfig.addRow.subject_id" style="width:338px">
+          <Select v-model="modelConfig.addRow.subject_id" style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.subjectOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -55,6 +55,26 @@ let tableEle = [
   {
     title: 'hr_subject',
     value: 'subject.name', //
+    display: true
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]

@@ -5,7 +5,7 @@
       <div slot="plugin-params">
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('content_type') }}:</label>
-          <Select v-model="modelConfig.addRow.content_type" style="width:338px">
+          <Select v-model="modelConfig.addRow.content_type" style="width: 338px">
             <Option
               v-for="item in modelConfig.v_select_configs.contentTypeOptions"
               :value="item.value"
@@ -41,6 +41,26 @@ let tableEle = [
   {
     title: 'endpoint_field', // 脚本地址
     value: 'endpoint_field',
+    display: true
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]

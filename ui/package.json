@@ -1,6 +1,6 @@
 {
-  "name": "wecmdb",
-  "version": "0.1.0",
+  "name": "itsdangerous",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "build": "vue-cli-service build",
