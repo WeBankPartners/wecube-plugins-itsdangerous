@@ -56,7 +56,10 @@ let tableEle = [
   {
     title: 'hr_enabled',
     value: 'enabled',
-    display: true
+    display: true,
+    render: item => {
+      return item.enabled ? 'Yes' : 'No'
+    }
   },
   {
     title: 'hr_level',
