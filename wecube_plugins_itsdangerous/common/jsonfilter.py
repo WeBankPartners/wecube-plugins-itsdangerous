@@ -15,6 +15,18 @@ def match_all(filters, data):
     '''
     check if data match all filters
     :param filters: [{xx eq xx}, {...}]
+        field set     [no value]
+        field notset  [no value]
+        field null    [no value]
+        field notNull [no value]
+        field ilike   'string'
+        field like    'string'
+        field eq      int/'string'
+        field ne      int/'string'
+        field in      [v1, v2]
+        field nin     [v1, v2]
+        field regex   'expr'
+        field iregex  'expr'
     :param data: {...}
     '''
     results = set([True])
