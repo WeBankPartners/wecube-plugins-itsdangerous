@@ -48,6 +48,14 @@ let tableEle = [
     display: true
   },
   {
+    title: 'hr_enabled',
+    value: 'enabled',
+    display: true,
+    render: item => {
+      return item.enabled ? 'Yes' : 'No'
+    }
+  },
+  {
     title: 'hr_policies',
     value: 'policy.name', //
     display: true
@@ -180,11 +188,13 @@ export default {
             type: 'text'
           },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
+          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' },
           { name: 'boxes', type: 'slot' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           name: null,
+          enabled: true,
           description: null,
           policy_id: null,
           subject_id: null
@@ -297,6 +307,7 @@ export default {
       }
     },
     async add () {
+      this.modelConfig.addRow.enabled = true
       await this.getConfigData()
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')

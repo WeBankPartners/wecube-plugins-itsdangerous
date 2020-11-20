@@ -32,7 +32,10 @@ let tableEle = [
   {
     title: 'hr_enabled',
     value: 'enabled',
-    display: true
+    display: true,
+    render: item => {
+      return item.enabled ? 'Yes' : 'No'
+    }
   },
   {
     title: 'hr_created_by',
@@ -167,6 +170,7 @@ export default {
       }
     },
     async add () {
+      this.modelConfig.addRow.enabled = true
       await this.getConfigData()
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')
