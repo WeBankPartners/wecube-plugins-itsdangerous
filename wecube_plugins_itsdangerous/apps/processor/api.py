@@ -15,7 +15,6 @@ from talos.common import cache
 from talos.core import config, utils
 from talos.core.i18n import _
 from talos.db import crud
-from talos.utils import scoped_globals
 import texttable
 from wecube_plugins_itsdangerous.apps.processor import detector
 from wecube_plugins_itsdangerous.common import exceptions, reader, s3, scope
@@ -45,7 +44,7 @@ def download_from_url(dir_path, url, random_name=False):
     filepath = os.path.join(dir_path, filename)
     if url.startswith(CONF.wecube.base_url):
         # nexus url
-        token = CONF.wecube.token or scoped_globals.GLOBALS.request.auth_token
+        token = scope.get_wecube_token(CONF.wecube.base_url)
         resp = requests.get(url, headers={'Authorization': 'Bearer ' + token}, stream=True)
         chunk_size = 1024 * 1024
         stream = resp.raw

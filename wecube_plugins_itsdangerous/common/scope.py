@@ -7,6 +7,8 @@ import datetime
 
 from talos.common import cache
 from talos.core import config
+from talos.core import utils as talos_utils
+from talos.utils import scoped_globals
 
 from wecube_plugins_itsdangerous.common import expression
 from wecube_plugins_itsdangerous.common import jsonfilter
@@ -32,7 +34,7 @@ class JsonScope(object):
 
 
 def get_wecube_token(base_url):
-    token = CONF.wecube.token
+    token = talos_utils.get_attr(scoped_globals.GLOBALS, 'request.auth_token') or CONF.wecube.token
     if not CONF.wecube.use_token:
         token = cache.get(WECUBE_TOKEN)
         if not cache.validate(token):
