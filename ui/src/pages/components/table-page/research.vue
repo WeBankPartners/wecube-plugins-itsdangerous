@@ -97,7 +97,7 @@ export default {
       this.activeClearIconNo = index_input_condition
     },
     // 注销当前搜索框信息
-    cancleActiveInput () {
+    cancelActiveInput () {
       this.activeClearIcon = null
       this.activeClearIconNo = null
     },
@@ -111,7 +111,7 @@ export default {
     // 搜索框清除按钮响应函数
     clearInputCondition (input_condition) {
       this.pageConfig.researchConfig.filters[input_condition.value] = ''
-      this.cancleActiveInput()
+      this.cancelActiveInput()
       this.$parent.search()
     },
     goToAction (func, filters) {

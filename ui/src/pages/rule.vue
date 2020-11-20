@@ -13,7 +13,7 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('effect_on') }}:</label>
-          <Select v-model="modelConfig.addRow.policy_id" style="width: 338px">
+          <Select v-model="modelConfig.addRow.effect_on" style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.effectOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -22,14 +22,19 @@
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('match_type') }}:</label>
           <Select v-model="modelConfig.addRow.match_type" style="width: 338px">
-            <Option v-for="item in modelConfig.v_select_configs.matchOptions" :value="item.value" :key="item.value">
+            <Option v-for="item in matchOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
           </Select>
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('match_param_id') }}:</label>
-          <Select v-model="modelConfig.addRow.match_param_id" style="width: 338px">
+          <Select
+            v-model="modelConfig.addRow.match_param_id"
+            :disabled="modelConfig.addRow.match_type === 'filter'"
+            style="width: 338px"
+            clearable
+          >
             <Option v-for="item in modelConfig.v_select_configs.matchParamOption" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -190,8 +195,8 @@ export default {
           description: null,
           enabled: true,
           level: 'high',
-          effect_on: 'param',
-          match_type: 'filter',
+          effect_on: 'script',
+          match_type: 'cli',
           match_value: '',
           match_param_id: []
         },
@@ -206,13 +211,6 @@ export default {
             { label: 'param', value: 'param' },
             { label: 'script', value: 'script' }
           ],
-          matchOptions: [
-            { label: 'filter', value: 'filter' },
-            { label: 'cli', value: 'cli' },
-            { label: 'sql', value: 'sql' },
-            { label: 'text', value: 'text' },
-            { label: 'fulltext', value: 'fulltext' }
-          ],
           matchParamOption: []
         }
       },
@@ -223,8 +221,35 @@ export default {
       id: ''
     }
   },
+  watch: {
+    matchOptions: function (val) {
+      this.modelConfig.addRow.match_type = val.length > 1 ? 'cli' : 'filter'
+    },
+    'modelConfig.addRow.match_type': function (val) {
+      if (val !== 'filter') {
+        this.getConfigData(val)
+      }
+    }
+  },
+  computed: {
+    matchOptions: function () {
+      let res = []
+      if (this.modelConfig.addRow.effect_on === 'script') {
+        res = [
+          { label: 'cli', value: 'cli' },
+          { label: 'sql', value: 'sql' },
+          { label: 'text', value: 'text' },
+          { label: 'fulltext', value: 'fulltext' }
+        ]
+      } else {
+        res = [{ label: 'filter', value: 'filter' }]
+      }
+      return res
+    }
+  },
   mounted () {
     this.initData()
+    this.getConfigData()
   },
   methods: {
     async initData () {
@@ -236,7 +261,14 @@ export default {
       }
     },
     async getConfigData () {
-      const params = 'matchparams'
+      // eslint-disable-next-line no-unused-vars
+      let params = ''
+      if (this.modelConfig.addRow.match_type === 'cli') {
+        params = 'matchparams?type=cli'
+      }
+      if (['sql', 'text', 'fulltext'].includes(this.modelConfig.addRow.match_type)) {
+        params = 'matchparams?type=regex'
+      }
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.modelConfig.v_select_configs.matchParamOption = data.data.map(item => {
@@ -248,8 +280,10 @@ export default {
       }
     },
     async add () {
-      await this.getConfigData()
-      this.modelConfig.addRow.effect_on = 'param'
+      this.modelConfig.addRow.enabled = true
+      this.modelConfig.addRow.level = 'high'
+      this.modelConfig.addRow.effect_on = 'script'
+      this.modelConfig.addRow.match_type = 'cli'
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
@@ -267,7 +301,6 @@ export default {
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
       this.modelConfig.addRow = this.$commonUtil.manageEditParams(this.modelConfig.addRow, rowData)
-      await this.getConfigData()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
@@ -281,7 +314,7 @@ export default {
     },
     deleteConfirmModal (rowData) {
       this.$Modal.confirm({
-        title: 123,
+        title: rowData.name,
         'z-index': 1000000,
         onOk: async () => {
           const { status, message } = await deleteTableRow(this.pageConfig.CRUD, rowData.id)

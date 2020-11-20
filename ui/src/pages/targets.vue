@@ -149,6 +149,7 @@ export default {
       }
     },
     add () {
+      this.modelConfig.addRow.enabled = true
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')
     },

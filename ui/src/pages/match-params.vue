@@ -5,11 +5,12 @@
       <div slot="match-params">
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_type') }}:</label>
-          <Select v-model="modelConfig.addRow.type" style="width: 338px" multiple>
+          <Select v-model="modelConfig.addRow.type" style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.typeOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
           </Select>
+          <label class="required-tip">*</label>
         </div>
       </div>
     </ModalComponent>
