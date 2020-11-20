@@ -150,6 +150,7 @@ class ServiceScript(resource.ServiceScript):
         scripts = []
         script_locations = self.list(filters={'service': service})
         if len(script_locations) == 0:
+            LOG.warn('service_script[%s] not found, get_contents will return empty content', service)
             return scripts
         script_location = script_locations[0]
         content_type = script_location['content_type']
@@ -213,18 +214,22 @@ class Box(resource.Box):
                              rule=my_validator.LengthValidator(0, 255),
                              validate_on=['check:O'],
                              nullable=True),
+        crud.ColumnValidator(field='entityType',
+                             rule=my_validator.LengthValidator(0, 255),
+                             validate_on=['check:O'],
+                             nullable=True),
         crud.ColumnValidator(field='entityInstances',
                              rule=my_validator.TypeValidator(list),
                              validate_on=['check:M'],
                              nullable=False),
-        crud.ColumnValidator(field='inputs',
+        crud.ColumnValidator(field='inputParams',
                              rule=my_validator.TypeValidator(list),
                              validate_on=['check:M'],
                              nullable=False),
     ]
 
     def _get_rules(self, data, boxes=None, without_subject_test=False):
-        boxes = boxes or self.list(filters={'policy.enabled': 1, 'subject.enabled': 1})
+        boxes = boxes or self.list(filters={'policy.enabled': 1, 'subject.enabled': 1, 'enabled': 1})
         rules = {}
         hasher = hashlib.sha256()
         hasher.update(json.dumps(data).encode('utf-8'))
@@ -240,7 +245,7 @@ class Box(resource.Box):
                     target_included = True
                     # target with the same data is cached
                     key = 'scope/target/%s/data/%s' % (target['id'], digest)
-                    cached = cache.get(key, 30)
+                    cached = cache.get(key, 10)
                     if cache.validate(cached):
                         target_included = cached
                         LOG.debug('scope test of target[%s - %s]: %s', target['id'], target['name'],
@@ -257,7 +262,7 @@ class Box(resource.Box):
                                 LOG.debug('args scope: accepted')
                                 if target['entity_scope']:
                                     target_included = scope.WeCubeScope(target['entity_scope']).is_match(
-                                        data['entityInstances'])
+                                        data['entityInstances'], data.get('entityType', None))
                                 else:
                                     target_included = True
                                 if target_included:
@@ -306,6 +311,7 @@ class Box(resource.Box):
         :return: see function check
         :rtype: see function check
         '''
+        # check even box is diabled
         refs = self.list({'id': rid})
         if len(refs) == 0:
             raise exceptions.NotFoundError(resource='Box')
@@ -316,14 +322,14 @@ class Box(resource.Box):
 
         :param data: input data
         {
-            // 操作人
             "operator": "admin",
-            "serviceName": "a/b(c)/d",
-            "servicePath": "a/b/run",
+            "serviceName": "qcloud/vm(resource)/create",
+            "servicePath": "/qcloud/v1/vm/create",
+            "entityType": "wecmdb:host_resource_instance",
             "entityInstances": [{"id": "xxx_xxxxxx"}],
             // inputs param for serviceName
-            "inputs": [
-                {"callbackParameter": "", "xml define prop": xxx},
+            "inputParams": [
+                {"xml define prop": xxx},
                 {},
                 {}
             ]
@@ -336,37 +342,45 @@ class Box(resource.Box):
         clean_data = crud.ColumnValidator.get_clean_data(self.runall_rules, data, 'check')
         service = clean_data['serviceName']
         entity_instances = clean_data['entityInstances']
-        input_params = clean_data['inputs']
+        input_params = clean_data['inputParams']
         for input_param in input_params:
             detect_data = {
+                "operator": clean_data.get('operator', None),
                 'serviceName': service,
                 'servicePath': clean_data.get('servicePath', None),
                 'inputParams': input_param,
                 'scripts': ServiceScript().get_contents(service, input_param),
+                'entityType': clean_data.get('entityType', None),
                 'entityInstances': entity_instances
             }
             input_results = self.check(detect_data)
             results.extend(input_results)
-        table = texttable.Texttable(max_width=120)
-        # {'lineno': [start, end], 'level': level of rule, 'content': content, 'message': rule name, 'script_name': script name}
-        table.set_cols_align(["c", "l", "l", "l"])
-        table.set_cols_valign(["m", "m", "m", "m"])
-        table.header([_("Line"), _("Content"), _("Message"), _('Source Script')])
-        for ret in results:
-            table.add_row(
-                ['%s-%s' % (ret['lineno'][0], ret['lineno'][1]), ret['content'], ret['message'], ret['script_name']])
-        return {'text': table.draw(), 'data': results}
+        text_output = ''
+        if results:
+            table = texttable.Texttable(max_width=120)
+            # {'lineno': [start, end], 'level': level of rule, 'content': content, 'message': rule name, 'script_name': script name}
+            table.set_cols_align(["c", "l", "l", "l"])
+            table.set_cols_valign(["m", "m", "m", "m"])
+            table.header([_("Line"), _("Content"), _("Message"), _('Source Script')])
+            for ret in results:
+                table.add_row([
+                    '%s-%s' % (ret['lineno'][0], ret['lineno'][1]), ret['content'], ret['message'], ret['script_name']
+                ])
+            text_output = table.draw()
+        return {'text': text_output, 'data': results}
 
     def check(self, data, boxes=None, without_subject_test=False):
         '''check script & param with boxes, return dangerous contents & rule name
 
         :param data: data with param & script content
         {
-            (Optional - JsonScope check)"serviceName": "a/b(c)/d",
-            (Optional - JsonScope check)"servicePath": "a/b/run",
+            (Optional - JsonScope check)"operator": "admin",
+            (Optional - JsonScope check)"serviceName": "qcloud/vm(resource)/create",
+            (Optional - JsonScope check)"servicePath": "/qcloud/v1/vm/create",
             (Optional - JsonScope check)"inputParams": {...service input params},
             (Must - script check)"scripts": [{"type": None/"sql"/"shell", "content": "...", "name": "filename"}],
-            (Must - WeCubeScope check)"entityInstances": [{"id": "xxx_xxxxxx"}]}
+            (Optional - EntityScope check)"entityType": "wecmdb:host_resource_instance",
+            (Must - EntityScope check)"entityInstances": [{"id": "xxx_xxxxxx"}]}
         :type data: dict
         :param boxes: specific boxes if any, defaults to None, mean all boxes
         :type boxes: list of Box, optional

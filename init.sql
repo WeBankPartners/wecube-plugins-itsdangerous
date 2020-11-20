@@ -22,6 +22,7 @@ CREATE TABLE `box` (
   `description` varchar(63) DEFAULT '',
   `policy_id` bigint(20) unsigned NOT NULL,
   `subject_id` bigint(20) unsigned NOT NULL,
+  `enabled` tinyint(4) NOT NULL,
   `created_by` varchar(36) DEFAULT NULL,
   `created_time` datetime DEFAULT NULL,
   `updated_by` varchar(36) DEFAULT NULL,

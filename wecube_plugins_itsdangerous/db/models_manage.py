@@ -127,7 +127,7 @@ class Target(Base, DictBase):
 class Box(Base, DictBase):
     __tablename__ = 'box'
     attributes = [
-        'id', 'name', 'description', 'policy_id', 'subject_id', 'created_by', 'created_time', 'updated_by',
+        'id', 'name', 'description', 'policy_id', 'subject_id', 'enabled', 'created_by', 'created_time', 'updated_by',
         'updated_time', 'policy', 'subject'
     ]
     detail_attributes = attributes
@@ -138,6 +138,7 @@ class Box(Base, DictBase):
     description = Column(String(63), server_default=text("''"), nullable=True)
     policy_id = Column(ForeignKey('policy.id'), nullable=False, index=True)
     subject_id = Column(ForeignKey('subject.id'), nullable=False, index=True)
+    enabled = Column(TINYINT(4), nullable=False)
 
     created_by = Column(String(36), nullable=True)
     created_time = Column(DateTime, nullable=True)

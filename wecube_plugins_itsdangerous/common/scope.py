@@ -71,18 +71,23 @@ class WeCubeScope(object):
     def __init__(self, expr):
         self.expression = expr
 
-    def is_match(self, data):
+    def is_match(self, data, expect_type=None):
         '''
         check if wecube data(from expression) contains any item from data 
-        :param data: [{...}]
+        :param data: [{id: xxx}, {...}]
         '''
-        if data is None:
-            return False
+        data = data or []
         # NOTE: (roy) change this if instance structure changed
         input_guids = [d['id'] for d in data]
         if input_guids:
             try:
-                expression.expr_parse(self.expression)
+                expr_groups = expression.expr_parse(self.expression)
+                # fast check for entity type match
+                # eg. expect_type="wecmdb:host_instance" & last_ci_type="wecmdb:rdb_instance"
+                # the result is always False
+                last_ci_type = '%s:%s' % (expr_groups[-1]['data']['plugin'], expr_groups[-1]['data']['ci'])
+                if expect_type and expect_type != last_ci_type:
+                    return False
             except ValueError as e:
                 LOG.exception(e)
             else:
