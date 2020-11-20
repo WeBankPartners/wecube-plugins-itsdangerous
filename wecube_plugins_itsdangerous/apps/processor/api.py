@@ -150,6 +150,7 @@ class ServiceScript(resource.ServiceScript):
         scripts = []
         script_locations = self.list(filters={'service': service})
         if len(script_locations) == 0:
+            LOG.warn('service_script[%s] not found, get_contents will return empty content', service)
             return scripts
         script_location = script_locations[0]
         content_type = script_location['content_type']
