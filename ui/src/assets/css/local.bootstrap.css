@@ -108,7 +108,6 @@ abbr[title] {
 }
 
 address {
-  margin-bottom: 1rem;
   font-style: normal;
   line-height: inherit;
 }
@@ -117,7 +116,6 @@ dl,
 ol,
 ul {
   margin-top: 0;
-  margin-bottom: 1rem;
 }
 
 ol ol,
