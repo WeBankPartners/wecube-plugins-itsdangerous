@@ -49,7 +49,10 @@ def match_all(filters, data):
                         break
                 results.add(True) if tmp_result else results.add(False)
             else:
-                results.add(True) if _filter['value'].lower() in val.lower() else results.add(False)
+                if not utils.is_string_type(val):
+                    results.add(False)
+                else:
+                    results.add(True) if _filter['value'].lower() in val.lower() else results.add(False)
         elif _filter['operator'] == 'like':
             if utils.is_list_type(val):
                 tmp_result = False
@@ -59,7 +62,10 @@ def match_all(filters, data):
                         break
                 results.add(True) if tmp_result else results.add(False)
             else:
-                results.add(True) if _filter['value'] in val else results.add(False)
+                if not utils.is_string_type(val):
+                    results.add(False)
+                else:
+                    results.add(True) if _filter['value'] in val else results.add(False)
         elif _filter['operator'] == 'eq':
             if utils.is_list_type(val):
                 tmp_result = False
@@ -107,7 +113,10 @@ def match_all(filters, data):
                         break
                 results.add(True) if tmp_result else results.add(False)
             else:
-                results.add(True) if re.search(_filter['value'], val, flag) else results.add(False)
+                if not utils.is_string_type(val):
+                    results.add(False)
+                else:
+                    results.add(True) if re.search(_filter['value'], val, flag) else results.add(False)
         # TODO: other operator
         else:
             # unregconize operator, ignore it

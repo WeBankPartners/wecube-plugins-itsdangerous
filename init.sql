@@ -41,7 +41,7 @@ CREATE TABLE `box` (
 
 LOCK TABLES `box` WRITE;
 /*!40000 ALTER TABLE `box` DISABLE KEYS */;
-INSERT INTO `box` VALUES (1,'通用测试','一些基本的shell&sql危险命令规则集合，针对所有对象',1,1,NULL,NULL,NULL,NULL);
+INSERT INTO `box` VALUES (1,'通用试盒','一些基本的shell&sql危险命令规则集合，针对所有对象',1,1,1,'admin','2020-11-01 00:00:00',NULL,NULL);
 /*!40000 ALTER TABLE `box` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -72,7 +72,7 @@ CREATE TABLE `match_param` (
 
 LOCK TABLES `match_param` WRITE;
 /*!40000 ALTER TABLE `match_param` DISABLE KEYS */;
-INSERT INTO `match_param` VALUES (1,'iregex','针对大小写不敏感的场景','{\"flag\": \"I\"}','regex',NULL,NULL,NULL,NULL),(2,'rm','文件删除','{\"name\":\"rm\", \"args\": [{\"name\": \"force\", \"shortcut\": \"-f,--force\", \"action\": \"store_true\"}, {\"name\": \"recursive\", \"shortcut\": \"-r,-R,--recursive\", \"action\": \"store_true\"}, {\"name\": \"help\", \"shortcut\": \"--help\", \"action\": \"store_true\"}, {\"name\": \"version\", \"shortcut\": \"--version\", \"action\": \"store_true\"}, {\"name\": \"path\", \"repeatable\": \"*\"}]}','cli',NULL,NULL,NULL,NULL),(3,'kill','进程关闭','{\"name\":\"kill\", \"args\": [{\"name\": \"name\", \"shortcut\": \"-s\"}, {\"name\": \"number\", \"shortcut\": \"-n\"}, {\"name\": \"help\", \"shortcut\": \"--help\", \"action\": \"store_true\"}, {\"name\": \"s_kill\", \"shortcut\": \"-9,-15\", \"action\": \"store_true\"}, {\"name\": \"pid\", \"repeatable\": \"*\"}]}','cli',NULL,NULL,NULL,NULL),(4,'reboot','重启机器','{\"name\":\"reboot\", \"args\": [{\"name\": \"help\", \"shortcut\": \"--help\", \"action\": \"store_true\"}]}','cli',NULL,NULL,NULL,NULL),(5,'netcat','reverse shell(nc)','{\"name\":\"nc\", \"args\": []}','cli',NULL,NULL,NULL,NULL),(6,'socat','reverse shell(socat)','{\"name\":\"socat\", \"args\": []}','cli',NULL,NULL,NULL,NULL),(7,'bash','reverse shel','{\"name\":\"bash\", \"opt_strip_path\": true, \"args\": [{\"name\": \"interact\", \"shortcut\": \"-i\", \"action\": \"store_true\"},{\"name\": \"command\", \"repeatable\": \"*\"}]}','cli',NULL,NULL,NULL,NULL);
+INSERT INTO `match_param` VALUES (1,'iregex','正则校验参数，针对大小写不敏感的场景','{\"flag\": \"I\"}','regex','admin','2020-11-01 00:00:00',NULL,NULL),(2,'rm','rm命令行参数定义','{\"name\":\"rm\", \"args\": [{\"name\": \"force\", \"shortcut\": \"-f,--force\", \"action\": \"store_true\"}, {\"name\": \"recursive\", \"shortcut\": \"-r,-R,--recursive\", \"action\": \"store_true\"}, {\"name\": \"help\", \"shortcut\": \"--help\", \"action\": \"store_true\"}, {\"name\": \"version\", \"shortcut\": \"--version\", \"action\": \"store_true\"}, {\"name\": \"path\", \"repeatable\": \"*\"}]}','cli','admin','2020-11-01 00:00:00',NULL,NULL),(3,'kill','kill命令行参数定义','{\"name\":\"kill\", \"args\": [{\"name\": \"name\", \"shortcut\": \"-s\"}, {\"name\": \"number\", \"shortcut\": \"-n\"}, {\"name\": \"help\", \"shortcut\": \"--help\", \"action\": \"store_true\"}, {\"name\": \"s_kill\", \"shortcut\": \"-9,-15\", \"action\": \"store_true\"}, {\"name\": \"pid\", \"repeatable\": \"*\"}]}','cli','admin','2020-11-01 00:00:00',NULL,NULL),(4,'reboot','reboot命令行参数定义','{\"name\":\"reboot\", \"args\": [{\"name\": \"help\", \"shortcut\": \"--help\", \"action\": \"store_true\"}]}','cli','admin','2020-11-01 00:00:00',NULL,NULL),(5,'netcat','necat命令行参数定义，reverse shell(nc)','{\"name\":\"nc\", \"args\": []}','cli','admin','2020-11-01 00:00:00',NULL,NULL),(6,'socat','socat命令行参数定义，reverse shell(socat)','{\"name\":\"socat\", \"args\": []}','cli','admin','2020-11-01 00:00:00',NULL,NULL),(7,'bash','bash交互式命令行参数定义','{\"name\":\"bash\", \"opt_strip_path\": true, \"args\": [{\"name\": \"interact\", \"shortcut\": \"-i\", \"action\": \"store_true\"},{\"name\": \"command\", \"repeatable\": \"*\"}]}','cli','admin','2020-11-01 00:00:00',NULL,NULL);
 /*!40000 ALTER TABLE `match_param` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,7 +102,7 @@ CREATE TABLE `policy` (
 
 LOCK TABLES `policy` WRITE;
 /*!40000 ALTER TABLE `policy` DISABLE KEYS */;
-INSERT INTO `policy` VALUES (1,'基础策略','基础策略',1,NULL,NULL,'admin','2020-11-19 11:42:23');
+INSERT INTO `policy` VALUES (1,'基础策略','包含数据销毁性操作的规则',1,'admin','2020-11-01 00:00:00',NULL,NULL);
 /*!40000 ALTER TABLE `policy` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -131,7 +131,7 @@ CREATE TABLE `policy_rule` (
 
 LOCK TABLES `policy_rule` WRITE;
 /*!40000 ALTER TABLE `policy_rule` DISABLE KEYS */;
-INSERT INTO `policy_rule` VALUES (1,1,18),(2,1,17),(3,1,16),(4,1,11),(5,1,8),(6,1,7),(7,1,6),(8,1,5),(9,1,4),(10,1,1);
+INSERT INTO `policy_rule` VALUES (1,1,17),(2,1,16),(3,1,15),(4,1,11),(5,1,8),(6,1,7),(7,1,6),(8,1,5),(9,1,4),(10,1,1);
 /*!40000 ALTER TABLE `policy_rule` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -157,7 +157,7 @@ CREATE TABLE `rule` (
   `updated_by` varchar(36) DEFAULT NULL,
   `updated_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -166,7 +166,7 @@ CREATE TABLE `rule` (
 
 LOCK TABLES `rule` WRITE;
 /*!40000 ALTER TABLE `rule` DISABLE KEYS */;
-INSERT INTO `rule` VALUES (1,'删除*批量文件','全量文件删除','high','script','cli','[{\"name\": \"force\", \"operator\": \"set\"}, {\"name\": \"recursive\", \"operator\": \"set\"}, {\"name\": \"help\", \"operator\": \"notset\"}, {\"name\": \"version\", \"operator\": \"notset\"}, {\"name\": \"path\", \"operator\": \"ilike\", \"value\": \"*\"}]',2,1,NULL,NULL,NULL,NULL),(2,'系统重启','系统重启','medium','script','cli','[{\"name\": \"help\", \"operator\": \"notset\"}]',4,1,NULL,NULL,NULL,NULL),(3,'修改系统参数','修改系统参数','low','script','text','sysctl',NULL,0,NULL,NULL,NULL,NULL),(4,'删除数据表','drop table','critical','script','sql','^drop\\s+table\\s+.*$',1,1,NULL,NULL,NULL,NULL),(5,'销毁主机','danger destroy','critical','param','filter','{serviceName eq \'qcloud/vm(resource)/action\'}{inputParams.name eq \'destroy\'}',NULL,1,NULL,NULL,NULL,NULL),(6,'删除根分区','删除根分区','critical','script','cli','[{\"name\": \"force\", \"operator\": \"set\"}, {\"name\": \"recursive\", \"operator\": \"set\"}, {\"name\": \"help\", \"operator\": \"notset\"}, {\"name\": \"version\", \"operator\": \"notset\"}, {\"name\": \"path\", \"operator\": \"eq\", \"value\": \"/\"}]',2,1,NULL,NULL,NULL,NULL),(7,'清空数据表truncate','turnc table','critical','script','sql','^truncate\\s+table\\s+.*$',1,1,NULL,NULL,NULL,NULL),(8,'清空数据表delete','delete table without where','critical','script','sql','^delete\\s+from\\s+(?:(?!where).)*$',1,1,NULL,NULL,NULL,NULL),(9,'更改外键限制','SET FOREIGN_KEY_CHECKS','low','script','sql','^SET\\s+FOREIGN_KEY_CHECKS=\\d;$',1,1,NULL,NULL,NULL,NULL),(10,'更改表结构','ALTER TABLE','low','script','sql','^ALTER\\s+TABLE\\s+.*$',1,1,NULL,NULL,NULL,NULL),(11,'更新全量数据表','update table without where','high','script','sql','^update\\s+(?:(?!where).)*$',1,1,NULL,NULL,NULL,NULL),(12,'强制kill(cli-s)','kill -9','medium','script','cli','[{\"name\": \"name\", \"operator\": \"in\", \"value\": [\"KILL\", \"TERM\"]}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,NULL,NULL,NULL,NULL),(13,'强制kill(cli-n)','kill -9','medium','script','cli','[{\"name\": \"number\", \"operator\": \"in\", \"value\": [\"9\", \"15\"]}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,NULL,NULL,NULL,NULL),(14,'强制kill(cli-9/15)','kill -9','medium','script','cli','[{\"name\": \"s_kill\", \"operator\": \"set\"}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,NULL,NULL,NULL,NULL),(15,'创建表结构','CREATE TABLE','low','script','sql','^CREATE\\s+TABLE\\s+.*$',1,1,NULL,NULL,NULL,NULL),(16,'反弹shell(nc)','nc','high','script','cli','[{\"name\": \"N/A\", \"operator\": \"notset\"}]',5,1,NULL,NULL,NULL,NULL),(17,'反弹shell(socat)','socat','high','script','cli','[{\"name\": \"N/A\", \"operator\": \"notset\"}]',6,1,NULL,NULL,NULL,NULL),(18,'反弹shell(bash)','bash','high','script','cli','[{\"name\": \"interact\", \"operator\": \"set\"}, {\"name\": \"command\", \"operator\": \"ilike\", \"value\": \"/dev/tcp/\"}]',7,1,NULL,NULL,NULL,NULL);
+INSERT INTO `rule` VALUES (1,'rm批量删除文件','删除目录下全量文件，可能会删除过多文件，建议明确删除目标','high','script','cli','[{\"name\": \"force\", \"operator\": \"set\"}, {\"name\": \"recursive\", \"operator\": \"set\"}, {\"name\": \"help\", \"operator\": \"notset\"}, {\"name\": \"version\", \"operator\": \"notset\"}, {\"name\": \"path\", \"operator\": \"ilike\", \"value\": \"*\"}]',2,1,'admin','2020-11-01 00:00:00',NULL,NULL),(2,'reboot系统重启','系统重启，可能会导致数据丢失，需要确认应用关闭后执行','medium','script','cli','[{\"name\": \"help\", \"operator\": \"notset\"}]',4,1,'admin','2020-11-01 00:00:00',NULL,NULL),(3,'sysctl修改系统参数','修改系统参数可能会造成全局影响','low','script','text','sysctl',NULL,1,'admin','2020-11-01 00:00:00',NULL,NULL),(4,'drop删除数据表','drop table，可能会造成数据丢失','critical','script','sql','^drop\\s+table\\s+.*$',1,1,'admin','2020-11-01 00:00:00',NULL,NULL),(5,'qcloud销毁主机','调用qcloud API进行主机销毁','critical','param','filter','{serviceName eq \'qcloud/vm(resource)/terminate\'}',NULL,1,'admin','2020-11-01 00:00:00',NULL,NULL),(6,'rm删除根分区','将删除根分区，导致操作系统不可用，非常危险。','critical','script','cli','[{\"name\": \"force\", \"operator\": \"set\"}, {\"name\": \"recursive\", \"operator\": \"set\"}, {\"name\": \"help\", \"operator\": \"notset\"}, {\"name\": \"version\", \"operator\": \"notset\"}, {\"name\": \"path\", \"operator\": \"eq\", \"value\": \"/\"}]',2,1,'admin','2020-11-01 00:00:00',NULL,NULL),(7,'truncate清空数据表','turncate table，可能会造成数据丢失','critical','script','sql','^truncate\\s+table\\s+.*$',1,1,'admin','2020-11-01 00:00:00',NULL,NULL),(8,'delete清空数据表','delete table语句没有带上正确的where条件语句，可能会误删数据','critical','script','sql','^delete\\s+from\\s+(?:(?!where).)*$',1,1,'admin','2020-11-01 00:00:00',NULL,NULL),(9,'sql更改外键限制','SET FOREIGN_KEY_CHECKS手动关闭外键校验，可能会导致数据不合法','low','script','sql','^SET\\s+FOREIGN_KEY_CHECKS=\\d;$',1,1,'admin','2020-11-01 00:00:00',NULL,NULL),(10,'sql更改表结构','ALTER TABLE，更改表结构可能会影响应用的运行','low','script','sql','^ALTER\\s+TABLE\\s+.*$',1,1,'admin','2020-11-01 00:00:00',NULL,NULL),(11,'update更新表全量数据','update table语句没有带上正确的where条件语句，可能会误删数据','high','script','sql','^update\\s+(?:(?!where).)*$',1,1,'admin','2020-11-01 00:00:00',NULL,NULL),(12,'强制kill(cli-s)','强制kill会导致应用非正常退出，一般建议使用kill即可','medium','script','cli','[{\"name\": \"name\", \"operator\": \"in\", \"value\": [\"KILL\", \"TERM\"]}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,'admin','2020-11-01 00:00:00',NULL,NULL),(13,'强制kill(cli-n)','强制kill会导致应用非正常退出，一般建议使用kill即可','medium','script','cli','[{\"name\": \"number\", \"operator\": \"in\", \"value\": [\"9\", \"15\"]}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,'admin','2020-11-01 00:00:00',NULL,NULL),(14,'强制kill(cli-9/15)','强制kill会导致应用非正常退出，一般建议使用kill即可','medium','script','cli','[{\"name\": \"s_kill\", \"operator\": \"set\"}, {\"name\": \"pid\", \"operator\": \"set\"}]',3,1,'admin','2020-11-01 00:00:00',NULL,NULL),(15,'反弹shell(nc)','nc常见于反弹shell，用于远程命令执行','high','script','cli','[{\"name\": \"N/A\", \"operator\": \"notset\"}]',5,1,'admin','2020-11-01 00:00:00',NULL,NULL),(16,'反弹shell(socat)','socat常见于反弹shell，用于远程命令执行','high','script','cli','[{\"name\": \"N/A\", \"operator\": \"notset\"}]',6,1,'admin','2020-11-01 00:00:00',NULL,NULL),(17,'反弹shell(bash)','bash -i 常见于反弹shell，用于远程命令执行','high','script','cli','[{\"name\": \"interact\", \"operator\": \"set\"}, {\"name\": \"command\", \"operator\": \"ilike\", \"value\": \"/dev/tcp/\"}]',7,1,'admin','2020-11-01 00:00:00',NULL,NULL);
 /*!40000 ALTER TABLE `rule` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -226,7 +226,7 @@ CREATE TABLE `subject` (
 
 LOCK TABLES `subject` WRITE;
 /*!40000 ALTER TABLE `subject` DISABLE KEYS */;
-INSERT INTO `subject` VALUES (1,'全部对象','全部对象',1,NULL,NULL,'admin','2020-11-19 11:35:48');
+INSERT INTO `subject` VALUES (1,'全部对象','任意对象范围',1,'admin','2020-11-01 00:00:00',NULL,NULL);
 /*!40000 ALTER TABLE `subject` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -286,7 +286,7 @@ CREATE TABLE `target` (
 
 LOCK TABLES `target` WRITE;
 /*!40000 ALTER TABLE `target` DISABLE KEYS */;
-INSERT INTO `target` VALUES (1,'全体对象','','',1,NULL,NULL,NULL,NULL);
+INSERT INTO `target` VALUES (1,'任意对象','','',1,'admin','2020-11-01 00:00:00',NULL,NULL);
 /*!40000 ALTER TABLE `target` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -299,4 +299,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-11-19 11:42:30
+-- Dump completed on 2020-11-23 17:08:28
