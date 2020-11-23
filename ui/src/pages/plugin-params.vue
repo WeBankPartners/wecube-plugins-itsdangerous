@@ -133,7 +133,7 @@ export default {
           {
             label: 'content_field',
             value: 'content_field',
-            v_validate: 'required:true',
+            v_validate: '',
             placeholder: '',
             disabled: false,
             type: 'text'
@@ -141,7 +141,7 @@ export default {
           {
             label: 'endpoint_field',
             value: 'endpoint_field',
-            v_validate: 'required:true',
+            v_validate: '',
             placeholder: '',
             disabled: false,
             type: 'text'
