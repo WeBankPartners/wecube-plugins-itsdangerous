@@ -198,7 +198,7 @@ export default {
           effect_on: 'script',
           match_type: 'cli',
           match_value: '',
-          match_param_id: []
+          match_param_id: null
         },
         v_select_configs: {
           levelOptions: [
