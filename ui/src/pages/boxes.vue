@@ -146,18 +146,20 @@ export default {
             {
               title: 'hr_level',
               value: 'level', //
-              display: true
+              display: true,
+              style: 'width: 80px;'
             },
             {
               title: 'lineno',
               value: 'lineno', //
-              display: true
+              display: true,
+              style: 'width: 80px;'
             },
             {
               title: 'message',
               value: 'message', //
               display: true,
-              style: 'width:90px'
+              style: 'width:120px'
             },
             {
               title: 'script_name',
