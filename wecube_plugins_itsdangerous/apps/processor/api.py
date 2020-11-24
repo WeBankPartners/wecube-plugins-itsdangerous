@@ -357,7 +357,10 @@ class Box(resource.Box):
         text_output = ''
         if results:
             table = texttable.Texttable(max_width=120)
-            # {'lineno': [start, end], 'level': level of rule, 'content': content, 'message': rule name, 'script_name': script name}
+            # {
+            # 'lineno': [start, end], 'level': level of rule,
+            # 'content': content, 'message': rule name, 'script_name': script name
+            # }
             table.set_cols_align(["c", "l", "l", "l"])
             table.set_cols_valign(["m", "m", "m", "m"])
             table.header([_("Line"), _("Content"), _("Message"), _('Source Script')])
@@ -383,7 +386,8 @@ class Box(resource.Box):
         :type data: dict
         :param boxes: specific boxes if any, defaults to None, mean all boxes
         :type boxes: list of Box, optional
-        :return: list of {'lineno': [start, end], 'level': level of rule, 'content': content, 'message': rule name, 'script_name': script name}
+        :return: list of {'lineno': [start, end], 'level': level of rule, 
+                          'content': content, 'message': rule name, 'script_name': script name}
         :rtype: list
         '''
 

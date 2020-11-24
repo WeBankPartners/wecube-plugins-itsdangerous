@@ -55,7 +55,10 @@ class Rule(Base, DictBase):
         'id', 'name', 'description', 'level', 'effect_on', 'enabled', 'match_type', 'match_param_id', 'match_value',
         'created_by', 'created_time', 'updated_by', 'updated_time', 'match_param'
     ]
-    detail_attributes = attributes
+    detail_attributes = [
+        'id', 'name', 'description', 'level', 'effect_on', 'enabled', 'match_type', 'match_param_id', 'match_value',
+        'created_by', 'created_time', 'updated_by', 'updated_time', 'match_param', 'policies'
+    ]
     summary_attributes = [
         'id', 'name', 'description', 'level', 'effect_on', 'enabled', 'match_type', 'match_param_id', 'match_value',
         'match_param'
@@ -77,7 +80,7 @@ class Rule(Base, DictBase):
     updated_time = Column(DateTime, nullable=True)
 
     match_param = relationship('MatchParam', lazy=False)
-    # policies = relationship("Policy", back_populates="policy_rule")
+    policies = relationship("Policy", secondary="policy_rule", lazy=True)
 
 
 class Subject(Base, DictBase):
@@ -107,7 +110,10 @@ class Target(Base, DictBase):
         'id', 'name', 'args_scope', 'entity_scope', 'enabled', 'created_by', 'created_time', 'updated_by',
         'updated_time'
     ]
-    detail_attributes = attributes
+    detail_attributes = [
+        'id', 'name', 'args_scope', 'entity_scope', 'enabled', 'created_by', 'created_time', 'updated_by',
+        'updated_time', 'subjects'
+    ]
     summary_attributes = ['id', 'name', 'args_scope', 'entity_scope', 'enabled']
 
     id = Column(INTEGER(11), primary_key=True)
@@ -121,7 +127,7 @@ class Target(Base, DictBase):
     updated_by = Column(String(36), nullable=True)
     updated_time = Column(DateTime, nullable=True)
 
-    # subjects = relationship('SubjectTarget', back_populates='target')
+    subjects = relationship('Subject', secondary="subject_target", lazy=True)
 
 
 class Box(Base, DictBase):

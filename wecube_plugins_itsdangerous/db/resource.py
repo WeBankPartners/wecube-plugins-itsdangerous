@@ -57,7 +57,7 @@ class MatchParam(MetaCRUD):
         refs = Rule().list({'match_param_id': rid})
         if refs:
             names = '|'.join([i['name'] for i in refs])
-            raise exceptions.ConflictError(name=names)
+            raise exceptions.ConflictError(oid=rid, name=names)
         return super().delete(rid, filters, detail)
 
 
@@ -122,7 +122,7 @@ class Policy(MetaCRUD):
             refs = BoxManage(session=session).list({'policy_id': rid})
             if refs:
                 names = '|'.join([i['name'] for i in refs])
-                raise exceptions.ConflictError(name=names)
+                raise exceptions.ConflictError(oid=rid, name=names)
             PolicyRule(transaction=session).delete_all(filters={'policy_id': rid})
             return super().delete(rid, filters, detail)
 
@@ -163,6 +163,13 @@ class Rule(MetaCRUD):
         crud.ColumnValidator(field='updated_by', validate_on=('create:O', 'update:O'), nullable=True),
         crud.ColumnValidator(field='updated_time', validate_on=('create:O', 'update:O'), nullable=True),
     ]
+
+    def delete(self, rid, filters=None, detail=True):
+        ref = super().get(rid)
+        if ref:
+            names = '|'.join([i['name'] for i in ref['policies']])
+            raise exceptions.ConflictError(oid=rid, name=names)
+        return super().delete(rid, filters, detail)
 
 
 class Subject(MetaCRUD):
@@ -226,7 +233,7 @@ class Subject(MetaCRUD):
             refs = BoxManage(session=session).list({'subject_id': rid})
             if refs:
                 names = '|'.join([i['name'] for i in refs])
-                raise exceptions.ConflictError(name=names)
+                raise exceptions.ConflictError(oid=rid, name=names)
             SubjectTarget(transaction=session).delete_all(filters={'subject_id': rid})
             return super().delete(rid, filters, detail)
 
@@ -252,6 +259,13 @@ class Target(MetaCRUD):
         crud.ColumnValidator(field='updated_by', validate_on=('create:O', 'update:O'), nullable=True),
         crud.ColumnValidator(field='updated_time', validate_on=('create:O', 'update:O'), nullable=True),
     ]
+
+    def delete(self, rid, filters=None, detail=True):
+        ref = super().get(rid)
+        if ref:
+            names = '|'.join([i['name'] for i in ref['subjects']])
+            raise exceptions.ConflictError(oid=rid, name=names)
+        return super().delete(rid, filters, detail)
 
 
 class Box(MetaCRUD):
@@ -310,11 +324,11 @@ class ServiceScript(MetaCRUD):
                              validate_on=['create:O', 'update:O'],
                              nullable=True),
         crud.ColumnValidator(field='content_field',
-                             rule=my_validator.LengthValidator(1, 63),
+                             rule=my_validator.LengthValidator(0, 63),
                              validate_on=['create:O', 'update:O'],
                              nullable=True),
         crud.ColumnValidator(field='endpoint_field',
-                             rule=my_validator.LengthValidator(1, 63),
+                             rule=my_validator.LengthValidator(0, 63),
                              validate_on=['create:O', 'update:O'],
                              nullable=True),
         crud.ColumnValidator(field='created_by', validate_on=('create:O', 'update:O'), nullable=True),
@@ -322,3 +336,18 @@ class ServiceScript(MetaCRUD):
         crud.ColumnValidator(field='updated_by', validate_on=('create:O', 'update:O'), nullable=True),
         crud.ColumnValidator(field='updated_time', validate_on=('create:O', 'update:O'), nullable=True),
     ]
+
+    def _before_create(self, resource, validate):
+        super()._before_create(resource, validate)
+        if ('content_field' not in resource
+                and 'endpoint_field' not in resource) or ('content_field' in resource and not resource['content_field']
+                                                          and 'endpoint_field' in resource
+                                                          and not resource['endpoint_field']):
+            raise exceptions.FieldRequired(attribute='content_field or endpoint_field')
+
+    def _before_update(self, rid, resource, validate):
+        super()._before_update(rid, resource, validate)
+        if 'content_field' in resource and not resource[
+                'content_field'] and 'endpoint_field' in resource and not resource['endpoint_field']:
+            raise exceptions.ValidationError(attribute='content_field and endpoint_field',
+                                             msg=_('specify at least one field content'))
