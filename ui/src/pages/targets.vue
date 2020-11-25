@@ -1,7 +1,7 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent> -->
+    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
   </div>
 </template>
 
@@ -26,6 +26,29 @@ let tableEle = [
   {
     title: 'hr_enabled',
     value: 'enabled',
+    display: true,
+    render: item => {
+      return item.enabled ? 'Yes' : 'No'
+    }
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]
@@ -126,6 +149,7 @@ export default {
       }
     },
     add () {
+      this.modelConfig.addRow.enabled = true
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')
     },

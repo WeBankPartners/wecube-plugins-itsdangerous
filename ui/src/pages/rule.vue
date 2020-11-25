@@ -1,7 +1,47 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent> -->
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="rule">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_level') }}:</label>
+          <Select v-model="modelConfig.addRow.level" style="width: 338px">
+            <Option v-for="item in modelConfig.v_select_configs.levelOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('effect_on') }}:</label>
+          <Select v-model="modelConfig.addRow.effect_on" style="width: 338px">
+            <Option v-for="item in modelConfig.v_select_configs.effectOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('match_type') }}:</label>
+          <Select v-model="modelConfig.addRow.match_type" style="width: 338px">
+            <Option v-for="item in matchOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('match_param_id') }}:</label>
+          <Select
+            v-model="modelConfig.addRow.match_param_id"
+            :disabled="modelConfig.addRow.match_type === 'filter'"
+            style="width: 338px"
+            clearable
+          >
+            <Option v-for="item in modelConfig.v_select_configs.matchParamOption" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+      </div>
+    </ModalComponent>
   </div>
 </template>
 
@@ -21,7 +61,10 @@ let tableEle = [
   {
     title: 'hr_enabled',
     value: 'enabled',
-    display: true
+    display: true,
+    render: item => {
+      return item.enabled ? 'Yes' : 'No'
+    }
   },
   {
     title: 'hr_level',
@@ -45,7 +88,27 @@ let tableEle = [
   },
   {
     title: 'match_param_id', // 不必
-    value: 'match_param_id', // 调用参数
+    value: 'match_param.name', // 调用参数
+    display: true
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]
@@ -115,65 +178,38 @@ export default {
             type: 'text'
           },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          { label: 'hr_level', value: 'level', max: 10, min: 0, placeholder: '', disabled: false, type: 'inputNumber' },
-          // {
-          //   label: 'effect_on',
-          //   value: 'effect_on',
-          //   option: 'effectOptions',
-          //   v_validate: 'required:true',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // },
-          // {
-          //   label: 'match_type',
-          //   value: 'match_type',
-          //   option: 'matchOptions',
-          //   v_validate: 'required:true',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // },
-          // {
-          //   label: 'match_value',
-          //   value: 'match_value',
-          //   v_validate: 'required:true',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'text'
-          // },
-          // {
-          //   label: 'match_param_id',
-          //   value: 'match_param_id',
-          //   option: 'matchParamOption',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // },
-          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
+          {
+            label: 'match_value',
+            value: 'match_value',
+            v_validate: 'required:true',
+            placeholder: '',
+            disabled: false,
+            type: 'text'
+          },
+          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' },
+          { name: 'rule', type: 'slot' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           name: null,
           description: null,
           enabled: true,
-          level: 0,
-          effect_on: 'param',
-          match_type: 'filter',
+          level: 'high',
+          effect_on: 'script',
+          match_type: 'cli',
           match_value: '',
-          match_param_id: []
+          match_param_id: null
         },
         v_select_configs: {
+          levelOptions: [
+            { label: 'critical', value: 'critical' },
+            { label: 'high', value: 'high' },
+            { label: 'medium', value: 'medium' },
+            { label: 'low', value: 'low' }
+          ],
           effectOptions: [
             { label: 'param', value: 'param' },
             { label: 'script', value: 'script' }
-          ],
-          matchOptions: [
-            { label: 'filter', value: 'filter' },
-            { label: 'cli', value: 'cli' },
-            { label: 'sql', value: 'sql' },
-            { label: 'text', value: 'text' },
-            { label: 'fulltext', value: 'fulltext' }
           ],
           matchParamOption: []
         }
@@ -185,8 +221,35 @@ export default {
       id: ''
     }
   },
+  watch: {
+    matchOptions: function (val) {
+      this.modelConfig.addRow.match_type = val.length > 1 ? 'cli' : 'filter'
+    },
+    'modelConfig.addRow.match_type': function (val) {
+      if (val !== 'filter') {
+        this.getConfigData(val)
+      }
+    }
+  },
+  computed: {
+    matchOptions: function () {
+      let res = []
+      if (this.modelConfig.addRow.effect_on === 'script') {
+        res = [
+          { label: 'cli', value: 'cli' },
+          { label: 'sql', value: 'sql' },
+          { label: 'text', value: 'text' },
+          { label: 'fulltext', value: 'fulltext' }
+        ]
+      } else {
+        res = [{ label: 'filter', value: 'filter' }]
+      }
+      return res
+    }
+  },
   mounted () {
     this.initData()
+    this.getConfigData()
   },
   methods: {
     async initData () {
@@ -198,7 +261,14 @@ export default {
       }
     },
     async getConfigData () {
-      const params = 'matchparams'
+      // eslint-disable-next-line no-unused-vars
+      let params = ''
+      if (this.modelConfig.addRow.match_type === 'cli') {
+        params = 'matchparams?type=cli'
+      }
+      if (['sql', 'text', 'fulltext'].includes(this.modelConfig.addRow.match_type)) {
+        params = 'matchparams?type=regex'
+      }
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.modelConfig.v_select_configs.matchParamOption = data.data.map(item => {
@@ -210,8 +280,10 @@ export default {
       }
     },
     async add () {
-      await this.getConfigData()
-      this.modelConfig.addRow.effect_on = 'param'
+      this.modelConfig.addRow.enabled = true
+      this.modelConfig.addRow.level = 'high'
+      this.modelConfig.addRow.effect_on = 'script'
+      this.modelConfig.addRow.match_type = 'cli'
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
@@ -229,7 +301,6 @@ export default {
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
       this.modelConfig.addRow = this.$commonUtil.manageEditParams(this.modelConfig.addRow, rowData)
-      await this.getConfigData()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
@@ -243,7 +314,7 @@ export default {
     },
     deleteConfirmModal (rowData) {
       this.$Modal.confirm({
-        title: 123,
+        title: rowData.name,
         'z-index': 1000000,
         onOk: async () => {
           const { status, message } = await deleteTableRow(this.pageConfig.CRUD, rowData.id)

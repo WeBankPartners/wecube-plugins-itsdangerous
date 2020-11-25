@@ -1,7 +1,19 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent> -->
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="match-params">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_type') }}:</label>
+          <Select v-model="modelConfig.addRow.type" style="width: 338px">
+            <Option v-for="item in modelConfig.v_select_configs.typeOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+          <label class="required-tip">*</label>
+        </div>
+      </div>
+    </ModalComponent>
   </div>
 </template>
 
@@ -29,6 +41,26 @@ let tableEle = [
   {
     title: 'hr_type',
     value: 'type',
+    display: true
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]
@@ -105,8 +137,8 @@ export default {
             placeholder: '',
             disabled: false,
             type: 'text'
-          }
-          // { label: 'hr_type', value: 'type', option: 'typeOptions', placeholder: '', disabled: false, type: 'select' }
+          },
+          { name: 'match-params', type: 'slot' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据

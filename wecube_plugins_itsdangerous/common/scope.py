@@ -7,6 +7,8 @@ import datetime
 
 from talos.common import cache
 from talos.core import config
+from talos.core import utils as talos_utils
+from talos.utils import scoped_globals
 
 from wecube_plugins_itsdangerous.common import expression
 from wecube_plugins_itsdangerous.common import jsonfilter
@@ -32,7 +34,7 @@ class JsonScope(object):
 
 
 def get_wecube_token(base_url):
-    token = CONF.wecube.token
+    token = talos_utils.get_attr(scoped_globals.GLOBALS, 'request.auth_token') or CONF.wecube.token
     if not CONF.wecube.use_token:
         token = cache.get(WECUBE_TOKEN)
         if not cache.validate(token):
@@ -71,18 +73,23 @@ class WeCubeScope(object):
     def __init__(self, expr):
         self.expression = expr
 
-    def is_match(self, data):
+    def is_match(self, data, expect_type=None):
         '''
         check if wecube data(from expression) contains any item from data 
-        :param data: [{...}]
+        :param data: [{id: xxx}, {...}]
         '''
-        if data is None:
-            return False
+        data = data or []
         # NOTE: (roy) change this if instance structure changed
         input_guids = [d['id'] for d in data]
         if input_guids:
             try:
-                expression.expr_parse(self.expression)
+                expr_groups = expression.expr_parse(self.expression)
+                # fast check for entity type match
+                # eg. expect_type="wecmdb:host_instance" & last_ci_type="wecmdb:rdb_instance"
+                # the result is always False
+                last_ci_type = '%s:%s' % (expr_groups[-1]['data']['plugin'], expr_groups[-1]['data']['ci'])
+                if expect_type and expect_type != last_ci_type:
+                    return False
             except ValueError as e:
                 LOG.exception(e)
             else:

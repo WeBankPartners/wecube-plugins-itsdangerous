@@ -1,7 +1,18 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent> -->
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="subjects">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_target') }}:</label>
+          <Select v-model="modelConfig.addRow.targets" style="width: 338px" multiple>
+            <Option v-for="item in modelConfig.v_select_configs.targetOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+      </div>
+    </ModalComponent>
   </div>
 </template>
 
@@ -21,6 +32,29 @@ let tableEle = [
   {
     title: 'hr_enabled',
     value: 'enabled',
+    display: true,
+    render: item => {
+      return item.enabled ? 'Yes' : 'No'
+    }
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]
@@ -89,14 +123,7 @@ export default {
             disabled: false,
             type: 'text'
           },
-          {
-            label: 'hr_target',
-            value: 'targets',
-            option: 'targetOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'multiSelect'
-          },
+          { name: 'subjects', type: 'slot' },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
           { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
         ],
@@ -143,6 +170,7 @@ export default {
       }
     },
     async add () {
+      this.modelConfig.addRow.enabled = true
       await this.getConfigData()
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')

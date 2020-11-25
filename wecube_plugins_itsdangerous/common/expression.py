@@ -9,12 +9,11 @@ wecube_plugins_itsdangerous.common.expression
 import json
 import re
 
-from talos.core import utils
 from wecube_plugins_itsdangerous.common import exceptions
 
-R_SINGLE_FILTER = re.compile('\{([_a-zA-Z][_a-zA-Z0-9.]*)\s+([a-zA-Z]+)\s+([^}]+)\}')
+R_SINGLE_FILTER = re.compile(r'\{([_a-zA-Z][_a-zA-Z0-9.]*)\s+([a-zA-Z]+)\s+([^}]+)\}')
 R_SEG_EXPRESSION = re.compile(
-    '(?:\(([_a-zA-Z][_a-zA-Z0-9]*)\))?(?:([_a-zA-Z][_a-zA-Z0-9]*):)?([_a-zA-Z][_a-zA-Z0-9]*)((?:\{[_a-zA-Z][_a-zA-Z0-9.]*\s+[a-zA-Z]+\s+.*\}){1,30})?(?:\.([_a-zA-Z][_a-zA-Z0-9]*))?$'
+    r'(?:\(([_a-zA-Z][_a-zA-Z0-9]*)\))?(?:([_a-zA-Z][_a-zA-Z0-9]*):)?([_a-zA-Z][_a-zA-Z0-9]*)((?:\{[_a-zA-Z][_a-zA-Z0-9.]*\s+[a-zA-Z]+\s+.*\}){1,30})?(?:\.([_a-zA-Z][_a-zA-Z0-9]*))?$'
 )
 
 
@@ -103,16 +102,16 @@ def expr_seg_parse(expr):
     '''
     parse a segment of expression to dict, eg. "(attr)[plugin:]ci[{key op value}*][.attr]" into
     {
-        'backref_attribute': '', 
-        'plugin': '', 
-        'ci': '', 
-        'filters': '', 
+        'backref_attribute': '',
+        'plugin': '',
+        'ci': '',
+        'filters': '',
         'attribute': ''
     }
     :param expr_filter: expression
     '''
     res = R_SEG_EXPRESSION.match(expr)
-    if (res):
+    if res:
         result = {
             'expr': expr,
             'backref_attribute': res.groups()[0] or '',

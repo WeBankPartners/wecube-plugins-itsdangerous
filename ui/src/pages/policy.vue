@@ -1,7 +1,18 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <!-- <ModalComponent :modelConfig="modelConfig"></ModalComponent> -->
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="policy">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_rule') }}:</label>
+          <Select v-model="modelConfig.addRow.rules" style="width: 338px" multiple>
+            <Option v-for="item in modelConfig.v_select_configs.ruleOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+      </div>
+    </ModalComponent>
   </div>
 </template>
 
@@ -21,6 +32,29 @@ let tableEle = [
   {
     title: 'hr_enabled',
     value: 'enabled',
+    display: true,
+    render: item => {
+      return item.enabled ? 'Yes' : 'No'
+    }
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]
@@ -89,16 +123,9 @@ export default {
             disabled: false,
             type: 'text'
           },
-          {
-            label: 'hr_rule',
-            value: 'rules',
-            option: 'ruleOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'multiSelect'
-          },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
+          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' },
+          { name: 'policy', type: 'slot' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
@@ -143,6 +170,7 @@ export default {
       }
     },
     async add () {
+      this.modelConfig.addRow.enabled = true
       await this.getConfigData()
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')

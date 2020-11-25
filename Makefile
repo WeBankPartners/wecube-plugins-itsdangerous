@@ -30,6 +30,7 @@ package: image
 	cd package && rm -f register.xml
 	cd package && rm -f ui.zip
 	cd package && rm -f init.sql
+	docker rmi $(project_name):$(version)
 
 upload: package
 	$(eval container_id:=$(shell docker run -v $(current_dir)/package:/package -itd --entrypoint=/bin/sh minio/mc))

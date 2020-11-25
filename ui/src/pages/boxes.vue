@@ -1,7 +1,26 @@
 <template>
   <div class=" ">
     <PageTable :pageConfig="pageConfig"></PageTable>
-    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="boxes">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_policies') }}:</label>
+          <Select v-model="modelConfig.addRow.policy_id" style="width: 338px">
+            <Option v-for="item in modelConfig.v_select_configs.policyOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_subject') }}:</label>
+          <Select v-model="modelConfig.addRow.subject_id" style="width: 338px">
+            <Option v-for="item in modelConfig.v_select_configs.subjectOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+      </div>
+    </ModalComponent>
     <ModalComponent :modelConfig="detectConfig">
       <div slot="detectBtn">
         <div style="text-align: right">
@@ -29,6 +48,14 @@ let tableEle = [
     display: true
   },
   {
+    title: 'hr_enabled',
+    value: 'enabled',
+    display: true,
+    render: item => {
+      return item.enabled ? 'Yes' : 'No'
+    }
+  },
+  {
     title: 'hr_policies',
     value: 'policy.name', //
     display: true
@@ -36,6 +63,26 @@ let tableEle = [
   {
     title: 'hr_subject',
     value: 'subject.name', //
+    display: true
+  },
+  {
+    title: 'hr_created_by',
+    value: 'created_by', //
+    display: true
+  },
+  {
+    title: 'hr_created_time',
+    value: 'created_time', //
+    display: true
+  },
+  {
+    title: 'hr_updated_by',
+    value: 'updated_by', //
+    display: true
+  },
+  {
+    title: 'hr_updated_time',
+    value: 'updated_time', //
     display: true
   }
 ]
@@ -99,18 +146,20 @@ export default {
             {
               title: 'hr_level',
               value: 'level', //
-              display: true
+              display: true,
+              style: 'width: 80px;'
             },
             {
               title: 'lineno',
               value: 'lineno', //
-              display: true
+              display: true,
+              style: 'width: 80px;'
             },
             {
               title: 'message',
               value: 'message', //
               display: true,
-              style: 'width:90px'
+              style: 'width:120px'
             },
             {
               title: 'script_name',
@@ -141,26 +190,13 @@ export default {
             type: 'text'
           },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          {
-            label: 'hr_policies',
-            value: 'policy_id',
-            option: 'policyOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          },
-          {
-            label: 'hr_subject',
-            value: 'subject_id',
-            option: 'subjectOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          }
+          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' },
+          { name: 'boxes', type: 'slot' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           name: null,
+          enabled: true,
           description: null,
           policy_id: null,
           subject_id: null
@@ -177,14 +213,14 @@ export default {
         noBtn: true,
         modalStyle: 'max-width:1000px',
         config: [
-          // {
-          //   label: 'hr_type',
-          //   value: 'type',
-          //   option: 'typeOptions',
-          //   placeholder: '',
-          //   disabled: false,
-          //   type: 'select'
-          // },
+          {
+            label: 'hr_type',
+            value: 'type',
+            option: 'typeOptions',
+            placeholder: '',
+            disabled: false,
+            type: 'select'
+          },
           {
             label: 'script',
             value: 'content',
@@ -198,13 +234,12 @@ export default {
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           name: null,
-          type: 'None',
+          type: 'shell',
           content: null,
           entityInstances: []
         },
         v_select_configs: {
           typeOptions: [
-            { label: 'None', value: 'None' },
             { label: 'shell', value: 'shell' },
             { label: 'sql', value: 'sql' }
           ]
@@ -274,6 +309,7 @@ export default {
       }
     },
     async add () {
+      this.modelConfig.addRow.enabled = true
       await this.getConfigData()
       this.modelConfig.isAdd = true
       this.$root.JQ('#add_edit_Modal').modal('show')

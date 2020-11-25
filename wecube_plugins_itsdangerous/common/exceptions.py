@@ -55,7 +55,7 @@ class ValidationError(PluginError):
 
     @property
     def message_format(self):
-        return _('detail: column %(attribute)s validate failed, because: %(msg)s')
+        return _('column %(attribute)s validate failed, because: %(msg)s')
 
 
 class PluginCallError(PluginError):
@@ -85,7 +85,7 @@ class BatchPartialError(PluginError):
 
     @property
     def message_format(self):
-        return _('Fail to %(action)s [%(num)s] record, detail error in the data block')
+        return _('fail to %(action)s [%(num)s] record, detail error in the data block')
 
 
 class ConflictError(PluginError):
@@ -99,4 +99,4 @@ class ConflictError(PluginError):
 
     @property
     def message_format(self):
-        return _('Object is used by %(name)s')
+        return _('object[%(oid)s] is used by %(name)s')

@@ -44,6 +44,10 @@ class EShlex(shlex.shlex):
                         print("shlex: I see whitespace in whitespace state")
                     if self.token or (self.posix and quoted):
                         break  # emit current token
+                    elif nextchar == '\n':
+                        is_punctuation = True
+                        self.token = '\n'
+                        break
                     else:
                         continue
                 elif nextchar in self.commenters:
@@ -105,12 +109,13 @@ class EShlex(shlex.shlex):
                 # character may be escaped within quotes.
                 if (escapedstate in self.quotes and nextchar != self.state and nextchar != escapedstate):
                     self.token += self.state
-                if not (escapedstate == 'a' and nextchar in '\r\n'):
+                if not (escapedstate == 'a' and nextchar == '\n'):
                     # escape with newline mean the same line
                     self.token += nextchar
                     self.state = escapedstate
-                if escapedstate == 'a' and nextchar in '\r\n':
+                if escapedstate == 'a' and nextchar == '\n':
                     line_continue = True
+                    token_line = self.lineno
                     self.state = ' '
             elif self.state in ('a', 'c'):
                 if not nextchar:

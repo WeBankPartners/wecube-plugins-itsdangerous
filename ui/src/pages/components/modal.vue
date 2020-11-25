@@ -45,9 +45,7 @@
                   :disabled="modelConfig.isAdd ? false : item.disabled"
                   :placeholder="$t(item.placeholder)"
                   type="text"
-                  v-validate="item.v_validate"
                   :name="item.value"
-                  :class="{ 'red-border': veeErrors.has(item.value) }"
                   class="col-md-7 form-control model-input"
                 />
                 <input
@@ -58,7 +56,6 @@
                   :placeholder="$t(item.placeholder)"
                   type="text"
                   :name="item.value"
-                  v-validate="item.v_validate"
                   class="col-md-7 form-control model-input"
                 />
                 <input
@@ -69,7 +66,6 @@
                   type="password"
                   :placeholder="$t(item.placeholder)"
                   :name="item.value"
-                  v-validate="item.v_validate"
                   class="col-md-7 form-control model-input"
                 />
                 <input
@@ -85,7 +81,6 @@
                   v-if="item.type === 'textarea' && isHide(item.hide)"
                   v-model="modelConfig.addRow[item.value]"
                   :placeholder="$t(item.placeholder)"
-                  v-validate="item.v_validate"
                   :class="item.isError ? 'red-border textareaSty' : 'textareaSty'"
                   :disabled="item.disabled"
                 />
@@ -160,15 +155,6 @@
                     <div v-html="item.tips"></div>
                   </div>
                 </Poptip>
-
-                <label v-show="veeErrors.has(item.value) && isHide(item.hide)" class="col-md-7 help is-danger"
-                  >{{ $t(item.label) }} {{ veeErrors.first(item.value) }}</label
-                >
-                <label
-                  v-if="(item.type === 'select' || item.type === 'textarea') && item.isError"
-                  class="col-md-7 help is-danger"
-                  >{{ $t(item.label) }} {{ $t('tips.required') }}</label
-                >
               </div>
             </form>
           </div>
@@ -219,46 +205,41 @@ export default {
   },
   props: ['modelConfig'],
   mounted () {
-    console.log(1)
     let _this = this
     let modalId = !this.$root.$validate.isEmpty(this.modelConfig.modalId) ? 'add_edit_Modal' : this.modelConfig.modalId
-
     this.$root.JQ('#' + modalId).on('hidden.bs.modal', () => {
       // 清理表单验证错误信息
-      _this.veeErrors.clear()
-      console.log(2)
       // 清除表单缓存内容  下面把清空switch的数据补全
       this.$root.$validate.emptyJson(_this.modelConfig.addRow)
-      console.log(3)
       // 清除表单缓存的selected数据
-      // for (let p in _this.modelConfig.v_select_configs) {
-      //   if (p.endsWith('selected')) {
-      //     _this.modelConfig.v_select_configs[p] = null
-      //   }
-      // }
+      for (let p in _this.modelConfig.v_select_configs) {
+        if (p.endsWith('selected')) {
+          _this.modelConfig.v_select_configs[p] = null
+        }
+      }
       // 清除表单selected
-      // for (let i = 0; i < this.modelConfig.config.length; i++) {
-      //   // 这里不能清空switch绑定的数据，不然会报错
-      //   if (this.modelConfig.config[i].type === 'switch') {
-      //     this.modelConfig.addRow[this.modelConfig.config[i].value] = false
-      //   }
-      //   if (this.modelConfig.config[i].type === 'textarea' && this.modelConfig.config[i].v_validate) {
-      //     this.modelConfig.config[i].isError = false
-      //   }
-      //   if (this.modelConfig.config[i].type === 'select' && this.modelConfig.config[i].v_validate) {
-      //     this.modelConfig.config[i].isError = false
-      //   }
-      //   if (this.modelConfig.config[i].type === 'slot') {
-      //     let arr = this.modelConfig.config[i].v_validate ? this.modelConfig.config[i].v_validate : []
-      //     for (let j = 0; j < arr.length; j++) {
-      //       let key = arr[j].isError
-      //       let value = arr[j].value
-      //       if (arr[j].type === 'select' && !this.modelConfig.v_select_configs[value]) {
-      //         this.modelConfig.v_select_configs[key] = false
-      //       }
-      //     }
-      //   }
-      // }
+      for (let i = 0; i < this.modelConfig.config.length; i++) {
+        // 这里不能清空switch绑定的数据，不然会报错
+        if (this.modelConfig.config[i].type === 'switch') {
+          this.modelConfig.addRow[this.modelConfig.config[i].value] = false
+        }
+        if (this.modelConfig.config[i].type === 'textarea' && this.modelConfig.config[i].v_validate) {
+          this.modelConfig.config[i].isError = false
+        }
+        if (this.modelConfig.config[i].type === 'select' && this.modelConfig.config[i].v_validate) {
+          this.modelConfig.config[i].isError = false
+        }
+        if (this.modelConfig.config[i].type === 'slot') {
+          let arr = this.modelConfig.config[i].v_validate ? this.modelConfig.config[i].v_validate : []
+          for (let j = 0; j < arr.length; j++) {
+            let key = arr[j].isError
+            let value = arr[j].value
+            if (arr[j].type === 'select' && !this.modelConfig.v_select_configs[value]) {
+              this.modelConfig.v_select_configs[key] = false
+            }
+          }
+        }
+      }
     })
   },
   watch: {},
@@ -270,83 +251,86 @@ export default {
       return interceptParams(this.$parent.modelTip.value, 20)
     },
     formValidate () {
-      console.log(4)
-      // return this.$validator.validate().then(result => {
-      //   console.log(5)
-      // result 为false插件验证input没有填写完整,true为验证填写完整
-      /** 验证 select是否进行了选填 实例可参照 [manage][authorizations]user-authorized.vue **/
-      // let flag = true
-      // for (let i = 0; i < this.modelConfig.config.length; i++) {
-      //   if (!this.isHide(this.modelConfig.config[i].hide)) {
-      //     continue
-      //   }
-      //   if (this.modelConfig.config[i].type === 'textarea' && this.modelConfig.config[i].v_validate) {
-      //     let obj = this.modelConfig.config[i]
-      //     if (!this.modelConfig.addRow[obj.value]) {
-      //       obj.isError = true
-      //       flag = false
-      //     } else {
-      //       obj.isError = false
-      //     }
-      //   }
-      /* ****** 配置里面的select ***** */
-      // 配置规则为：在配置type:selcet时，如需校验则添加v_validate: 'required:true',isError: false==>控制错误提示label显示
-      // 如果无需校验，则不添加
-      // if(this.modelConfig.config[i].type === 'select' && this.modelConfig.config[i].v_validate) {
-      //   let obj = this.modelConfig.config[i]
-      //   if(!this.modelConfig.v_select_configs[obj.value]){
-      //     this.modelConfig.config[i].isError = true
-      //     flag = false
-      //   }else{
-      //     this.modelConfig.config[i].isError = false
-      //   }
-      // }
-      /* ******  slot里面的select  ****** */
-      // 配置规则为：在配置type:slot 时，添加 v_validate:[],数组里面存放需要校验的select的配置信息
-      // value:绑定值,isError:错误标签显示绑定值，type:select  ===> 如果以后再校验其他类型，再增加判断逻辑
-      // {name:'xxxx',type:'slot',v_validate:[{value: 'v_xxx_selected', isError: 'v_xxx_isError', type: 'select'}]}
-      // 同时在this.modelConfig.v_select_configs里面定义v_xxx_isError：false
-      // slot里面错误提示label显示用 v-if="modelConfig.v_select_configs.v_xxx_isError" 搭配其他具体规则进行组合
-      // if(this.modelConfig.config[i].type === 'slot' && !this.modelConfig.config[i].ishide) {
-      //   let arr = this.modelConfig.config[i].v_validate ? this.modelConfig.config[i].v_validate :[]
-      //   for(let j =0;j<arr.length;j++){
-      //     let key = arr[j].isError
-      //     let value = arr[j].value
-      //     let isMutile = Array.isArray(this.modelConfig.v_select_configs[value]) && this.modelConfig.v_select_configs[value].length<1
-      //     if (arr[j].type === 'select' && (isMutile ||!this.modelConfig.v_select_configs[value])) {
-      //       this.modelConfig.v_select_configs[key] = true
-      //       flag = false
-      //     } else {
-      //       this.modelConfig.v_select_configs[key] = false
-      //     }
-      //   }
-      // }
-      // }
-      //   this.modelConfig.config = JSON.parse(JSON.stringify(this.modelConfig.config))
-      //   console.log(6)
-      //   return result && flag
-      // })
+      return this.$validator.validate().then(result => {
+        // result 为false插件验证input没有填写完整,true为验证填写完整
+        /** 验证 select是否进行了选填 实例可参照 [manage][authorizations]user-authorized.vue **/
+        let flag = true
+        for (let i = 0; i < this.modelConfig.config.length; i++) {
+          if (!this.isHide(this.modelConfig.config[i].hide)) {
+            continue
+          }
+          if (this.modelConfig.config[i].type === 'textarea' && this.modelConfig.config[i].v_validate) {
+            let obj = this.modelConfig.config[i]
+            if (!this.modelConfig.addRow[obj.value]) {
+              obj.isError = true
+              flag = false
+            } else {
+              obj.isError = false
+            }
+          }
+          /* ****** 配置里面的select ***** */
+          // 配置规则为：在配置type:selcet时，如需校验则添加v_validate: 'required:true',isError: false==>控制错误提示label显示
+          // 如果无需校验，则不添加
+          // if(this.modelConfig.config[i].type === 'select' && this.modelConfig.config[i].v_validate) {
+          //   let obj = this.modelConfig.config[i]
+          //   if(!this.modelConfig.v_select_configs[obj.value]){
+          //     this.modelConfig.config[i].isError = true
+          //     flag = false
+          //   }else{
+          //     this.modelConfig.config[i].isError = false
+          //   }
+          // }
+          /* ******  slot里面的select  ****** */
+          // 配置规则为：在配置type:slot 时，添加 v_validate:[],数组里面存放需要校验的select的配置信息
+          // value:绑定值,isError:错误标签显示绑定值，type:select  ===> 如果以后再校验其他类型，再增加判断逻辑
+          // {name:'xxxx',type:'slot',v_validate:[{value: 'v_xxx_selected', isError: 'v_xxx_isError', type: 'select'}]}
+          // 同时在this.modelConfig.v_select_configs里面定义v_xxx_isError：false
+          // slot里面错误提示label显示用 v-if="modelConfig.v_select_configs.v_xxx_isError" 搭配其他具体规则进行组合
+          // if(this.modelConfig.config[i].type === 'slot' && !this.modelConfig.config[i].ishide) {
+          //   let arr = this.modelConfig.config[i].v_validate ? this.modelConfig.config[i].v_validate :[]
+          //   for(let j =0;j<arr.length;j++){
+          //     let key = arr[j].isError
+          //     let value = arr[j].value
+          //     let isMutile = Array.isArray(this.modelConfig.v_select_configs[value]) && this.modelConfig.v_select_configs[value].length<1
+          //     if (arr[j].type === 'select' && (isMutile ||!this.modelConfig.v_select_configs[value])) {
+          //       this.modelConfig.v_select_configs[key] = true
+          //       flag = false
+          //     } else {
+          //       this.modelConfig.v_select_configs[key] = false
+          //     }
+          //   }
+          // }
+        }
+        this.modelConfig.config = JSON.parse(JSON.stringify(this.modelConfig.config))
+        return result && flag
+      })
     },
     save (val) {
-      let resultPromise = this.formValidate()
-      resultPromise.then(result => {
-        if (result) {
-          if (val) {
-            this.$parent.addPost()
-          } else {
-            this.$parent.editPost()
-          }
-        }
-      })
+      // let resultPromise = this.formValidate()
+      // resultPromise.then(result => {
+      //   if (result) {
+      //     if (val) {
+      //       this.$parent.addPost()
+      //     } else {
+      //       this.$parent.editPost()
+      //     }
+      //   }
+      // })
+      if (val) {
+        this.$parent.addPost()
+      } else {
+        this.$parent.editPost()
+      }
     },
     // 自定义模态框保存响应函数
     customFunc (func) {
-      let val = this.formValidate()
-      val.then(result => {
-        if (result) {
-          this.$parent[func]()
-        }
-      })
+      // let val = this.formValidate()
+      // val.then(result => {
+      //   if (result) {
+      //     this.$parent[func]()
+      //   }
+      // })
+      this.$parent[func]()
     },
     // 控制是否显示必填'*'
     isRequired_s (item) {
@@ -466,7 +450,6 @@ export default {
   margin-left: 70px;
   margin-bottom: 0px;
 }
-
 .question-circle {
   font-size: 14px;
   color: gray;
@@ -477,7 +460,6 @@ export default {
   padding: 6px;
   white-space: normal;
 }
-
 button:focus {
   box-shadow: none;
 }
@@ -486,7 +468,6 @@ button:focus {
   height: 32px;
   padding: 4px 0px;
 }
-
 /*placeholer样式--开始 */
 ::-webkit-input-placeholder {
   /* WebKit, Blink, Edge */
