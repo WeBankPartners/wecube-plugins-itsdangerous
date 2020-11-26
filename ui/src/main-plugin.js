@@ -16,7 +16,7 @@ import ModalComponent from '@/pages/components/modal'
 
 window.addOptions({
   JQ: jquery,
-  $commonUtil: commonUtil,
+  $itsCommonUtil: commonUtil,
   $validate: validate
 })
 

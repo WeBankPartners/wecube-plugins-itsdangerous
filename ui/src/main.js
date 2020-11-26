@@ -18,7 +18,7 @@ import PageTable from '@/pages/components/table-page/page'
 import ModalComponent from '@/pages/components/modal'
 
 Vue.prototype.$validate = validate
-Vue.prototype.$commonUtil = commonUtil
+Vue.prototype.$itsCommonUtil = commonUtil
 Vue.prototype.JQ = jquery
 Vue.component('PageTable', PageTable)
 Vue.component('ModalComponent', ModalComponent)
