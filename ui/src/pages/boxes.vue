@@ -1,6 +1,6 @@
 <template>
   <div class=" ">
-    <PageTable :pageConfig="pageConfig"></PageTable>
+    <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
       <div slot="boxes">
         <div class="marginbottom params-each">
@@ -38,7 +38,7 @@
             {{ $t('detect') }}
           </button>
         </div>
-        <PageTable :pageConfig="exectPageConfig"></PageTable>
+        <DangerousPageTable :pageConfig="exectPageConfig"></DangerousPageTable>
       </div>
     </ModalComponent>
   </div>
