@@ -1,6 +1,6 @@
 <template>
   <div class=" ">
-    <PageTable :pageConfig="pageConfig"></PageTable>
+    <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
       <div slot="policy">
         <div class="marginbottom params-each">
