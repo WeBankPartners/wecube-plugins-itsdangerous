@@ -61,8 +61,8 @@ export default {
   props: ['pageConfig', 'selectedData'],
   mounted () {},
   methods: {
-    initData (url, params) {
-      this.$parent.initData(this.pageConfig.CRUD, this.pageConfig)
+    initTableData (url, params) {
+      this.$parent.initTableData(this.pageConfig.CRUD, this.pageConfig)
     },
     search () {
       // 搜索时清空已选中数据
@@ -71,7 +71,7 @@ export default {
       if (this.pageConfig.pagination) {
         this.pageConfig.pagination.current = 1
       }
-      this.$parent.initData(this.pageConfig.CRUD, this.pageConfig)
+      this.$parent.initTableData(this.pageConfig.CRUD, this.pageConfig)
     },
     // 原始删除
     noSmsDelete (val, delTip) {

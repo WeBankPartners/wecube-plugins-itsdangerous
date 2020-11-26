@@ -42,7 +42,7 @@ export default {
       pageConfig.researchConfig = {}
       pageConfig.researchConfig.filters = this.filters
       pageConfig.pagination = this.pagination
-      this.$parent.initData(this.pageUrl, pageConfig)
+      this.$parent.initTableData(this.pageUrl, pageConfig)
     }
   },
   components: {}
