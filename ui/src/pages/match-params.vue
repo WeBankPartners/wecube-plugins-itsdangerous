@@ -166,7 +166,7 @@ export default {
   },
   methods: {
     async initData () {
-      const params = this.$commonUtil.managementUrl(this)
+      const params = this.$itsCommonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.pageConfig.table.tableData = data.data
@@ -191,7 +191,7 @@ export default {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
-      this.modelConfig.addRow = this.$commonUtil.manageEditParams(this.modelConfig.addRow, rowData)
+      this.modelConfig.addRow = this.$itsCommonUtil.manageEditParams(this.modelConfig.addRow, rowData)
       this.modelConfig.addRow.params = JSON.stringify(rowData.params)
       this.$root.JQ('#add_edit_Modal').modal('show')
     },

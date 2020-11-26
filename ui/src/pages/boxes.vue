@@ -22,6 +22,16 @@
       </div>
     </ModalComponent>
     <ModalComponent :modelConfig="detectConfig">
+      <div slot="scriptType">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_type') }}:</label>
+          <Select v-model="detectConfig.addRow.type" style="width: 70%">
+            <Option v-for="item in detectConfig.v_select_configs.typeOptions" :value="item.value" :key="item.value">
+              {{ item.label }}
+            </Option>
+          </Select>
+        </div>
+      </div>
       <div slot="detectBtn">
         <div style="text-align: right">
           <button type="button" @click="exectDetect" style="margin: 8px 122px" class="btn btn-sm btn-confirm-f">
@@ -213,14 +223,7 @@ export default {
         noBtn: true,
         modalStyle: 'max-width:1000px',
         config: [
-          {
-            label: 'hr_type',
-            value: 'type',
-            option: 'typeOptions',
-            placeholder: '',
-            disabled: false,
-            type: 'select'
-          },
+          { name: 'scriptType', type: 'slot' },
           {
             label: 'script',
             value: 'content',
@@ -257,7 +260,7 @@ export default {
   },
   methods: {
     async initData () {
-      const params = this.$commonUtil.managementUrl(this)
+      const params = this.$itsCommonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.pageConfig.table.tableData = data.data
@@ -266,6 +269,8 @@ export default {
     },
     detectF (rowData) {
       this.id = rowData.id
+      this.detectConfig.addRow.type = 'shell'
+      this.exectPageConfig.table.tableData = []
       this.detectConfig.addRow.name = rowData.name
       this.$root.JQ('#detect_Modal').modal('show')
     },
@@ -326,7 +331,7 @@ export default {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
-      this.modelConfig.addRow = this.$commonUtil.manageEditParams(this.modelConfig.addRow, rowData)
+      this.modelConfig.addRow = this.$itsCommonUtil.manageEditParams(this.modelConfig.addRow, rowData)
       await this.getConfigData()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
