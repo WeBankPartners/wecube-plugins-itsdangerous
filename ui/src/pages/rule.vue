@@ -13,7 +13,7 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('effect_on') }}:</label>
-          <Select v-model="modelConfig.addRow.effect_on" style="width: 338px">
+          <Select v-model="modelConfig.addRow.effect_on" style="width: 338px" @on-change="changeEffectOn">
             <Option v-for="item in modelConfig.v_select_configs.effectOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -223,10 +223,10 @@ export default {
   },
   watch: {
     matchOptions: function (val) {
-      this.modelConfig.addRow.match_type = val.length > 1 ? 'cli' : 'filter'
+      this.modelConfig.addRow.match_type = val.length > 1 ? this.modelConfig.addRow.match_type || 'cli' : 'filter'
     },
     'modelConfig.addRow.match_type': function (val) {
-      if (val !== 'filter') {
+      if (val !== 'filter' && val) {
         this.getConfigData(val)
       }
     }
@@ -252,6 +252,9 @@ export default {
     this.getConfigData()
   },
   methods: {
+    changeEffectOn () {
+      this.modelConfig.addRow.match_type = ''
+    },
     async initData () {
       const params = this.$itsCommonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
