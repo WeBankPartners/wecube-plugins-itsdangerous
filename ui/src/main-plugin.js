@@ -11,16 +11,16 @@ import jquery from 'jquery'
 import zhCN from '@/locale/i18n/zh-CN.json'
 import enUS from '@/locale/i18n/en-US.json'
 
-import PageTable from '@/pages/components/table-page/page'
+import DangerousPageTable from '@/pages/components/table-page/page'
 import ModalComponent from '@/pages/components/modal'
 
 window.addOptions({
   JQ: jquery,
-  $commonUtil: commonUtil,
+  $itsCommonUtil: commonUtil,
   $validate: validate
 })
 
-window.component('PageTable', PageTable)
+window.component('DangerousPageTable', DangerousPageTable)
 window.component('ModalComponent', ModalComponent)
 
 window.locale('zh-CN', zhCN)
