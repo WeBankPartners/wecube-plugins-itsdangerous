@@ -1,6 +1,6 @@
 <template>
   <div class=" ">
-    <PageTable :pageConfig="pageConfig"></PageTable>
+    <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
       <div slot="plugin-params">
         <div class="marginbottom params-each">
@@ -169,11 +169,11 @@ export default {
     }
   },
   mounted () {
-    this.initData()
+    this.initTableData()
   },
   methods: {
-    async initData () {
-      const params = this.$commonUtil.managementUrl(this)
+    async initTableData () {
+      const params = this.$itsCommonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.pageConfig.table.tableData = data.data
@@ -187,7 +187,7 @@ export default {
     async addPost () {
       const { status, message } = await addTableRow(this.pageConfig.CRUD, [this.modelConfig.addRow])
       if (status === 'OK') {
-        this.initData()
+        this.initTableData()
         this.$Message.success(message)
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
@@ -196,13 +196,13 @@ export default {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
-      this.modelConfig.addRow = this.$commonUtil.manageEditParams(this.modelConfig.addRow, rowData)
+      this.modelConfig.addRow = this.$itsCommonUtil.manageEditParams(this.modelConfig.addRow, rowData)
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
       const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
-        this.initData()
+        this.initTableData()
         this.$Message.success(message)
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
@@ -214,7 +214,7 @@ export default {
         onOk: async () => {
           const { status, message } = await deleteTableRow(this.pageConfig.CRUD, rowData.id)
           if (status === 'OK') {
-            this.initData()
+            this.initTableData()
             this.$Message.success(message)
           }
         },
