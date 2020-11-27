@@ -595,7 +595,7 @@ export default {
       let orders = sort + key
       this.pageConfig.pagination['__orders'] = orders
       this.pageConfig.pagination.current = 1
-      this.$parent.$parent.initData(this.pageConfig.CRUD, this.pageConfig)
+      this.$parent.$parent.initTableData(this.pageConfig.CRUD, this.pageConfig)
       for (let ele in this.pageConfig.table.tableEle) {
         this.pageConfig.table.tableEle[parseInt(ele)]._sortType = 'normal'
       }
@@ -675,7 +675,7 @@ export default {
       this.pageConfig.table.tableEle[i]._activeKey = valx.value
 
       this.pageConfig.pagination.current = 1
-      this.$parent.$parent.initData(this.pageConfig.CRUD, this.pageConfig)
+      this.$parent.$parent.initTableData(this.pageConfig.CRUD, this.pageConfig)
     },
     // 多选筛选控制
     multiFilter: function (ele, i) {
@@ -684,7 +684,7 @@ export default {
       this.multiVisibleFilter = false
 
       this.pageConfig.pagination.current = 1
-      this.$parent.$parent.initData(this.pageConfig.CRUD, this.pageConfig)
+      this.$parent.$parent.initTableData(this.pageConfig.CRUD, this.pageConfig)
 
       // .multiXX
     },
@@ -695,7 +695,7 @@ export default {
       this.pageConfig.pagination[ele.filterable.filterParam] = this.pageConfig.table.tableEle[i].multiFilterParams
       this.multiVisibleFilter = false
       this.pageConfig.pagination.current = 1
-      this.$parent.$parent.initData(this.pageConfig.CRUD, this.pageConfig)
+      this.$parent.$parent.initTableData(this.pageConfig.CRUD, this.pageConfig)
     },
     // 获取排序状态active状态
     getColumnFilter (index) {
@@ -837,7 +837,7 @@ export default {
     // 刷新列表
     refreshTable () {
       this.initSelected()
-      this.$parent.$parent.initData(this.pageConfig.CRUD, this.pageConfig)
+      this.$parent.$parent.initTableData(this.pageConfig.CRUD, this.pageConfig)
     },
     // 列表列数量改变时，重新计算列表展开位置长度
     changeTdNumber () {
