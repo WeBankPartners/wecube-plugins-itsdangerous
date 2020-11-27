@@ -14,13 +14,13 @@ import 'bootstrap/dist/js/bootstrap.min.js'
 import 'font-awesome/css/font-awesome.css'
 import jquery from 'jquery'
 
-import PageTable from '@/pages/components/table-page/page'
+import DangerousPageTable from '@/pages/components/table-page/page'
 import ModalComponent from '@/pages/components/modal'
 
 Vue.prototype.$validate = validate
-Vue.prototype.$commonUtil = commonUtil
+Vue.prototype.$itsCommonUtil = commonUtil
 Vue.prototype.JQ = jquery
-Vue.component('PageTable', PageTable)
+Vue.component('DangerousPageTable', DangerousPageTable)
 Vue.component('ModalComponent', ModalComponent)
 
 Vue.config.productionTip = false

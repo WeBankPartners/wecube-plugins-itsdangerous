@@ -1,6 +1,6 @@
 <template>
   <div class=" ">
-    <PageTable :pageConfig="pageConfig"></PageTable>
+    <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
       <div slot="rule">
         <div class="marginbottom params-each">
@@ -13,7 +13,7 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('effect_on') }}:</label>
-          <Select v-model="modelConfig.addRow.effect_on" style="width: 338px">
+          <Select v-model="modelConfig.addRow.effect_on" style="width: 338px" @on-change="changeEffectOn">
             <Option v-for="item in modelConfig.v_select_configs.effectOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -223,10 +223,10 @@ export default {
   },
   watch: {
     matchOptions: function (val) {
-      this.modelConfig.addRow.match_type = val.length > 1 ? 'cli' : 'filter'
+      this.modelConfig.addRow.match_type = val.length > 1 ? this.modelConfig.addRow.match_type || 'cli' : 'filter'
     },
     'modelConfig.addRow.match_type': function (val) {
-      if (val !== 'filter') {
+      if (val !== 'filter' && val) {
         this.getConfigData(val)
       }
     }
@@ -248,12 +248,15 @@ export default {
     }
   },
   mounted () {
-    this.initData()
+    this.initTableData()
     this.getConfigData()
   },
   methods: {
-    async initData () {
-      const params = this.$commonUtil.managementUrl(this)
+    changeEffectOn () {
+      this.modelConfig.addRow.match_type = ''
+    },
+    async initTableData () {
+      const params = this.$itsCommonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.pageConfig.table.tableData = data.data
@@ -291,7 +294,7 @@ export default {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
       const { status, message } = await addTableRow(this.pageConfig.CRUD, [this.modelConfig.addRow])
       if (status === 'OK') {
-        this.initData()
+        this.initTableData()
         this.$Message.success(message)
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
@@ -300,14 +303,14 @@ export default {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
-      this.modelConfig.addRow = this.$commonUtil.manageEditParams(this.modelConfig.addRow, rowData)
+      this.modelConfig.addRow = this.$itsCommonUtil.manageEditParams(this.modelConfig.addRow, rowData)
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
       const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
-        this.initData()
+        this.initTableData()
         this.$Message.success(message)
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
@@ -319,7 +322,7 @@ export default {
         onOk: async () => {
           const { status, message } = await deleteTableRow(this.pageConfig.CRUD, rowData.id)
           if (status === 'OK') {
-            this.initData()
+            this.initTableData()
             this.$Message.success(message)
           }
         },
