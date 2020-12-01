@@ -1,0 +1,8 @@
+/var/log/itsdangerous/access.log /var/log/itsdangerous/error.log /var/log/itsdangerous/server.log {
+    daily
+    rotate 7
+    missingok
+    create 640 app app
+    compress
+    delaycompress
+}

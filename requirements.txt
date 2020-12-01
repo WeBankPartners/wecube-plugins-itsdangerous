@@ -3,10 +3,13 @@
 # process, which may cause wedges in the gate later.
 talos-api
 sqlparse==0.3.1
+requests
 pymysql
+pyjwt
 minio
-# celery
-# dogpile.cache
-# redis
-# gunicorn
-# psycopg2-binary/pymysql
+pycrypto
+gunicorn
+gevent
+pytz
+apscheduler
+texttable

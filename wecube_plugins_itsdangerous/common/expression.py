@@ -9,11 +9,11 @@ wecube_plugins_itsdangerous.common.expression
 import json
 import re
 
-from talos.core import utils
+from wecube_plugins_itsdangerous.common import exceptions
 
-R_SINGLE_FILTER = re.compile('\{([_a-zA-Z][_a-zA-Z0-9.]*)\s+([a-zA-Z]+)\s+([^}]+)\}')
+R_SINGLE_FILTER = re.compile(r'\{([_a-zA-Z][_a-zA-Z0-9.]*)\s+([a-zA-Z]+)\s+([^}]+)\}')
 R_SEG_EXPRESSION = re.compile(
-    '(?:\(([_a-zA-Z][_a-zA-Z0-9]*)\))?(?:([_a-zA-Z][_a-zA-Z0-9]*):)?([_a-zA-Z][_a-zA-Z0-9]*)((?:\{[_a-zA-Z][_a-zA-Z0-9.]*\s+[a-zA-Z]+\s+.*\}){1,30})?(?:\.([_a-zA-Z][_a-zA-Z0-9]*))?$'
+    r'(?:\(([_a-zA-Z][_a-zA-Z0-9]*)\))?(?:([_a-zA-Z][_a-zA-Z0-9]*):)?([_a-zA-Z][_a-zA-Z0-9]*)((?:\{[_a-zA-Z][_a-zA-Z0-9.]*\s+[a-zA-Z]+\s+.*\}){1,30})?(?:\.([_a-zA-Z][_a-zA-Z0-9]*))?$'
 )
 
 
@@ -102,17 +102,18 @@ def expr_seg_parse(expr):
     '''
     parse a segment of expression to dict, eg. "(attr)[plugin:]ci[{key op value}*][.attr]" into
     {
-        'backref_attribute': '', 
-        'plugin': '', 
-        'ci': '', 
-        'filters': '', 
+        'backref_attribute': '',
+        'plugin': '',
+        'ci': '',
+        'filters': '',
         'attribute': ''
     }
     :param expr_filter: expression
     '''
     res = R_SEG_EXPRESSION.match(expr)
-    if (res):
+    if res:
         result = {
+            'expr': expr,
             'backref_attribute': res.groups()[0] or '',
             'plugin': res.groups()[1] or '',
             'ci': res.groups()[2] or '',
@@ -121,7 +122,7 @@ def expr_seg_parse(expr):
         }
         result['filters'] = expr_filter_parse(result['filters'])
         return result
-    raise ValueError('invalid expression: ' + expr)
+    raise exceptions.PluginError('invalid expression: ' + expr)
 
 
 def expr_parse(expr):
@@ -134,110 +135,3 @@ def expr_parse(expr):
         if el['type'] == 'expr':
             el['data'] = expr_seg_parse(el['value'])
     return split_res
-
-
-def expr_match_input(expr_groups, ci_getter, input_data, ci_mapping):
-    '''
-    fetch data according to expression by specific source(input_data), see if there are any matches
-    :param expr_groups: result of expr_parse()
-    :param ci_getter: function (expr_data, is_backref, guids) => {}
-    :param input_data: list of input ci
-    
-    ci_getter: 
-    if is_backref
-        ci[with filters][expr_data.backref_attrubute].guid in guids
-    else 
-        ci[with filters].guid in guids
-    '''
-    results = {}
-    for el in input_data:
-        is_backref = False
-        guids = []
-        cur_data = []
-        for i in range(len(expr_groups)):
-            expr = expr_groups[i]
-            expr_data = expr['data']
-            # user input_data
-            if i == 0:
-                if len(expr_data['attribute']) > 0:
-                    guid = el['data'][expr_data['attribute']]['guid']
-                else:
-                    guid = el['data']['guid']
-                if guid:
-                    guids.append(guid)
-                continue
-            if expr['type'] == 'expr':
-                # user ci, backref_attribute.guid in guids[if is_backref], filters
-                if len(guids) == 0:
-                    # can not find any data that match expression
-                    cur_data = []
-                    break
-                cur_data = ci_getter(expr_data, is_backref, guids, ci_mapping)
-                guids = []
-                for j in range(len(cur_data)):
-                    guid = ""
-                    if len(expr_data['attribute']) > 0:
-                        result_item = cur_data[j]['data'][expr_data['attribute']]
-                        if utils.is_list_type(result_item):
-                            guids.extend([i_result_item['guid'] for i_result_item in result_item])
-                        else:
-                            guid = result_item['guid']
-                    else:
-                        guid = cur_data[j]['data']['guid']
-                    if guid:
-                        guids.append(guid)
-            elif expr['type'] == 'op':
-                if expr['value'] == '>' or expr['value'] == '->':
-                    is_backref = False
-                elif expr['value'] == '~' or expr['value'] == '<-':
-                    is_backref = True
-        results[el['data']['guid']] = cur_data
-    return results
-
-
-def expr_query(expr, ci_getter, ci_mapping):
-    '''
-    fetch data according to expression
-    :param expr: result of ()
-    :param ci_getter: function (expr_data, is_backref, guids) => {}
-    
-    ci_getter: 
-    if is_backref
-        ci[with filters][expr_data.backref_attrubute].guid in guids
-    else 
-        ci[with filters].guid in guids
-    '''
-    results = []
-    is_backref = False
-    guids = None
-    expr_origin = expr
-    expr_groups = expr_parse(expr_origin)
-    for i in range(len(expr_groups)):
-        expr = expr_groups[i]
-        expr_data = expr['data']
-        if expr['type'] == 'expr':
-            # user ci, backref_attribute.guid in guids[if is_backref], filters
-            if guids is not None and len(guids) == 0:
-                # can not find any data that match expression
-                results = []
-                break
-            results = ci_getter(expr_data, is_backref, guids, ci_mapping)
-            guids = []
-            for j in range(len(results)):
-                guid = ""
-                if len(expr_data['attribute']) > 0:
-                    result_item = results[j]['data'][expr_data['attribute']]
-                    if utils.is_list_type(result_item):
-                        guids.extend([i_result_item['guid'] for i_result_item in result_item])
-                    else:
-                        guid = result_item['guid']
-                else:
-                    guid = results[j]['data']['guid']
-                if guid:
-                    guids.append(guid)
-        elif expr['type'] == 'op':
-            if expr['value'] == '>' or expr['value'] == '->':
-                is_backref = False
-            elif expr['value'] == '~' or expr['value'] == '<-':
-                is_backref = True
-    return results

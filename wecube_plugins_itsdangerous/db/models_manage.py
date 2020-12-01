@@ -2,7 +2,7 @@
 
 from __future__ import absolute_import
 
-from sqlalchemy import Column, ForeignKey, String, text, JSON
+from sqlalchemy import Column, DateTime, ForeignKey, String, text, JSON
 from sqlalchemy.dialects.mysql import INTEGER, TINYINT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -14,6 +14,7 @@ metadata = Base.metadata
 
 class MatchParam(Base, DictBase):
     __tablename__ = 'match_param'
+    summary_attributes = ['id', 'name', 'type', 'params']
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
@@ -21,10 +22,17 @@ class MatchParam(Base, DictBase):
     type = Column(String(36), nullable=False)
     params = Column(JSON, nullable=False)
 
+    created_by = Column(String(36), nullable=True)
+    created_time = Column(DateTime, nullable=True)
+    updated_by = Column(String(36), nullable=True)
+    updated_time = Column(DateTime, nullable=True)
+
 
 class Policy(Base, DictBase):
     __tablename__ = 'policy'
-    attributes = ['id', 'name', 'description', 'enabled', 'rules']
+    attributes = [
+        'id', 'name', 'description', 'enabled', 'created_by', 'created_time', 'updated_by', 'updated_time', 'rules'
+    ]
     detail_attributes = attributes
     summary_attributes = ['id', 'name', 'description', 'enabled']
 
@@ -32,6 +40,11 @@ class Policy(Base, DictBase):
     name = Column(String(36), nullable=False)
     description = Column(String(63), server_default=text("''"), nullable=True)
     enabled = Column(TINYINT(4), nullable=False)
+
+    created_by = Column(String(36), nullable=True)
+    created_time = Column(DateTime, nullable=True)
+    updated_by = Column(String(36), nullable=True)
+    updated_time = Column(DateTime, nullable=True)
 
     rules = relationship("Rule", secondary="policy_rule", lazy=False)
 
@@ -40,28 +53,41 @@ class Rule(Base, DictBase):
     __tablename__ = 'rule'
     attributes = [
         'id', 'name', 'description', 'level', 'effect_on', 'enabled', 'match_type', 'match_param_id', 'match_value',
+        'created_by', 'created_time', 'updated_by', 'updated_time', 'match_param'
+    ]
+    detail_attributes = [
+        'id', 'name', 'description', 'level', 'effect_on', 'enabled', 'match_type', 'match_param_id', 'match_value',
+        'created_by', 'created_time', 'updated_by', 'updated_time', 'match_param', 'policies'
+    ]
+    summary_attributes = [
+        'id', 'name', 'description', 'level', 'effect_on', 'enabled', 'match_type', 'match_param_id', 'match_value',
         'match_param'
     ]
-    detail_attributes = attributes
-    summary_attributes = attributes
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
     description = Column(String(63), server_default=text("''"), nullable=True)
-    level = Column(INTEGER(11), nullable=False)
+    level = Column(String(36), nullable=False)
     effect_on = Column(String(36), nullable=False)
     match_type = Column(String(36), nullable=False)
     match_param_id = Column(ForeignKey('match_param.id'), nullable=True)
     match_value = Column(String(512), nullable=False)
     enabled = Column(TINYINT(4), nullable=False)
 
+    created_by = Column(String(36), nullable=True)
+    created_time = Column(DateTime, nullable=True)
+    updated_by = Column(String(36), nullable=True)
+    updated_time = Column(DateTime, nullable=True)
+
     match_param = relationship('MatchParam', lazy=False)
-    # policies = relationship("Policy", back_populates="policy_rule")
+    policies = relationship("Policy", secondary="policy_rule", lazy=True)
 
 
 class Subject(Base, DictBase):
     __tablename__ = 'subject'
-    attributes = ['id', 'name', 'description', 'enabled', 'targets']
+    attributes = [
+        'id', 'name', 'description', 'enabled', 'created_by', 'created_time', 'updated_by', 'updated_time', 'targets'
+    ]
     detail_attributes = attributes
     summary_attributes = ['id', 'name', 'description', 'enabled']
 
@@ -70,11 +96,25 @@ class Subject(Base, DictBase):
     description = Column(String(63), server_default=text("''"), nullable=True)
     enabled = Column(TINYINT(4), nullable=False)
 
+    created_by = Column(String(36), nullable=True)
+    created_time = Column(DateTime, nullable=True)
+    updated_by = Column(String(36), nullable=True)
+    updated_time = Column(DateTime, nullable=True)
+
     targets = relationship('Target', secondary='subject_target', lazy=False)
 
 
 class Target(Base, DictBase):
     __tablename__ = 'target'
+    attributes = [
+        'id', 'name', 'args_scope', 'entity_scope', 'enabled', 'created_by', 'created_time', 'updated_by',
+        'updated_time'
+    ]
+    detail_attributes = [
+        'id', 'name', 'args_scope', 'entity_scope', 'enabled', 'created_by', 'created_time', 'updated_by',
+        'updated_time', 'subjects'
+    ]
+    summary_attributes = ['id', 'name', 'args_scope', 'entity_scope', 'enabled']
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(36), nullable=False)
@@ -82,12 +122,20 @@ class Target(Base, DictBase):
     entity_scope = Column(String(512), nullable=True)
     enabled = Column(TINYINT(4), nullable=False)
 
-    # subjects = relationship('SubjectTarget', back_populates='target')
+    created_by = Column(String(36), nullable=True)
+    created_time = Column(DateTime, nullable=True)
+    updated_by = Column(String(36), nullable=True)
+    updated_time = Column(DateTime, nullable=True)
+
+    subjects = relationship('Subject', secondary="subject_target", lazy=True)
 
 
 class Box(Base, DictBase):
     __tablename__ = 'box'
-    attributes = ['id', 'name', 'description', 'policy_id', 'subject_id', 'policy', 'subject']
+    attributes = [
+        'id', 'name', 'description', 'policy_id', 'subject_id', 'enabled', 'created_by', 'created_time', 'updated_by',
+        'updated_time', 'policy', 'subject'
+    ]
     detail_attributes = attributes
     summary_attributes = attributes
 
@@ -96,6 +144,12 @@ class Box(Base, DictBase):
     description = Column(String(63), server_default=text("''"), nullable=True)
     policy_id = Column(ForeignKey('policy.id'), nullable=False, index=True)
     subject_id = Column(ForeignKey('subject.id'), nullable=False, index=True)
+    enabled = Column(TINYINT(4), nullable=False)
+
+    created_by = Column(String(36), nullable=True)
+    created_time = Column(DateTime, nullable=True)
+    updated_by = Column(String(36), nullable=True)
+    updated_time = Column(DateTime, nullable=True)
 
     policy = relationship('Policy', lazy=False)
     subject = relationship('Subject', lazy=False)
@@ -132,3 +186,8 @@ class ServiceScript(Base, DictBase):
     content_type = Column(String(36))
     content_field = Column(String(63))
     endpoint_field = Column(String(63))
+
+    created_by = Column(String(36), nullable=True)
+    created_time = Column(DateTime, nullable=True)
+    updated_by = Column(String(36), nullable=True)
+    updated_time = Column(DateTime, nullable=True)

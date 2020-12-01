@@ -5,15 +5,27 @@ from __future__ import absolute_import
 import falcon
 from talos.common.controller import CollectionController
 from talos.common.controller import ItemController
-from talos.core import exceptions
+from talos.common.controller import Controller as BaseController
+from talos.core import exceptions as base_ex
 from talos.core import utils
 from talos.core.i18n import _
 
-from wecube_plugins_itsdangerous.common import exceptions as my_exceptions
+from wecube_plugins_itsdangerous.common import exceptions
+
+
+class Controller(BaseController):
+    def on_post(self, req, resp, **kwargs):
+        self._validate_method(req)
+        self._validate_data(req)
+        data = req.json
+        resp.json = {'code': 200, 'status': 'OK', 'data': self.create(req, data, **kwargs), 'message': 'success'}
+        resp.status = falcon.HTTP_200
+
+    def create(self, req, data, **kwargs):
+        return self.make_resource(req).create(data, **kwargs)
 
 
 class Collection(CollectionController):
-
     def on_get(self, req, resp, **kwargs):
         self._validate_method(req)
         refs = []
@@ -29,25 +41,25 @@ class Collection(CollectionController):
         self._validate_data(req)
         datas = req.json
         if not utils.is_list_type(datas):
-            raise exceptions.BodyParseError(_('must be list type'))
+            raise exceptions.PluginError(_('data must be list type'))
         rets = []
         ex_rets = []
         for idx, data in enumerate(datas):
             try:
                 rets.append(self.create(req, data, **kwargs))
-            except exceptions.Error as e:
+            except base_ex.Error as e:
                 ex_rets.append({'index': idx + 1, 'message': str(e)})
         if len(ex_rets):
-            raise my_exceptions.BatchPartialError(num=len(ex_rets), action='create', exception_data={'data': ex_rets})
+            raise exceptions.BatchPartialError(num=len(ex_rets), action='create', exception_data={'data': ex_rets})
         resp.json = {'code': 200, 'status': 'OK', 'data': rets, 'message': 'success'}
-        resp.status = falcon.HTTP_201
+        resp.status = falcon.HTTP_200
 
     def on_patch(self, req, resp, **kwargs):
         self._validate_method(req)
         self._validate_data(req)
         datas = req.json
         if not utils.is_list_type(datas):
-            raise exceptions.BodyParseError(_('must be list type'))
+            raise exceptions.PluginError(_('data must be list type'))
         rets = []
         ex_rets = []
         for idx, data in enumerate(datas):
@@ -60,10 +72,10 @@ class Collection(CollectionController):
                 if after_update is None:
                     raise exceptions.NotFoundError(resource='%s[%s]' % (self.resource.__name__, rid))
                 rets.append(after_update)
-            except exceptions.Error as e:
+            except base_ex.Error as e:
                 ex_rets.append({'index': idx + 1, 'message': str(e)})
         if len(ex_rets):
-            raise my_exceptions.BatchPartialError(num=len(ex_rets), action='update', exception_data={'data': ex_rets})
+            raise exceptions.BatchPartialError(num=len(ex_rets), action='update', exception_data={'data': ex_rets})
         resp.json = {'code': 200, 'status': 'OK', 'data': rets, 'message': 'success'}
         resp.status = falcon.HTTP_200
 
@@ -76,7 +88,7 @@ class Collection(CollectionController):
         self._validate_data(req)
         datas = req.json
         if not utils.is_list_type(datas):
-            raise exceptions.BodyParseError(_('must be list type'))
+            raise exceptions.PluginError(_('data must be list type'))
         rets = []
         ex_rets = []
         for idx, data in enumerate(datas):
@@ -84,10 +96,10 @@ class Collection(CollectionController):
                 res_instance = self.make_resource(req)
                 ref_count, ref_details = self.delete(req, rid=data)
                 rets.append(ref_details[0])
-            except exceptions.Error as e:
+            except base_ex.Error as e:
                 ex_rets.append({'index': idx + 1, 'message': str(e)})
         if len(ex_rets):
-            raise my_exceptions.BatchPartialError(num=len(ex_rets), action='delete', exception_data={'data': ex_rets})
+            raise exceptions.BatchPartialError(num=len(ex_rets), action='delete', exception_data={'data': ex_rets})
         resp.json = {'code': 200, 'status': 'OK', 'data': rets, 'message': 'success'}
         resp.status = falcon.HTTP_200
 
@@ -96,7 +108,6 @@ class Collection(CollectionController):
 
 
 class Item(ItemController):
-
     def on_get(self, req, resp, **kwargs):
         self._validate_method(req)
         ref = self.get(req, **kwargs)
@@ -108,7 +119,10 @@ class Item(ItemController):
     def on_patch(self, req, resp, **kwargs):
         self._validate_method(req)
         self._validate_data(req)
-        ref_before, ref_after = self.update(req, req.json, **kwargs)
+        data = req.json
+        if data is not None and not isinstance(data, dict):
+            raise exceptions.PluginError(_('data must be dict type'))
+        ref_before, ref_after = self.update(req, data, **kwargs)
         if ref_after is not None:
             resp.json = {'code': 200, 'status': 'OK', 'data': ref_after, 'message': 'success'}
         else:

@@ -9,8 +9,9 @@ import multiprocessing
 
 from talos.core import config as __config
 
-__config.setup(os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF', './etc/wecube_plugins_itsdangerous.conf'),
-               dir_path=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR', './etc/wecube_plugins_itsdangerous.conf.d'))
+__config.setup(os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF', '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
+               dir_path=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
+                                       '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'))
 CONF = __config.CONF
 
 name = CONF.locale_app
@@ -20,7 +21,7 @@ backlog = CONF.server.backlog
 # 超时
 timeout = 30
 # 进程数
-workers = multiprocessing.cpu_count() * 2
+workers = max(multiprocessing.cpu_count() * 2, 8)
 # 指定每个进程开启的线程数
 threads = 1
 debug = False
@@ -43,8 +44,8 @@ errlog.propagate = False
 # ca_certs =
 # chdir = '/home/user'
 # sync/gevent/eventlet/tornado/gthread/gaiohttp
-# worker_class = 'gevent'
-# worker_connections = 1000
+worker_class = 'gevent'
+worker_connections = 20
 # 到达max requests之后worker会重启
 # max_requests = 0
 # keepalive = 5

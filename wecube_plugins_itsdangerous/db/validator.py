@@ -32,3 +32,6 @@ class BackRefValidator(validator.NullValidator):
         if self.cls_res().count(filters={'id': value}) == 0:
             return _('reference of %(resource)s(%(id)s) not found') % {'resource': self.cls_res.__name__, 'id': value}
         return True
+
+
+TypeValidator = validator.TypeValidator
