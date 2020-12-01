@@ -15,7 +15,6 @@ LOG = logging.getLogger(__name__)
 
 
 class JsonFilterDetector(object):
-
     def __init__(self, content, rules):
         '''
         :param content: input params dict
@@ -40,7 +39,6 @@ class JsonFilterDetector(object):
 
 
 class BashCliDetector(object):
-
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -77,7 +75,8 @@ class BashCliDetector(object):
                     r_name = rule['name']
                     r_level = rule['level']
                     r_filters = json.loads(rule['match_value'])
-                    if rule['match_param_id'] in self.parsers and self._command_equal(cmd, self.parsers[rule['match_param_id']]):
+                    if rule['match_param_id'] in self.parsers and self._command_equal(
+                            cmd, self.parsers[rule['match_param_id']]):
                         sim = self.parsers[rule['match_param_id']]['simulator']
                         if sim.check(args, r_filters):
                             results.append({
@@ -90,7 +89,6 @@ class BashCliDetector(object):
 
 
 class SqlDetector(object):
-
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -123,7 +121,6 @@ class SqlDetector(object):
 
 
 class FullTextDetector(object):
-
     def __init__(self, content, rules):
         '''
         :param content: script content
@@ -160,7 +157,6 @@ class FullTextDetector(object):
 
 
 class LineTextDetector(FullTextDetector):
-
     def __init__(self, content, rules):
         '''
         :param content: script content

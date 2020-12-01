@@ -133,30 +133,42 @@ class ShellReader(Reader):
         # we want $ or chinese charatars be together
         ret.whitespace_split = True
         tokens = []
-        lineno, token, is_punctuation, line_continue = ret.read_token_ex()
-        new_lineno = lineno
+        lineno_start, token, is_punctuation, line_continue = ret.read_token_ex()
+        new_lineno = lineno_start
+        lineno_switch = lineno_start
         while token is not None:
             if is_punctuation and token in self.special_punctuation:
                 if tokens:
-                    yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
+                    yield ((lineno_start, new_lineno), tokens)
                 tokens = []
-            elif token == '':
+                lineno_start = new_lineno
+                lineno_switch = lineno_start
+            elif is_punctuation and token == '\n':
                 # empty string means newline token
-                yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
+                yield ((lineno_start, new_lineno), tokens)
                 tokens = []
-                lineno = new_lineno
+                lineno_start = new_lineno
+                lineno_switch = lineno_start
             else:
-                if new_lineno != lineno and not line_continue:
+                if new_lineno != lineno_switch and not line_continue:
                     if tokens:
-                        yield ((lineno, new_lineno - 1), tokens)
+                        yield ((lineno_start, new_lineno - 1), tokens)
                     tokens = []
-                    lineno = new_lineno
-                    tokens.append(token)
+                    lineno_start = new_lineno
+                    lineno_switch = lineno_start
+                    if token:
+                        tokens.append(token)
+                elif new_lineno != lineno_switch and line_continue:
+                    # handle line continue
+                    lineno_switch = new_lineno
+                    if token:
+                        tokens.append(token)
                 else:
-                    tokens.append(token)
+                    if token:
+                        tokens.append(token)
             new_lineno, token, is_punctuation, line_continue = ret.read_token_ex()
             if token is None and tokens:
-                yield ((lineno, lineno + u''.join(tokens).count('\n')), tokens)
+                yield ((lineno_start, new_lineno), tokens)
 
 
 class SqlReader(Reader):
