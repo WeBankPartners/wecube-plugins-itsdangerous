@@ -1,3 +1,4 @@
+SET NAMES utf8 ;
 /* rule */
 INSERT INTO `rule` (name,description,`level`,effect_on,match_type,match_value,match_param_id,enabled,created_by,created_time,updated_by,updated_time) VALUES
 	 ('qcloud销毁主机','调用qcloud API进行主机销毁','critical','param','filter','{serviceName eq ''qcloud/vm(resource)/terminate''}',NULL,1,'admin','2020-11-01 00:00:00.0',NULL,NULL);
