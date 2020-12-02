@@ -17,7 +17,7 @@ from talos.core.i18n import _
 from talos.db import crud
 import texttable
 from wecube_plugins_itsdangerous.apps.processor import detector
-from wecube_plugins_itsdangerous.common import exceptions, reader, s3, scope
+from wecube_plugins_itsdangerous.common import exceptions, reader, s3, scope, wecube
 from wecube_plugins_itsdangerous.common import utils as plugin_utils
 from wecube_plugins_itsdangerous.db import resource
 from wecube_plugins_itsdangerous.db import validator as my_validator
@@ -44,7 +44,7 @@ def download_from_url(dir_path, url, random_name=False):
     filepath = os.path.join(dir_path, filename)
     if url.startswith(CONF.wecube.base_url):
         # nexus url
-        token = scope.get_wecube_token(CONF.wecube.base_url)
+        token = wecube.get_wecube_token()
         resp = requests.get(url, headers={'Authorization': 'Bearer ' + token}, stream=True)
         chunk_size = 1024 * 1024
         stream = resp.raw
@@ -419,4 +419,23 @@ class Box(resource.Box):
         for r in json_results:
             r['script_name'] = ''
         results.extend(json_results)
+        return results
+
+
+class WecubeService(object):
+    def list(self, filters=None, orders=None, offset=None, limit=None, hooks=None):
+        results = []
+        service_name = filters.get('serviceName', '') or ''
+        client = wecube.WeCubeClient(CONF.wecube.base_url)
+        key = '/platform/v1/plugins/interfaces/enabled'
+        cached = cache.get(key, 15)
+        if cache.validate(cached):
+            resp = cached
+        else:
+            resp = client.retrieve('/platform/v1/plugins/interfaces/enabled')
+            cache.set(key, resp)
+        for interface in resp['data']:
+            if interface['serviceName'] == service_name:
+                for param in interface['inputParameters']:
+                    results.append({'type': param['dataType'], 'name': param['name']})
         return results

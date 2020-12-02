@@ -28,4 +28,7 @@ def add_routes(api):
     api.add_route('/itsdangerous/ui/v1/boxes', controller.CollectionBox())
     api.add_route('/itsdangerous/ui/v1/boxes/{rid}', controller.ItemBox())
     api.add_route('/itsdangerous/ui/v1/boxes/{rid}/run', controller.BoxRun())
+    # batch execution
     api.add_route('/itsdangerous/v1/batch_execution_detection', controller.PluginCheck())
+    # service param
+    api.add_route('/itsdangerous/v1/platform/services', controller.WecubeService())

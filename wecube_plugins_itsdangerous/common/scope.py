@@ -7,12 +7,11 @@ import datetime
 
 from talos.common import cache
 from talos.core import config
-from talos.core import utils as talos_utils
-from talos.utils import scoped_globals
 
 from wecube_plugins_itsdangerous.common import expression
 from wecube_plugins_itsdangerous.common import jsonfilter
 from wecube_plugins_itsdangerous.common import utils
+from wecube_plugins_itsdangerous.common import wecube
 
 CONF = config.CONF
 LOG = logging.getLogger(__name__)
@@ -33,34 +32,18 @@ class JsonScope(object):
         return jsonfilter.match_all(self.filters, data)
 
 
-def get_wecube_token(base_url):
-    token = talos_utils.get_attr(scoped_globals.GLOBALS, 'request.auth_token') or CONF.wecube.token
-    if not CONF.wecube.use_token:
-        token = cache.get(WECUBE_TOKEN)
-        if not cache.validate(token):
-            token = utils.RestfulJson.post(base_url + '/auth/v1/api/login',
-                                           json={
-                                               "username": CONF.wecube.username,
-                                               "password": CONF.wecube.password
-                                           }).json()['data'][1]['token']
-            cache.set(WECUBE_TOKEN, token)
-    return token
-
-
 def wecube_expr_query(expr):
     base_url = CONF.wecube.base_url
-    token = get_wecube_token(base_url)
     cache_key = 'wecube/expr/%s' % expr
     results = cache.get(cache_key, exipres=3)
     if not cache.validate(results):
-        LOG.debug('wecube_expr_query POST /platform/v1/data-model/dme/integrated-query with %s' % expr)
+        LOG.debug('wecube_expr_query with %s' % expr)
         cost_start = datetime.datetime.now()
-        resp = utils.RestfulJson.post(base_url + '/platform/v1/data-model/dme/integrated-query',
-                                      json={
-                                          'dataModelExpression': expr,
-                                          'filters': []
-                                      },
-                                      headers={'Authorization': 'Bearer ' + token})
+        client = wecube.WeCubeClient(base_url)
+        resp = client.post(base_url + '/platform/v1/data-model/dme/integrated-query', {
+            'dataModelExpression': expr,
+            'filters': []
+        })
         cost_end = datetime.datetime.now()
         LOG.debug('wecube_expr_query time cost %s' % (cost_end - cost_start))
         results = resp['data'] or []
