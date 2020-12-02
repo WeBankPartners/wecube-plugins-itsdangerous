@@ -91,3 +91,13 @@ class PluginCheck(controller.Controller):
 
     def create(self, req, data, **kwargs):
         return self.make_resource(req).plugin_check(data, **kwargs)
+
+
+class WecubeService(controller.Collection):
+    allow_methods = ('GET', )
+    name = 'wecube_plugins_itsdangerous.processor.wecube.services'
+    resource = processor_api.WecubeService
+
+    def count(self, req, criteria, results=None, **kwargs):
+        results = results or []
+        return len(results)
