@@ -15,6 +15,7 @@ def add_routes(api):
     # matchparam
     api.add_route('/itsdangerous/ui/v1/matchparams', controller.CollectionMatchParam())
     api.add_route('/itsdangerous/ui/v1/matchparams/{rid}', controller.ItemMatchParam())
+    api.add_route('/itsdangerous/ui/v1/matchparams/{rid}/args', controller.ItemMatchParamArgs())
     # subject
     api.add_route('/itsdangerous/ui/v1/subjects', controller.CollectionSubject())
     api.add_route('/itsdangerous/ui/v1/subjects/{rid}', controller.ItemSubject())

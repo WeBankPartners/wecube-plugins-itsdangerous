@@ -35,6 +35,19 @@ class ItemMatchParam(controller.Item):
     resource = processor_api.MatchParam
 
 
+class ItemMatchParamArgs(controller.Item):
+    name = 'wecube_plugins_itsdangerous.processor.matchparam.args'
+    resource = processor_api.MatchParam
+
+    def on_get(self, req, resp, **kwargs):
+        self._validate_method(req)
+        ref = self.get_args(req, **kwargs)
+        resp.json = {'code': 200, 'status': 'OK', 'data': ref, 'message': 'success'}
+
+    def get_args(self, req, **kwargs):
+        return self.make_resource(req).get_args(**kwargs)
+
+
 class CollectionSubject(controller.Collection):
     name = 'wecube_plugins_itsdangerous.processor.subject'
     resource = processor_api.Subject
