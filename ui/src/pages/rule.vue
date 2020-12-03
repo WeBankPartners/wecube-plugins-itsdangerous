@@ -40,6 +40,46 @@
             </Option>
           </Select>
         </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">过滤规则:</label>
+          <button type="button" @click="modelConfig.showRules = !modelConfig.showRules" class="btn btn-confirm-f">
+            添加
+          </button>
+        </div>
+        <template v-if="modelConfig.showRules">
+          <div style="margin: 4px 12px;padding:8px 12px;border:1px solid #dcdee2;border-radius:4px">
+            <template v-for="(item, index) in modelConfig.ruleResult">
+              <p :key="index">
+                <Button
+                  @click="deleterule(index)"
+                  size="small"
+                  style="background-color: #e13d13;border-color: #e13d13;"
+                  type="error"
+                  icon="ios-power"
+                ></Button>
+                <Select v-model="item.attr" style="width:140px">
+                  <Option v-for="attr in modelConfig.ruleConfig.attr" :value="attr.value" :key="attr.value">{{
+                    attr.label
+                  }}</Option>
+                </Select>
+                <Select v-model="item.symbolValue" style="width:100px">
+                  <Option v-for="rule in modelConfig.ruleConfig.filterRuleOp" :value="rule" :key="rule">{{
+                    rule
+                  }}</Option>
+                </Select>
+                <Input v-model="item.inputValue" style="width: 146px" placeholder="" />
+              </p>
+            </template>
+            <Button
+              @click="addEmptyRule"
+              type="success"
+              size="small"
+              style="background-color: #0080FF;border-color: #0080FF;"
+              long
+              >增加过滤规则</Button
+            >
+          </div>
+        </template>
       </div>
     </ModalComponent>
   </div>
@@ -212,7 +252,16 @@ export default {
             { label: 'script', value: 'script' }
           ],
           matchParamOption: []
-        }
+        },
+        showRules: false,
+        ruleConfig: {
+          filterRuleOp: ['eq', 'neq', 'in', 'like', 'gt', 'lt', 'is', 'isnot'],
+          attr: [
+            { label: 'id', value: 'id' },
+            { label: 'name', value: 'name' }
+          ]
+        },
+        ruleResult: [{ attr: 'id', symbolValue: 'eq', inputValue: '123' }]
       },
       modelTip: {
         key: 'name',
@@ -252,6 +301,12 @@ export default {
     this.getConfigData()
   },
   methods: {
+    addEmptyRule () {
+      this.modelConfig.ruleResult.push({ attr: '', symbolValue: '', inputValue: '' })
+    },
+    deleterule (index) {
+      this.modelConfig.ruleResult.splice(index, 1)
+    },
     changeEffectOn () {
       this.modelConfig.addRow.match_type = ''
     },
