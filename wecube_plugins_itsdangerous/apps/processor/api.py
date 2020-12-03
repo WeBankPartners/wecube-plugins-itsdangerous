@@ -443,5 +443,5 @@ class WecubeService(object):
         for interface in resp['data']:
             if interface['serviceName'] == service_name:
                 for param in interface['inputParameters']:
-                    results.append({'type': param['dataType'], 'name': param['name']})
+                    results.append({'type': param['dataType'], 'name': 'inputParams.' + param['name']})
         return results
