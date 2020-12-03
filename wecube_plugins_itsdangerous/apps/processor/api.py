@@ -108,7 +108,13 @@ class MatchParam(resource.MatchParam):
     '''
     MatchParam Resource for CRUD
     '''
-    pass
+    def get_args(self, rid):
+        ref = self.get(rid)
+        results = []
+        if ref:
+            for arg in ref['params'].get('args', []):
+                results.append({'type': 'string', 'name': arg['name']})
+        return results
 
 
 class Subject(resource.Subject):
