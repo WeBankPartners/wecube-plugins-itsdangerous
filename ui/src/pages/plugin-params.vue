@@ -2,7 +2,7 @@
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
-      <div slot="plugin-params">
+      <template #plugin-params>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('content_type') }}:</label>
           <Select v-model="modelConfig.addRow.content_type" style="width: 338px">
@@ -15,7 +15,7 @@
             </Option>
           </Select>
         </div>
-      </div>
+      </template>
     </ModalComponent>
   </div>
 </template>

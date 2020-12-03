@@ -2,7 +2,7 @@
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
-      <div slot="boxes">
+      <template #boxes>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_policies') }}:</label>
           <Select v-model="modelConfig.addRow.policy_id" style="width: 338px">
@@ -19,10 +19,10 @@
             </Option>
           </Select>
         </div>
-      </div>
+      </template>
     </ModalComponent>
     <ModalComponent :modelConfig="detectConfig">
-      <div slot="scriptType">
+      <template #scriptType>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_type') }}:</label>
           <Select v-model="detectConfig.addRow.type" style="width: 70%">
@@ -31,15 +31,15 @@
             </Option>
           </Select>
         </div>
-      </div>
-      <div slot="detectBtn">
+      </template>
+      <template #detectBtn>
         <div style="text-align: right">
           <button type="button" @click="exectDetect" style="margin: 8px 122px" class="btn btn-sm btn-confirm-f">
             {{ $t('detect') }}
           </button>
         </div>
         <DangerousPageTable :pageConfig="exectPageConfig"></DangerousPageTable>
-      </div>
+      </template>
     </ModalComponent>
   </div>
 </template>

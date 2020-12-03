@@ -2,7 +2,7 @@
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
-      <div slot="policy">
+      <template #policy>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_rule') }}:</label>
           <Select v-model="modelConfig.addRow.rules" style="width: 338px" multiple>
@@ -11,7 +11,7 @@
             </Option>
           </Select>
         </div>
-      </div>
+      </template>
     </ModalComponent>
   </div>
 </template>
