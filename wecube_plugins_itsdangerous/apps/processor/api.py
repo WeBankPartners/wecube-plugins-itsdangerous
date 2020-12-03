@@ -113,7 +113,7 @@ class MatchParam(resource.MatchParam):
         results = []
         if ref:
             for arg in ref['params'].get('args', []):
-                results.append({'type': 'string', 'name': arg['name']})
+                results.append({'type': 'string', 'name': arg['name'], 'value': arg['name']})
         return results
 
 
@@ -443,5 +443,9 @@ class WecubeService(object):
         for interface in resp['data']:
             if interface['serviceName'] == service_name:
                 for param in interface['inputParameters']:
-                    results.append({'type': param['dataType'], 'name': 'inputParams.' + param['name']})
+                    results.append({
+                        'type': param['dataType'],
+                        'name': param['name'],
+                        'value': 'inputParams.' + param['name']
+                    })
         return results
