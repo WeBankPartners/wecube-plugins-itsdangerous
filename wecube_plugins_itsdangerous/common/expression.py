@@ -78,9 +78,9 @@ def expr_filter_parse(expr_filter):
                     filter_op = 'null'
                     filter_val = None
                 elif filter_op == 'isnot':
-                    filter_op = 'notNull'
+                    filter_op = 'notnull'
                     filter_val = None
-                elif filter_op == 'in':
+                elif filter_op in ('in', 'notin', 'nin'):
                     # TODO: fix this, replace is not good enough
                     filter_val = json.loads(filter_val[1:-1].replace("'", '"'))
                 elif (filter_val.startswith("'") and filter_val.endswith("'")) or (filter_val.startswith('"')
@@ -89,7 +89,11 @@ def expr_filter_parse(expr_filter):
                     filter_val = filter_val[1:-1]
                 else:
                     # number
-                    filter_val = int(filter_val)
+                    rule_float = '^\d+\.\d+$'
+                    if re.match(rule_float, filter_val):
+                        filter_val = float(filter_val)
+                    else:
+                        filter_val = int(filter_val)
 
                 results.append({'name': filter_name, 'operator': filter_op, 'value': filter_val})
                 index = res.end()
