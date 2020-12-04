@@ -79,7 +79,7 @@ class BashCliDetector(object):
                     if rule['match_value'] and rule['match_value'].lstrip().startswith(
                             '[') and rule['match_value'].rstrip().endswith(']'):
                         r_filters = json.loads(rule['match_value'])
-                    elif rule['match_value']:
+                    else:
                         r_filters = expression.expr_filter_parse(rule['match_value'])
                     if rule['match_param_id'] in self.parsers and self._command_equal(
                             cmd, self.parsers[rule['match_param_id']]):
