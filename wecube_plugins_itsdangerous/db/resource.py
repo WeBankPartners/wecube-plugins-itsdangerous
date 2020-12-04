@@ -168,7 +168,8 @@ class Rule(MetaCRUD):
         ref = super().get(rid)
         if ref:
             names = '|'.join([i['name'] for i in ref['policies']])
-            raise exceptions.ConflictError(oid=rid, name=names)
+            if names:
+                raise exceptions.ConflictError(oid=rid, name=names)
         return super().delete(rid, filters, detail)
 
 
@@ -264,7 +265,8 @@ class Target(MetaCRUD):
         ref = super().get(rid)
         if ref:
             names = '|'.join([i['name'] for i in ref['subjects']])
-            raise exceptions.ConflictError(oid=rid, name=names)
+            if names:
+                raise exceptions.ConflictError(oid=rid, name=names)
         return super().delete(rid, filters, detail)
 
 
