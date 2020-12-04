@@ -7,6 +7,7 @@ import logging
 import os.path
 import re
 
+from wecube_plugins_itsdangerous.common import expression
 from wecube_plugins_itsdangerous.common import clisimulator
 from wecube_plugins_itsdangerous.common import reader
 from wecube_plugins_itsdangerous.common import scope
@@ -74,11 +75,24 @@ class BashCliDetector(object):
                 for rule in self.rules:
                     r_name = rule['name']
                     r_level = rule['level']
-                    r_filters = json.loads(rule['match_value'])
+                    r_filters = []
+                    if rule['match_value'] and rule['match_value'].lstrip().startswith(
+                            '[') and rule['match_value'].rstrip().endswith(']'):
+                        r_filters = json.loads(rule['match_value'])
+                    elif rule['match_value']:
+                        r_filters = expression.expr_filter_parse(rule['match_value'])
                     if rule['match_param_id'] in self.parsers and self._command_equal(
                             cmd, self.parsers[rule['match_param_id']]):
                         sim = self.parsers[rule['match_param_id']]['simulator']
-                        if sim.check(args, r_filters):
+                        # command equal & empty filter means YES
+                        if not r_filters:
+                            results.append({
+                                'lineno': lineno,
+                                'level': r_level,
+                                'content': ' '.join(tokens),
+                                'message': r_name
+                            })
+                        elif sim.check(args, r_filters):
                             results.append({
                                 'lineno': lineno,
                                 'level': r_level,
