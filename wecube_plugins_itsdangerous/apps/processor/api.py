@@ -176,7 +176,8 @@ class ServiceScript(resource.ServiceScript):
                 user_include_fields = re.split(common_spliter, user_include)
                 for field in user_include_fields:
                     field_content = utils.get_item(plugin_param, field)
-                    user_include_files = user_include_files | set(re.split(common_spliter, field_content))
+                    if field_content:
+                        user_include_files = user_include_files | set(re.split(common_spliter, field_content))
             endpoint_url = utils.get_item(plugin_param, script_location['endpoint_field'])
             filepath, filename = ensure_url_cached(endpoint_url)
             packed_extensions = [
