@@ -2,12 +2,14 @@
 
 from __future__ import absolute_import
 
+import fnmatch
 import glob
 import hashlib
 import json
 import logging
 import os
 import os.path
+import re
 import tempfile
 
 import requests
@@ -165,7 +167,16 @@ class ServiceScript(resource.ServiceScript):
             if content:
                 scripts.append({'type': content_type, 'content': content, 'name': None})
         # if endpoint_field present, download from endpoint(s3/artifacts url from platform)
+        common_spliter = r',|\||;'
         if script_location['endpoint_field']:
+            user_include = script_location['endpoint_include']
+            user_include_files = None
+            if user_include:
+                user_include_files = set()
+                user_include_fields = re.split(common_spliter, user_include)
+                for field in user_include_fields:
+                    field_content = utils.get_item(plugin_param, field)
+                    user_include_files = user_include_files | set(re.split(common_spliter, field_content))
             endpoint_url = utils.get_item(plugin_param, script_location['endpoint_field'])
             filepath, filename = ensure_url_cached(endpoint_url)
             packed_extensions = [
@@ -179,19 +190,41 @@ class ServiceScript(resource.ServiceScript):
                 for name in glob.glob(os.path.join(unzip_path, '**/*' + shell_extension), recursive=True):
                     if not os.path.isfile(name):
                         continue
-                    with open(name, 'r') as f:
-                        scripts.append({'type': 'shell', 'content': f.read(), 'name': name[len(unzip_path) + 1:]})
+                    shortpath = name[len(unzip_path) + 1:]
+                    included = False
+                    if user_include_files is not None:
+                        for user_include_file in user_include_files:
+                            if fnmatch.fnmatch(shortpath, user_include_file):
+                                included = True
+                                break
+                    else:
+                        included = True
+                    if included:
+                        with open(name, 'r') as f:
+                            scripts.append({'type': 'shell', 'content': f.read(), 'name': shortpath})
                 for name in glob.glob(os.path.join(unzip_path, '**/*' + sql_extension), recursive=True):
                     if not os.path.isfile(name):
                         continue
-                    with open(name, 'r') as f:
-                        scripts.append({'type': 'sql', 'content': f.read(), 'name': name[len(unzip_path) + 1:]})
+                    shortpath = name[len(unzip_path) + 1:]
+                    included = False
+                    if user_include_files is not None:
+                        for user_include_file in user_include_files:
+                            if fnmatch.fnmatch(shortpath, user_include_file):
+                                included = True
+                                break
+                    else:
+                        included = True
+                    if included:
+                        with open(name, 'r') as f:
+                            scripts.append({'type': 'sql', 'content': f.read(), 'name': shortpath})
             elif filepath.endswith(shell_extension):
                 with open(filepath, 'r') as f:
                     scripts.append({'type': 'shell', 'content': f.read(), 'name': filename})
             elif filepath.endswith(sql_extension):
                 with open(filepath, 'r') as f:
                     scripts.append({'type': 'sql', 'content': f.read(), 'name': filename})
+            else:
+                LOG.warn('the type of this file[%s] could not be determined', filename)
         return scripts
 
 
