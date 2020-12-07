@@ -67,7 +67,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'subjects',
+        CRUD: '/itsdangerous/ui/v1/subjects',
         researchConfig: {
           input_conditions: [
             {
@@ -158,7 +158,7 @@ export default {
       }
     },
     async getConfigData () {
-      const params = 'targets'
+      const params = '/itsdangerous/ui/v1/targets'
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.modelConfig.v_select_configs.targetOptions = data.data.map(item => {

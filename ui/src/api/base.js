@@ -1,7 +1,7 @@
 import { setCookie, getCookie } from '@/pages/util/cookie'
 import Vue from 'vue'
 import axios from 'axios'
-export const baseURL = '/itsdangerous/ui/v1/'
+export const baseURL = ''
 export const req = axios.create({
   withCredentials: true,
   baseURL,

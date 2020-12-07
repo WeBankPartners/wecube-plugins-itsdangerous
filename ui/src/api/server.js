@@ -13,7 +13,11 @@ if (window.request) {
 
 export const getTableData = url => req.get(url)
 export const addTableRow = (url, data) => req.post(`${url}`, data)
-export const editTableRow = (url, id, data) => req.patch(`/${url}/${id}`, data)
-export const deleteTableRow = (url, id) => req.delete(`/${url}/${id}`)
+export const editTableRow = (url, id, data) => req.patch(`${url}/${id}`, data)
+export const deleteTableRow = (url, id) => req.delete(`${url}/${id}`)
 
-export const boxDetect = (id, data) => req.post(`boxes/${id}/run`, data)
+export const boxDetect = (id, data) => req.post(`/itsdangerous/ui/v1/boxes/${id}/run`, data)
+
+export const getRuleAttrById = id => req.get(`/itsdangerous/ui/v1/matchparams/${id}/args`)
+export const getRuleAttrByServiceName = serviceName =>
+  req.get(`/itsdangerous/v1/platform/services?serviceName=${serviceName}`)
