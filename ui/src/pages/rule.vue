@@ -1,6 +1,60 @@
 <template>
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
+    <Modal v-model="showAddRulesModal" :z-index="1001" title="配置表达式" @on-ok="generateExpression()">
+      <Form label-position="top" label-colon>
+        <FormItem
+          :label="$t('match_value')"
+          v-if="['sql', 'text', 'fulltext'].includes(this.modelConfig.addRow.match_type)"
+        >
+          <Input v-model="addRulesModal.diyRules"></Input>
+        </FormItem>
+        <FormItem label="服务名称" v-if="this.modelConfig.addRow.match_type === 'filter'">
+          <Input v-model="addRulesModal.serviceName" style="width: 300px"></Input>
+          <Button @click="getRulesAttr('getRuleAttrByServiceName')" type="success">Success</Button>
+        </FormItem>
+        <FormItem :label="$t('match_value')" v-if="this.addRulesModal.ruleConfig.attr.length > 0">
+          <div style="margin: 4px 12px;padding:8px 12px;border:1px solid #dcdee2;border-radius:4px">
+            <template v-for="(item, index) in addRulesModal.ruleResult">
+              <p :key="index">
+                <Button
+                  @click="deleterule(index)"
+                  size="small"
+                  style="background-color: #ff9900;border-color: #ff9900;"
+                  type="error"
+                  icon="md-close"
+                ></Button>
+                <Select v-model="item.attr" style="width:140px">
+                  <Option v-for="attr in addRulesModal.ruleConfig.attr" :value="attr.value" :key="attr.value">{{
+                    attr.name
+                  }}</Option>
+                </Select>
+                <Select v-model="item.symbolValue" style="width:100px">
+                  <Option v-for="rule in addRulesModal.ruleConfig.filterRuleOp" :value="rule" :key="rule">{{
+                    rule
+                  }}</Option>
+                </Select>
+                <Input
+                  :disabled="setInputValue(item.symbolValue, index)"
+                  v-model="item.inputValue"
+                  style="width: 146px"
+                  placeholder=""
+                />
+              </p>
+            </template>
+            <Button
+              @click="addEmptyRule"
+              type="success"
+              size="small"
+              style="background-color: #0080FF;border-color: #0080FF;"
+              long
+              >增加过滤规则</Button
+            >
+          </div>
+          <!-- </template> -->
+        </FormItem>
+      </Form>
+    </Modal>
     <ModalComponent :modelConfig="modelConfig">
       <div slot="rule">
         <div class="marginbottom params-each">
@@ -10,6 +64,7 @@
               {{ item.label }}
             </Option>
           </Select>
+          <label class="required-tip">*</label>
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('effect_on') }}:</label>
@@ -18,6 +73,7 @@
               {{ item.label }}
             </Option>
           </Select>
+          <label class="required-tip">*</label>
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('match_type') }}:</label>
@@ -26,6 +82,7 @@
               {{ item.label }}
             </Option>
           </Select>
+          <label class="required-tip">*</label>
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('match_param_id') }}:</label>
@@ -39,6 +96,18 @@
               {{ item.label }}
             </Option>
           </Select>
+          <label class="required-tip">*</label>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">配置表达式:</label>
+          <button :disabled="disableRuleBtn" type="button" @click="configMatchValaue" class="btn btn-confirm-f">
+            编辑
+          </button>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('match_value') }}:</label>
+          <input v-model="modelConfig.addRow.match_value" disabled class="col-md-7 form-control model-input" />
+          <label class="required-tip">*</label>
         </div>
       </div>
     </ModalComponent>
@@ -46,7 +115,14 @@
 </template>
 
 <script>
-import { getTableData, addTableRow, editTableRow, deleteTableRow } from '@/api/server'
+import {
+  getTableData,
+  addTableRow,
+  editTableRow,
+  deleteTableRow,
+  getRuleAttrById,
+  getRuleAttrByServiceName
+} from '@/api/server'
 let tableEle = [
   {
     title: 'hr_name',
@@ -121,7 +197,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'rules',
+        CRUD: '/itsdangerous/ui/v1/rules',
         researchConfig: {
           input_conditions: [
             {
@@ -178,14 +254,6 @@ export default {
             type: 'text'
           },
           { label: 'hr_description', value: 'description', placeholder: '', disabled: false, type: 'text' },
-          {
-            label: 'match_value',
-            value: 'match_value',
-            v_validate: 'required:true',
-            placeholder: '',
-            disabled: false,
-            type: 'text'
-          },
           { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' },
           { name: 'rule', type: 'slot' }
         ],
@@ -212,7 +280,42 @@ export default {
             { label: 'script', value: 'script' }
           ],
           matchParamOption: []
-        }
+        },
+        ruleConfig: {
+          filterRuleOp: ['eq', 'neq', 'in', 'like', 'gt', 'lt', 'is', 'isnot'],
+          attr: [
+            { label: 'id', value: 'id' },
+            { label: 'name', value: 'name' }
+          ]
+        },
+        ruleResult: [{ attr: 'id', symbolValue: 'eq', inputValue: '123' }]
+      },
+      showAddRulesModal: false,
+      addRulesModal: {
+        serviceName: '', // filter时配置
+        diyRules: '', // sql、text、fulltext时配置
+        ruleConfig: {
+          filterRuleOp: [
+            'set',
+            'notset',
+            'is',
+            'isnot',
+            'like',
+            'ilike',
+            'eq',
+            'neq',
+            'regex',
+            'iregex',
+            'lt',
+            'gt',
+            'lte',
+            'gte',
+            'in',
+            'notin'
+          ],
+          attr: []
+        },
+        ruleResult: [{ attr: '', symbolValue: '', inputValue: '' }]
       },
       modelTip: {
         key: 'name',
@@ -226,12 +329,21 @@ export default {
       this.modelConfig.addRow.match_type = val.length > 1 ? this.modelConfig.addRow.match_type || 'cli' : 'filter'
     },
     'modelConfig.addRow.match_type': function (val) {
+      this.modelConfig.addRow.match_value = ''
       if (val !== 'filter' && val) {
-        this.getConfigData(val)
+        this.getConfigData()
       }
     }
   },
   computed: {
+    disableRuleBtn: function () {
+      if (this.modelConfig.addRow.match_type === 'cli') {
+        if (!this.modelConfig.addRow.match_param_id) {
+          return true
+        }
+      }
+      return false
+    },
     matchOptions: function () {
       let res = []
       if (this.modelConfig.addRow.effect_on === 'script') {
@@ -252,6 +364,106 @@ export default {
     this.getConfigData()
   },
   methods: {
+    configMatchValaue () {
+      this.manageEditRules()
+      if (this.modelConfig.addRow.match_type === 'cli' && this.modelConfig.addRow.match_param_id) {
+        this.getRulesAttr('getRuleAttrById')
+      }
+      this.showAddRulesModal = true
+    },
+    manageEditRules () {
+      let editData = {
+        match_type: this.modelConfig.addRow.match_type,
+        match_value: this.modelConfig.addRow.match_value
+      }
+
+      this.modelConfig.ruleResult = []
+      this.addRulesModal.serviceName = ''
+      this.addRulesModal.diyRules = ''
+      this.addRulesModal.ruleConfig.attr = []
+      if (['sql', 'text', 'fulltext'].includes(editData.match_type)) {
+        this.addRulesModal.diyRules = editData.match_value
+        this.getConfigData()
+      }
+      if (editData.match_type === 'cli') {
+        let singleMatchValue = editData.match_value.split('}{')
+        singleMatchValue[0] = singleMatchValue[0].substring(1)
+        // eslint-disable-next-line no-unused-vars
+        let lastRule = singleMatchValue[singleMatchValue.length - 1]
+        lastRule = lastRule.substring(0, lastRule.lastIndexOf('}'))
+        singleMatchValue[singleMatchValue.length - 1] = lastRule
+        singleMatchValue.forEach(item => {
+          const sRule = item.split(' ')
+          this.addRulesModal.ruleResult.push({ attr: sRule[0], symbolValue: sRule[1], inputValue: sRule[2] })
+        })
+      }
+      if (editData.match_type === 'filter') {
+        let singleMatchValue = editData.match_value.split('}{')
+        singleMatchValue[0] = singleMatchValue[0].substring(1)
+        // eslint-disable-next-line no-unused-vars
+        let lastRule = singleMatchValue[singleMatchValue.length - 1]
+        lastRule = lastRule.substring(0, lastRule.lastIndexOf('}'))
+        singleMatchValue[singleMatchValue.length - 1] = lastRule
+        singleMatchValue.forEach(item => {
+          const sRule = item.split(' ')
+          if (sRule[0] === 'serviceName') {
+            this.addRulesModal.serviceName = sRule[2].substring(1, sRule[2].length - 1)
+          } else {
+            this.addRulesModal.ruleResult.push({ attr: sRule[0], symbolValue: sRule[1], inputValue: sRule[2] })
+          }
+        })
+        this.getRulesAttr('getRuleAttrByServiceName')
+      }
+    },
+    async getRulesAttr (fun) {
+      const { status, data } =
+        fun === 'getRuleAttrByServiceName'
+          ? await getRuleAttrByServiceName(this.addRulesModal.serviceName)
+          : await getRuleAttrById(this.modelConfig.addRow.match_param_id)
+      if (status === 'OK') {
+        this.addRulesModal.ruleConfig.attr = data.data
+      }
+    },
+    setInputValue (symbolValue, index) {
+      if (['set', 'notset', 'is', 'isnot'].includes(symbolValue)) {
+        this.addRulesModal.ruleResult[index].inputValue = 'NULL'
+        return true
+      } else {
+        return false
+      }
+    },
+    generateExpression () {
+      if (['sql', 'text', 'fulltext'].includes(this.modelConfig.addRow.match_type)) {
+        this.modelConfig.addRow.match_value = this.addRulesModal.diyRules
+      }
+      if (this.modelConfig.addRow.match_type === 'cli') {
+        this.modelConfig.addRow.match_value = this.manageRuleResult()
+      }
+      if (this.modelConfig.addRow.match_type === 'filter') {
+        let tmp = this.manageRuleResult()
+        this.modelConfig.addRow.match_value = `{serviceName eq '${this.addRulesModal.serviceName}'}` + tmp
+      }
+    },
+    manageRuleResult () {
+      // eslint-disable-next-line no-unused-vars
+      let serviceNameResult = ''
+      this.addRulesModal.ruleResult.forEach(item => {
+        if (item.attr && item.symbolValue) {
+          if (['like', 'ilike', 'eq', 'neq', 'regex', 'iregex'].includes(item.symbolValue)) {
+            serviceNameResult += `{${item.attr} ${item.symbolValue} '${item.inputValue}'}`
+          } else {
+            serviceNameResult += `{${item.attr} ${item.symbolValue} ${item.inputValue}}`
+          }
+        }
+      })
+      return serviceNameResult
+    },
+    addEmptyRule () {
+      this.addRulesModal.ruleResult.push({ attr: '', symbolValue: '', inputValue: '' })
+    },
+    deleterule (index) {
+      this.addRulesModal.ruleResult.splice(index, 1)
+    },
     changeEffectOn () {
       this.modelConfig.addRow.match_type = ''
     },
@@ -267,10 +479,10 @@ export default {
       // eslint-disable-next-line no-unused-vars
       let params = ''
       if (this.modelConfig.addRow.match_type === 'cli') {
-        params = 'matchparams?type=cli'
+        params = '/itsdangerous/ui/v1/matchparams?type=cli'
       }
       if (['sql', 'text', 'fulltext'].includes(this.modelConfig.addRow.match_type)) {
-        params = 'matchparams?type=regex'
+        params = '/itsdangerous/ui/v1/matchparams?type=regex'
       }
       const { status, data } = await getTableData(params)
       if (status === 'OK') {

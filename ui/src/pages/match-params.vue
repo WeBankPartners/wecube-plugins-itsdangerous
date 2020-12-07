@@ -2,7 +2,7 @@
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
-      <div slot="match-params">
+      <template #match-params>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_type') }}:</label>
           <Select v-model="modelConfig.addRow.type" style="width: 338px">
@@ -12,7 +12,7 @@
           </Select>
           <label class="required-tip">*</label>
         </div>
-      </div>
+      </template>
     </ModalComponent>
   </div>
 </template>
@@ -73,7 +73,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'matchparams',
+        CRUD: '/itsdangerous/ui/v1/matchparams',
         researchConfig: {
           input_conditions: [
             {
