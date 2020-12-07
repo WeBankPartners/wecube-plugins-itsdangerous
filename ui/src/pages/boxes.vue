@@ -106,7 +106,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'boxes',
+        CRUD: '/itsdangerous/ui/v1/boxes',
         researchConfig: {
           input_conditions: [
             {
@@ -292,7 +292,7 @@ export default {
       }
     },
     async getConfigData () {
-      const params = 'policies'
+      const params = '/itsdangerous/ui/v1/policies'
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.modelConfig.v_select_configs.policyOptions = data.data.map(item => {
@@ -302,7 +302,7 @@ export default {
           }
         })
       }
-      const url = 'subjects'
+      const url = '/itsdangerous/ui/v1/subjects'
       const res = await getTableData(url)
       if (res.status === 'OK') {
         this.modelConfig.v_select_configs.subjectOptions = res.data.data.map(item => {

@@ -61,7 +61,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'targets',
+        CRUD: '/itsdangerous/ui/v1/targets',
         researchConfig: {
           input_conditions: [
             {

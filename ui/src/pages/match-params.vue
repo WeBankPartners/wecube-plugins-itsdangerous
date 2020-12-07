@@ -73,7 +73,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'matchparams',
+        CRUD: '/itsdangerous/ui/v1/matchparams',
         researchConfig: {
           input_conditions: [
             {

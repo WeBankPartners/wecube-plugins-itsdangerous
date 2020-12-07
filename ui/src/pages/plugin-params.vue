@@ -73,7 +73,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'service-scripts',
+        CRUD: '/itsdangerous/ui/v1/service-scripts',
         researchConfig: {
           input_conditions: [
             {
