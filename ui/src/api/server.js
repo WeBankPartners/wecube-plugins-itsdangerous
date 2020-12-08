@@ -19,5 +19,6 @@ export const deleteTableRow = (url, id) => req.delete(`${url}/${id}`)
 export const boxDetect = (id, data) => req.post(`/itsdangerous/ui/v1/boxes/${id}/run`, data)
 
 export const getRuleAttrById = id => req.get(`/itsdangerous/ui/v1/matchparams/${id}/args`)
+export const getService = () => req.get(`/itsdangerous/v1/platform/services?__fields=serviceName`)
 export const getRuleAttrByServiceName = serviceName =>
-  req.get(`/itsdangerous/v1/platform/services?serviceName=${serviceName}`)
+  req.get(`/itsdangerous/v1/platform/service-attributes?serviceName=${serviceName}`)
