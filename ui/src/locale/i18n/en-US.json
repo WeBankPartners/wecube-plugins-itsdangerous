@@ -134,5 +134,7 @@
   "hr_created_by": "Created By",
   "hr_created_time": "Created Time",
   "hr_updated_by": "Updated By",
-  "hr_updated_time": "Updated Time"
+  "hr_updated_time": "Updated Time",
+  "hr_add_rule": "Add Rule",
+  "hr_service_name": "Service Name"
 }

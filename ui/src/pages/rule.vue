@@ -1,7 +1,7 @@
 <template>
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
-    <Modal v-model="showAddRulesModal" :z-index="1001" title="配置表达式" @on-ok="generateExpression()">
+    <Modal v-model="showAddRulesModal" :z-index="1051" :title="$t('match_value')" @on-ok="generateExpression()">
       <Form label-position="top" label-colon>
         <FormItem
           :label="$t('match_value')"
@@ -9,9 +9,16 @@
         >
           <Input v-model="addRulesModal.diyRules"></Input>
         </FormItem>
-        <FormItem label="服务名称" v-if="this.modelConfig.addRow.match_type === 'filter'">
-          <Input v-model="addRulesModal.serviceName" style="width: 300px"></Input>
-          <Button @click="getRulesAttr('getRuleAttrByServiceName')" type="success">Success</Button>
+        <FormItem :label="$t('hr_service_name')" v-if="this.modelConfig.addRow.match_type === 'filter'">
+          <Select v-model="addRulesModal.serviceName" style="width:300px">
+            <Option
+              v-for="service in addRulesModal.ruleConfig.serviceList"
+              :value="service.serviceName"
+              :key="service.serviceName"
+              >{{ service.serviceName }}</Option
+            >
+          </Select>
+          <Button @click="getRulesAttr('getRuleAttrByServiceName'), clearRuleResult()" type="success">获取配置</Button>
         </FormItem>
         <FormItem :label="$t('match_value')" v-if="this.addRulesModal.ruleConfig.attr.length > 0">
           <div style="margin: 4px 12px;padding:8px 12px;border:1px solid #dcdee2;border-radius:4px">
@@ -48,7 +55,7 @@
               size="small"
               style="background-color: #0080FF;border-color: #0080FF;"
               long
-              >增加过滤规则</Button
+              >{{ $t('hr_add_rule') }}</Button
             >
           </div>
           <!-- </template> -->
@@ -77,7 +84,7 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('match_type') }}:</label>
-          <Select v-model="modelConfig.addRow.match_type" style="width: 338px">
+          <Select v-model="modelConfig.addRow.match_type" style="width: 338px" @on-change="clearMatchValue">
             <Option v-for="item in matchOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -91,6 +98,7 @@
             :disabled="modelConfig.addRow.match_type === 'filter'"
             style="width: 338px"
             clearable
+            @on-change="clearMatchValue"
           >
             <Option v-for="item in modelConfig.v_select_configs.matchParamOption" :value="item.value" :key="item.value">
               {{ item.label }}
@@ -99,15 +107,16 @@
           <label class="required-tip">*</label>
         </div>
         <div class="marginbottom params-each">
-          <label class="col-md-2 label-name">配置表达式:</label>
-          <button :disabled="disableRuleBtn" type="button" @click="configMatchValaue" class="btn btn-confirm-f">
-            编辑
-          </button>
-        </div>
-        <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('match_value') }}:</label>
           <input v-model="modelConfig.addRow.match_value" disabled class="col-md-7 form-control model-input" />
-          <label class="required-tip">*</label>
+          <Button
+            :disabled="disableRuleBtn"
+            @click="configMatchValaue"
+            size="small"
+            style="background-color: #57a3f3;border-color: #57a3f3;"
+            type="primary"
+            icon="ios-create-outline"
+          ></Button>
         </div>
       </div>
     </ModalComponent>
@@ -121,6 +130,7 @@ import {
   editTableRow,
   deleteTableRow,
   getRuleAttrById,
+  getService,
   getRuleAttrByServiceName
 } from '@/api/server'
 let tableEle = [
@@ -313,6 +323,7 @@ export default {
             'in',
             'notin'
           ],
+          serviceList: [],
           attr: []
         },
         ruleResult: [{ attr: '', symbolValue: '', inputValue: '' }]
@@ -329,7 +340,6 @@ export default {
       this.modelConfig.addRow.match_type = val.length > 1 ? this.modelConfig.addRow.match_type || 'cli' : 'filter'
     },
     'modelConfig.addRow.match_type': function (val) {
-      this.modelConfig.addRow.match_value = ''
       if (val !== 'filter' && val) {
         this.getConfigData()
       }
@@ -364,20 +374,26 @@ export default {
     this.getConfigData()
   },
   methods: {
-    configMatchValaue () {
-      this.manageEditRules()
-      if (this.modelConfig.addRow.match_type === 'cli' && this.modelConfig.addRow.match_param_id) {
-        this.getRulesAttr('getRuleAttrById')
-      }
+    clearRuleResult () {
+      this.addRulesModal.ruleResult = []
+    },
+    clearMatchValue () {
+      this.modelConfig.addRow.match_value = ''
+    },
+    async configMatchValaue () {
+      await this.manageEditRules()
+      // if (this.modelConfig.addRow.match_type === 'cli' && this.modelConfig.addRow.match_param_id) {
+      //   this.getRulesAttr('getRuleAttrById')
+      // }
       this.showAddRulesModal = true
     },
-    manageEditRules () {
+    async manageEditRules () {
       let editData = {
         match_type: this.modelConfig.addRow.match_type,
         match_value: this.modelConfig.addRow.match_value
       }
 
-      this.modelConfig.ruleResult = []
+      this.addRulesModal.ruleResult = []
       this.addRulesModal.serviceName = ''
       this.addRulesModal.diyRules = ''
       this.addRulesModal.ruleConfig.attr = []
@@ -386,6 +402,7 @@ export default {
         this.getConfigData()
       }
       if (editData.match_type === 'cli') {
+        this.getRulesAttr('getRuleAttrById')
         let singleMatchValue = editData.match_value.split('}{')
         singleMatchValue[0] = singleMatchValue[0].substring(1)
         // eslint-disable-next-line no-unused-vars
@@ -398,6 +415,10 @@ export default {
         })
       }
       if (editData.match_type === 'filter') {
+        const { status, data } = await getService()
+        if (status === 'OK') {
+          this.addRulesModal.ruleConfig.serviceList = data.data
+        }
         let singleMatchValue = editData.match_value.split('}{')
         singleMatchValue[0] = singleMatchValue[0].substring(1)
         // eslint-disable-next-line no-unused-vars
@@ -408,14 +429,17 @@ export default {
           const sRule = item.split(' ')
           if (sRule[0] === 'serviceName') {
             this.addRulesModal.serviceName = sRule[2].substring(1, sRule[2].length - 1)
+            this.getRulesAttr('getRuleAttrByServiceName')
           } else {
             this.addRulesModal.ruleResult.push({ attr: sRule[0], symbolValue: sRule[1], inputValue: sRule[2] })
           }
         })
-        this.getRulesAttr('getRuleAttrByServiceName')
       }
     },
     async getRulesAttr (fun) {
+      if (fun === 'getRuleAttrByServiceName') {
+        this.addRulesModal.ruleResult = []
+      }
       const { status, data } =
         fun === 'getRuleAttrByServiceName'
           ? await getRuleAttrByServiceName(this.addRulesModal.serviceName)
