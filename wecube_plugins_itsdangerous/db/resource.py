@@ -156,7 +156,7 @@ class Rule(MetaCRUD):
                              nullable=True),
         crud.ColumnValidator(field='enabled', rule_type='in', rule=[0, 1], validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='match_value',
-                             rule=my_validator.LengthValidator(1, 512),
+                             rule=my_validator.LengthValidator(0, 512),
                              validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='created_by', validate_on=('create:O', 'update:O'), nullable=True),
         crud.ColumnValidator(field='created_time', validate_on=('create:O', 'update:O'), nullable=True),
@@ -168,7 +168,8 @@ class Rule(MetaCRUD):
         ref = super().get(rid)
         if ref:
             names = '|'.join([i['name'] for i in ref['policies']])
-            raise exceptions.ConflictError(oid=rid, name=names)
+            if names:
+                raise exceptions.ConflictError(oid=rid, name=names)
         return super().delete(rid, filters, detail)
 
 
@@ -264,7 +265,8 @@ class Target(MetaCRUD):
         ref = super().get(rid)
         if ref:
             names = '|'.join([i['name'] for i in ref['subjects']])
-            raise exceptions.ConflictError(oid=rid, name=names)
+            if names:
+                raise exceptions.ConflictError(oid=rid, name=names)
         return super().delete(rid, filters, detail)
 
 

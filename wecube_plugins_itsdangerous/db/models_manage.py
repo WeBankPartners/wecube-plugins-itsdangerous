@@ -186,6 +186,7 @@ class ServiceScript(Base, DictBase):
     content_type = Column(String(36))
     content_field = Column(String(63))
     endpoint_field = Column(String(63))
+    endpoint_include = Column(String(255))
 
     created_by = Column(String(36), nullable=True)
     created_time = Column(DateTime, nullable=True)
