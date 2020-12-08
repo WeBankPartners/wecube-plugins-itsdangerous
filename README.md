@@ -38,7 +38,7 @@ Itsdangerous插件可以对shell & sql 脚本进行命令检测，根据既定�
 
 ```bash
 rm -rf /tmp/*
-rm -r -f /tmp/*;rm -f -r /tmp/* && rm -rf '/tmp/*'
+rm -r -f /tmp/* && rm -f -r /tmp/* && rm -rf '/tmp/*' && rm '-rf' '/tmp/*' 
 rm --force -r /tmp/*
 rm --force -R /tmp/*
 rm \
@@ -46,9 +46,9 @@ rm \
 /tmp/*
 ```
 
-以上仅是一些常见的写法，如果使用正则解析，会存在命令参数组合问题，再加上多行命令等情况，正则会变得异常复杂
+以上仅是一些常见的写法，如果使用正则解析，会存在命令参数组合，引号问题，再加上多行命令等情况，正则会变得异常复杂
 
-同样的在sql语句中，除了常见的大小写，还存在这多行，注释混插，\`表名\`等多种表达方式
+同样的在sql语句中，除了常见的大小写，还存在着多行，注释混插，\`表名\`等多种表达方式
 
 ```mysql
 SELECT * FROM `box`;DROP/*???*/ TABLE IF EXISTS `box`;
@@ -76,7 +76,7 @@ Itsdangerous插件中针对以上的场景进行了优化：
 
 为bash增加了一个**shell命令解析器** + **命令行模拟器** 来进行数据分析，简化了高危规则的表达
 
-shell命令解析器： input - rm -rf '/tmp/*'      =>      命令行模拟器： rm - force=True， recursive=True， path=/tmp/\*
+shell命令解析器： input - rm '-rf' '/tmp/*'      =>      命令行模拟器： command = rm，force=True， recursive=True， path=/tmp/\*
 
 为sql增加了一个**sql格式化工具**，自动进行sql语句的切分&格式化，正则表达式只需要写^drop\s+table\s+.*$即可
 
@@ -85,7 +85,27 @@ sql语句的切分&格式化输出：
     DROP TABLE IF EXISTS \`box\`
     ...
 
-> ​	当然在Itsdangerous插件中，也支持对不经任何处理的原数据进行按行(text)/多行(fulltext)方式进行正则匹配，以满足更多的通用自定义检测场景。
+> 当然在Itsdangerous插件中，也支持对不经任何处理的原数据进行按行(text)/多行(fulltext)方式进行正则匹配，以满足更多的通用自定义检测场景。
+>
+> 主要支持2类检测器
+>
+> script检测器
+> |
+> |-----------------------------|----------------|-------------------------------------|
+> |                                    |                    |                                              |
+> cli(for shell script)       sql                 text(for line match)              fulltext(for multi-line)
+>
+> 
+>
+> param检测器
+> |
+> |
+> | 
+> filter(for any json data)
+
+当在wecube中执行插件时，用户可以根据自己已有的插件最佳实践配置脚本字段或脚本地址字段，itsdangerous插件会提取脚本内容进行解压/检测。
+
+比如：saltstack/host-script(host)/run-custom-script插件实践中，用户会提供scriptContent字段，字段值为shell脚本
 
 
 

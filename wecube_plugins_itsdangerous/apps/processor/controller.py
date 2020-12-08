@@ -35,6 +35,18 @@ class ItemMatchParam(controller.Item):
     resource = processor_api.MatchParam
 
 
+class ItemMatchParamArgs(controller.Collection):
+    name = 'wecube_plugins_itsdangerous.processor.matchparam.args'
+    resource = processor_api.MatchParam
+
+    def list(self, req, criteria, **kwargs):
+        return self.make_resource(req).get_args(**kwargs)
+
+    def count(self, req, criteria, results=None, **kwargs):
+        results = results or []
+        return len(results)
+
+
 class CollectionSubject(controller.Collection):
     name = 'wecube_plugins_itsdangerous.processor.subject'
     resource = processor_api.Subject
@@ -91,3 +103,23 @@ class PluginCheck(controller.Controller):
 
     def create(self, req, data, **kwargs):
         return self.make_resource(req).plugin_check(data, **kwargs)
+
+
+class WecubeService(controller.Collection):
+    allow_methods = ('GET', )
+    name = 'wecube_plugins_itsdangerous.processor.wecube.services'
+    resource = processor_api.WecubeService
+
+    def count(self, req, criteria, results=None, **kwargs):
+        results = results or []
+        return len(results)
+
+
+class WecubeServiceAttribute(controller.Collection):
+    allow_methods = ('GET', )
+    name = 'wecube_plugins_itsdangerous.processor.wecube.service-attributes'
+    resource = processor_api.WecubeServiceAttribute
+
+    def count(self, req, criteria, results=None, **kwargs):
+        results = results or []
+        return len(results)
