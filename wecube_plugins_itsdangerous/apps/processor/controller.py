@@ -113,3 +113,13 @@ class WecubeService(controller.Collection):
     def count(self, req, criteria, results=None, **kwargs):
         results = results or []
         return len(results)
+
+
+class WecubeServiceAttribute(controller.Collection):
+    allow_methods = ('GET', )
+    name = 'wecube_plugins_itsdangerous.processor.wecube.service-attributes'
+    resource = processor_api.WecubeServiceAttribute
+
+    def count(self, req, criteria, results=None, **kwargs):
+        results = results or []
+        return len(results)

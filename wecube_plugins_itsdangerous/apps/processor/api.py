@@ -465,7 +465,26 @@ class Box(resource.Box):
 class WecubeService(object):
     def list(self, filters=None, orders=None, offset=None, limit=None, hooks=None):
         results = []
+        client = wecube.WeCubeClient(CONF.wecube.base_url)
+        key = '/platform/v1/plugins/interfaces/enabled'
+        cached = cache.get(key, 15)
+        if cache.validate(cached):
+            resp = cached
+        else:
+            resp = client.retrieve('/platform/v1/plugins/interfaces/enabled')
+            cache.set(key, resp)
+        results = resp['data']
+        return results
+
+
+class WecubeServiceAttribute(object):
+    def list(self, filters=None, orders=None, offset=None, limit=None, hooks=None):
+        results = []
         service_name = filters.get('serviceName', '') or ''
+        if not service_name:
+            raise exceptions.FieldRequired(
+                message=_('missing query param: %(attribute)s, eg. /v1/api?%(attribute)s=value') %
+                {'attribute': 'serviceName'})
         client = wecube.WeCubeClient(CONF.wecube.base_url)
         key = '/platform/v1/plugins/interfaces/enabled'
         cached = cache.get(key, 15)
