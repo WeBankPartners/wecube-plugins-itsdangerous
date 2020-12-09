@@ -10,7 +10,7 @@
           <Input v-model="addRulesModal.diyRules"></Input>
         </FormItem>
         <FormItem :label="$t('hr_service_name')" v-if="this.modelConfig.addRow.match_type === 'filter'">
-          <Select v-model="addRulesModal.serviceName" style="width:300px">
+          <Select v-model="addRulesModal.serviceName" filterable style="width:300px">
             <Option
               v-for="service in addRulesModal.ruleConfig.serviceList"
               :value="service.serviceName"
@@ -31,7 +31,7 @@
                   type="error"
                   icon="md-close"
                 ></Button>
-                <Select v-model="item.attr" style="width:140px">
+                <Select v-model="item.attr" filterable style="width:140px">
                   <Option v-for="attr in addRulesModal.ruleConfig.attr" :value="attr.value" :key="attr.value">{{
                     attr.name
                   }}</Option>
@@ -98,6 +98,7 @@
             :disabled="modelConfig.addRow.match_type === 'filter'"
             style="width: 338px"
             clearable
+            @on-clear="modelConfig.addRow.match_param_id = ''"
             @on-change="clearMatchValue"
           >
             <Option v-for="item in modelConfig.v_select_configs.matchParamOption" :value="item.value" :key="item.value">
@@ -276,7 +277,7 @@ export default {
           effect_on: 'script',
           match_type: 'cli',
           match_value: '',
-          match_param_id: null
+          match_param_id: ''
         },
         v_select_configs: {
           levelOptions: [
@@ -390,7 +391,7 @@ export default {
     async manageEditRules () {
       let editData = {
         match_type: this.modelConfig.addRow.match_type,
-        match_value: this.modelConfig.addRow.match_value
+        match_value: this.modelConfig.addRow.match_value || ''
       }
 
       this.addRulesModal.ruleResult = []
@@ -411,7 +412,11 @@ export default {
         singleMatchValue[singleMatchValue.length - 1] = lastRule
         singleMatchValue.forEach(item => {
           const sRule = item.split(' ')
-          this.addRulesModal.ruleResult.push({ attr: sRule[0], symbolValue: sRule[1], inputValue: sRule[2] })
+          this.addRulesModal.ruleResult.push({
+            attr: sRule[0],
+            symbolValue: sRule[1],
+            inputValue: this.tirmComma(sRule[1], sRule[2])
+          })
         })
       }
       if (editData.match_type === 'filter') {
@@ -431,10 +436,20 @@ export default {
             this.addRulesModal.serviceName = sRule[2].substring(1, sRule[2].length - 1)
             this.getRulesAttr('getRuleAttrByServiceName')
           } else {
-            this.addRulesModal.ruleResult.push({ attr: sRule[0], symbolValue: sRule[1], inputValue: sRule[2] })
+            this.addRulesModal.ruleResult.push({
+              attr: sRule[0],
+              symbolValue: sRule[1],
+              inputValue: this.tirmComma(sRule[1], sRule[2])
+            })
           }
         })
       }
+    },
+    tirmComma (op, val) {
+      if (['like', 'ilike', 'eq', 'neq', 'regex', 'iregex'].includes(op)) {
+        return val.substring(1, val.lastIndexOf("'"))
+      }
+      return val
     },
     async getRulesAttr (fun) {
       if (fun === 'getRuleAttrByServiceName') {
@@ -544,6 +559,7 @@ export default {
     },
     async editPost () {
       this.modelConfig.addRow.enabled = Number(this.modelConfig.addRow.enabled)
+      this.modelConfig.addRow.match_param_id = this.modelConfig.addRow.match_param_id || null
       const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initTableData()
