@@ -125,6 +125,7 @@
   "content_type": "脚本类型",
   "content_field": "脚本字段",
   "endpoint_field": "脚本地址",
+  "endpoint_include": "指定脚本",
   "detect": "检测",
   "script": "脚本",
   "lineno": "行号",
