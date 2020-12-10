@@ -447,9 +447,9 @@ export default {
     },
     tirmComma (op, val) {
       if (['like', 'ilike', 'eq', 'neq', 'regex', 'iregex'].includes(op)) {
-        return val.substring(1, val.lastIndexOf("'"))
+        return val.substring(1, val.lastIndexOf("'")) || ''
       }
-      return val
+      return val || ''
     },
     async getRulesAttr (fun) {
       if (fun === 'getRuleAttrByServiceName') {
