@@ -164,6 +164,36 @@ class Rule(MetaCRUD):
         crud.ColumnValidator(field='updated_time', validate_on=('create:O', 'update:O'), nullable=True),
     ]
 
+    def create(self, resource, validate=True, detail=False):
+        '''make detail False as default, or it will return policies.rules extra info[performance issue]'''
+        return super().create(resource, validate=validate, detail=detail)
+
+    def update(self, rid, resource, filters=None, validate=True, detail=False):
+        '''make detail False as default, or it will return policies.rules extra info[performance issue]'''
+        return super().update(rid, resource, filters=filters, validate=validate, detail=detail)
+
+    def _addtional_validation(self, resource):
+        if resource['effect_on'] == 'param' and resource['match_type'] not in ('filter', ):
+            raise exceptions.ValidationError(attribute='match_type',
+                                             msg=_('%(value)s is not acceptable, use %(fixed_value)s instead') % {
+                                                 'value': resource['match_type'],
+                                                 'fixed_value': 'filter'
+                                             })
+        if resource['effect_on'] == 'script' and resource['match_type'] not in ('cli', 'sql', 'text', 'fulltext'):
+            raise exceptions.ValidationError(attribute='match_type',
+                                             msg=_('%(value)s is not acceptable, use %(fixed_value)s instead') % {
+                                                 'value': resource['match_type'],
+                                                 'fixed_value': ('cli', 'sql', 'text', 'fulltext')
+                                             })
+        if resource['effect_on'] == 'script' and resource['match_type'] == 'cli' and not resource['match_param_id']:
+            raise exceptions.FieldRequired(attribute='match_param_id')
+
+    def _addtional_create(self, session, resource, created):
+        self._addtional_validation(created)
+
+    def _addtional_update(self, session, rid, resource, before_updated, after_updated):
+        self._addtional_validation(after_updated)
+
     def delete(self, rid, filters=None, detail=True):
         ref = super().get(rid)
         if ref:
@@ -260,6 +290,14 @@ class Target(MetaCRUD):
         crud.ColumnValidator(field='updated_by', validate_on=('create:O', 'update:O'), nullable=True),
         crud.ColumnValidator(field='updated_time', validate_on=('create:O', 'update:O'), nullable=True),
     ]
+
+    def create(self, resource, validate=True, detail=False):
+        '''make detail False as default, or it will return subjects.targets extra info[performance issue]'''
+        return super().create(resource, validate=validate, detail=detail)
+
+    def update(self, rid, resource, filters=None, validate=True, detail=False):
+        '''make detail False as default, or it will return subjects.targets extra info[performance issue]'''
+        return super().update(rid, resource, filters=filters, validate=validate, detail=detail)
 
     def delete(self, rid, filters=None, detail=True):
         ref = super().get(rid)
