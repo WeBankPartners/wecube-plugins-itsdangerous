@@ -68,19 +68,31 @@
             icon="ios-create-outline"
           ></Button>
         </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('entity_scope') }}:</label>
+          <FilterRules
+            style="display:inline-block;vertical-align: middle;padding:0"
+            class="col-md-9"
+            :needAttr="true"
+            v-model="modelConfig.addRow.entity_scope"
+            :allDataModelsWithAttrs="allEntityType"
+          ></FilterRules>
+        </div>
       </div>
     </ModalComponent>
   </div>
 </template>
 
 <script>
+import FilterRules from './components/filter-rules.vue'
 import {
   getTableData,
   addTableRow,
   editTableRow,
   deleteTableRow,
   getService,
-  getRuleAttrByServiceName
+  getRuleAttrByServiceName,
+  getAllDataModels
 } from '@/api/server'
 let tableEle = [
   {
@@ -192,7 +204,6 @@ export default {
             disabled: false,
             type: 'text'
           },
-          { label: 'entity_scope', value: 'entity_scope', placeholder: '', disabled: false, type: 'text' },
           { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' },
           { name: 'rule', type: 'slot' }
         ],
@@ -235,13 +246,21 @@ export default {
         key: 'name',
         value: null
       },
-      id: ''
+      id: '',
+      routineExpression: '',
+      allEntityType: []
     }
   },
   mounted () {
     this.initTableData()
   },
   methods: {
+    async getAllDataModels () {
+      let { data, status } = await getAllDataModels()
+      if (status === 'OK') {
+        this.allEntityType = data
+      }
+    },
     // 规则配置函数-开始
     generateExpression () {
       let tmp = this.manageRuleResult()
@@ -333,9 +352,10 @@ export default {
         this.pageConfig.pagination.total = data.count
       }
     },
-    add () {
+    async add () {
       this.modelConfig.addRow.enabled = true
       this.modelConfig.isAdd = true
+      await this.getAllDataModels()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
@@ -347,11 +367,12 @@ export default {
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
     },
-    editF (rowData) {
+    async editF (rowData) {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
       this.modelConfig.addRow = this.$itsCommonUtil.manageEditParams(this.modelConfig.addRow, rowData)
+      await this.getAllDataModels()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
@@ -378,7 +399,9 @@ export default {
       })
     }
   },
-  components: {}
+  components: {
+    FilterRules
+  }
 }
 </script>
 

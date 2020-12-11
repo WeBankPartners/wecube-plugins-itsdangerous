@@ -10,6 +10,9 @@ module.exports = {
     proxy: {
       '/itsdangerous': {
         target: baseUrl
+      },
+      '/platform': {
+        target: baseUrl
       }
     }
   },
