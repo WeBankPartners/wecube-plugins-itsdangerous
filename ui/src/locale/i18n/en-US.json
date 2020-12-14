@@ -153,5 +153,6 @@
   "repeatable_three": "At least 1 time",
   "repeatable_four": "Any number of times",
   "name_require": "Name is required",
-  "name_ex_require": "Name and expression name are required"
+  "name_ex_require": "Name and expression name are required",
+  "convert_int": "Convert Integer"
 }

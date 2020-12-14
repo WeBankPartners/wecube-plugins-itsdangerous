@@ -1,17 +1,17 @@
 <template>
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
-    <Modal v-model="showAddRulesModal" :width="750" :z-index="1051" :title="$t('params')">
+    <Modal v-model="showAddRulesModal" :width="800" :z-index="1051" :title="$t('params')">
       <!-- @on-ok="generateExpression()" -->
       <Form label-position="top" label-colon>
         <FormItem v-if="modelConfig.addRow.type === 'regex'">
           <label class="col-md-2 label-name">{{ $t('params') }}:</label>
-          <Input v-model="addRulesModal.regexParams" style="width:300px" placeholder="Enter something..." />
+          <Input v-model="addRulesModal.regexParams" style="width:300px" placeholder="" />
         </FormItem>
         <template v-else>
           <FormItem>
             <label class="col-md-2 label-name">{{ $t('hr_name') }}:</label>
-            <Input v-model="addRulesModal.name" style="width:300px" placeholder="Enter something..." />
+            <Input v-model="addRulesModal.name" style="width:300px" placeholder="" />
           </FormItem>
           <FormItem>
             <label class="col-md-2 label-name">{{ $t('strip_path') }}:</label>
@@ -29,14 +29,17 @@
                     type="error"
                     icon="md-close"
                   ></Button>
-                  <Input v-model="item.name" style="width: 146px" placeholder="" />
+                  <Input v-model="item.name" style="width: 146px" :placeholder="$t('name')" />
                   <Input v-model="item.shortcut" style="width: 146px" placeholder="e.g:-f,-F,--force" />
                   <Select v-model="item.action" filterable style="width:140px">
                     <Option v-for="action in addRulesModal.ruleConfig.actionOption" :value="action" :key="action">{{
                       action
                     }}</Option>
                   </Select>
-                  <i-switch v-model="item.convert_int" />
+                  <i-switch size="large" v-model="item.convert_int" />
+                  <Tooltip :content="$t('convert_int')">
+                    <Icon type="md-help" />
+                  </Tooltip>
                   <Select v-model="item.repeatable" filterable style="width:140px">
                     <Option
                       v-for="repeatable in addRulesModal.ruleConfig.repeatableOption"
