@@ -78,7 +78,10 @@ class MatchParam(MetaCRUD):
                              rule=[True, False],
                              validate_on=('create:O', ),
                              nullable=True),
-        crud.ColumnValidator(field='repeatable', rule=my_validator.RepeatableValidator(), validate_on=('create:O', )),
+        crud.ColumnValidator(field='repeatable',
+                             rule=my_validator.RepeatableValidator(),
+                             validate_on=('create:O', ),
+                             nullable=True),
     ]
 
     def _addtional_create(self, session, resource, created):
