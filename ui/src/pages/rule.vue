@@ -10,7 +10,7 @@
           <Input v-model="addRulesModal.diyRules"></Input>
         </FormItem>
         <FormItem :label="$t('hr_service_name')" v-if="this.modelConfig.addRow.match_type === 'filter'">
-          <Select v-model="addRulesModal.serviceName" filterable style="width:300px">
+          <Select v-model="addRulesModal.serviceName" @on-change="changeService" filterable style="width:475px">
             <Option
               v-for="service in addRulesModal.ruleConfig.serviceList"
               :value="service.serviceName"
@@ -18,7 +18,7 @@
               >{{ service.serviceName }}</Option
             >
           </Select>
-          <Button @click="getRulesAttr('getRuleAttrByServiceName'), clearRuleResult()" type="success">获取配置</Button>
+          <!-- <Button @click="getRulesAttr('getRuleAttrByServiceName'), clearRuleResult()" type="success">获取配置</Button> -->
         </FormItem>
         <FormItem :label="$t('match_value')" v-if="this.addRulesModal.ruleConfig.attr.length > 0">
           <div style="margin: 4px 12px;padding:8px 12px;border:1px solid #dcdee2;border-radius:4px">
@@ -109,7 +109,12 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('match_value') }}:</label>
-          <input v-model="modelConfig.addRow.match_value" disabled class="col-md-7 form-control model-input" />
+          <input
+            v-model="modelConfig.addRow.match_value"
+            disabled
+            style="min-width:64%"
+            class="col-md-6 form-control model-input"
+          />
           <Button
             :disabled="disableRuleBtn"
             @click="configMatchValaue"
@@ -117,6 +122,13 @@
             style="background-color: #57a3f3;border-color: #57a3f3;"
             type="primary"
             icon="ios-create-outline"
+          ></Button>
+          <Button
+            @click="modelConfig.addRow.match_value = ''"
+            size="small"
+            style="background-color: #ed4015;border-color: #ed4015;"
+            type="primary"
+            icon="md-close"
           ></Button>
         </div>
       </div>
@@ -375,6 +387,10 @@ export default {
     this.getConfigData()
   },
   methods: {
+    changeService () {
+      this.getRulesAttr('getRuleAttrByServiceName')
+      this.clearRuleResult()
+    },
     clearRuleResult () {
       this.addRulesModal.ruleResult = []
     },
