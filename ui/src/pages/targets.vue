@@ -4,7 +4,7 @@
     <Modal v-model="showAddRulesModal" :z-index="1051" :title="$t('args_scope')" @on-ok="generateExpression()">
       <Form label-position="top" label-colon>
         <FormItem :label="$t('hr_service_name')">
-          <Select v-model="addRulesModal.serviceName" filterable style="width:300px">
+          <Select v-model="addRulesModal.serviceName" @on-change="changeService" filterable style="width:475px">
             <Option
               v-for="service in addRulesModal.ruleConfig.serviceList"
               :value="service.serviceName"
@@ -12,7 +12,7 @@
               >{{ service.serviceName }}</Option
             >
           </Select>
-          <Button @click="getRulesAttr('getRuleAttrByServiceName'), clearRuleResult()" type="success">获取配置</Button>
+          <!-- <Button @click="getRulesAttr('getRuleAttrByServiceName'), clearRuleResult()" type="success">获取配置</Button> -->
         </FormItem>
         <FormItem :label="$t('match_value')" v-if="this.addRulesModal.ruleConfig.attr.length > 0">
           <div style="margin: 4px 12px;padding:8px 12px;border:1px solid #dcdee2;border-radius:4px">
@@ -59,13 +59,25 @@
       <div slot="rule">
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('args_scope') }}:</label>
-          <input v-model="modelConfig.addRow.args_scope" disabled class="col-md-7 form-control model-input" />
+          <input
+            v-model="modelConfig.addRow.args_scope"
+            style="min-width:61%"
+            disabled
+            class="col-md-6 form-control model-input"
+          />
           <Button
             @click="configMatchValaue"
             size="small"
             style="background-color: #57a3f3;border-color: #57a3f3;"
             type="primary"
             icon="ios-create-outline"
+          ></Button>
+          <Button
+            @click="modelConfig.addRow.args_scope = ''"
+            size="small"
+            style="background-color: #ed4015;border-color: #ed4015;"
+            type="primary"
+            icon="md-close"
           ></Button>
         </div>
         <div class="marginbottom params-each">
@@ -255,6 +267,10 @@ export default {
     this.initTableData()
   },
   methods: {
+    changeService () {
+      this.getRulesAttr('getRuleAttrByServiceName')
+      this.clearRuleResult()
+    },
     async getAllDataModels () {
       let { data, status } = await getAllDataModels()
       if (status === 'OK') {
