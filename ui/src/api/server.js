@@ -22,3 +22,10 @@ export const getRuleAttrById = id => req.get(`/itsdangerous/ui/v1/matchparams/${
 export const getService = () => req.get(`/itsdangerous/v1/platform/services?__fields=serviceName`)
 export const getRuleAttrByServiceName = serviceName =>
   req.get(`/itsdangerous/v1/platform/service-attributes?serviceName=${serviceName}`)
+
+// Wecube Api
+export const getAllDataModels = () => req.get(`/platform/v1/models`)
+export const getTargetOptions = (pkgName, entityName) =>
+  req.get(`/platform/v1/packages/${pkgName}/entities/${entityName}/retrieve`)
+export const getEntityRefsByPkgNameAndEntityName = (pkgName, entityName) =>
+  req.get(`/platform/v1/models/package/${pkgName}/entity/${entityName}`)
