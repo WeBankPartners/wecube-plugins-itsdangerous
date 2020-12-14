@@ -1,25 +1,24 @@
 <template>
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
-    <Modal
-      v-model="showAddRulesModal"
-      :width="750"
-      :z-index="1051"
-      :title="$t('args_scope')"
-      @on-ok="generateExpression()"
-    >
+    <Modal v-model="showAddRulesModal" :width="750" :z-index="1051" :title="$t('params')">
+      <!-- @on-ok="generateExpression()" -->
       <Form label-position="top" label-colon>
-        <FormItem :label="$t('params')" v-if="modelConfig.addRow.type === 'regex'">
-          <Input v-model="addRulesModal.regexParams" placeholder="Enter something..." />
+        <FormItem v-if="modelConfig.addRow.type === 'regex'">
+          <label class="col-md-2 label-name">{{ $t('params') }}:</label>
+          <Input v-model="addRulesModal.regexParams" style="width:300px" placeholder="Enter something..." />
         </FormItem>
         <template v-else>
-          <FormItem :label="$t('hr_name')">
-            <Input v-model="addRulesModal.name" placeholder="Enter something..." />
+          <FormItem>
+            <label class="col-md-2 label-name">{{ $t('hr_name') }}:</label>
+            <Input v-model="addRulesModal.name" style="width:300px" placeholder="Enter something..." />
           </FormItem>
-          <FormItem label="忽略路径">
+          <FormItem>
+            <label class="col-md-2 label-name">{{ $t('strip_path') }}:</label>
             <i-switch v-model="addRulesModal.opt_strip_path" />
           </FormItem>
-          <FormItem :label="$t('match_value')">
+          <FormItem>
+            <label class="col-md-2 label-name">{{ $t('match_value') }}:</label>
             <div style="margin: 4px 12px;padding:8px 12px;border:1px solid #dcdee2;border-radius:4px">
               <template v-for="(item, index) in addRulesModal.ruleResult">
                 <p :key="index">
@@ -31,7 +30,7 @@
                     icon="md-close"
                   ></Button>
                   <Input v-model="item.name" style="width: 146px" placeholder="" />
-                  <Input v-model="item.shortcut" style="width: 146px" placeholder="" />
+                  <Input v-model="item.shortcut" style="width: 146px" placeholder="e.g:-f,-F,--force" />
                   <Select v-model="item.action" filterable style="width:140px">
                     <Option v-for="action in addRulesModal.ruleConfig.actionOption" :value="action" :key="action">{{
                       action
@@ -60,13 +59,16 @@
           </FormItem>
         </template>
       </Form>
+      <div slot="footer">
+        <Button @click="showAddRulesModal = false">{{ $t('button.cancel') }}</Button>
+        <Button type="primary" @click="generateExpression">{{ $t('button.confirm') }}</Button>
+      </div>
     </Modal>
     <ModalComponent :modelConfig="modelConfig">
       <template #match-params>
-        {{ showAddRulesModal }}123123
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_type') }}:</label>
-          <Select v-model="modelConfig.addRow.type" style="width: 338px">
+          <Select v-model="modelConfig.addRow.type" @on-change="changeType" style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.typeOptions" :value="item.value" :key="item.value">
               {{ item.label }}
             </Option>
@@ -226,10 +228,10 @@ export default {
         ruleConfig: {
           actionOption: ['store', 'store_true', 'store_false', 'count', 'append'],
           repeatableOption: [
-            { label: '覆盖上一次', value: 'null' },
-            { label: '允许0次或1次', value: '?' },
-            { label: '至少1次', value: '+' },
-            { label: '任意次数', value: '*' }
+            { label: this.$t('repeatable_one'), value: 'null' },
+            { label: this.$t('repeatable_two'), value: '?' },
+            { label: this.$t('repeatable_three'), value: '+' },
+            { label: this.$t('repeatable_four'), value: '*' }
           ]
         },
         ruleResult: [{ name: '', shortcut: '', action: 'store', convert_int: true, repeatable: 'null' }]
@@ -245,15 +247,28 @@ export default {
     this.initTableData()
   },
   methods: {
+    changeType () {
+      this.modelConfig.addRow.params = ''
+    },
     async configMatchValaue () {
       await this.manageEditRules()
       this.showAddRulesModal = true
     },
     async manageEditRules () {
+      this.addRulesModal.regexParams = ''
+      this.addRulesModal.name = ''
+      this.addRulesModal.ruleResult = []
+      this.addRulesModal.opt_strip_path = true
       if (this.modelConfig.addRow.type === 'regex') {
         this.addRulesModal.regexParams = this.modelConfig.addRow.params
       } else {
+        if (!this.modelConfig.addRow.params) return
         const rule = JSON.parse(this.modelConfig.addRow.params)
+        rule.args.forEach(item => {
+          if (item.repeatable === null) {
+            item.repeatable = 'null'
+          }
+        })
         this.addRulesModal.name = rule.name
         this.addRulesModal.opt_strip_path = rule.opt_strip_path
         this.addRulesModal.ruleResult = rule.args
@@ -261,13 +276,26 @@ export default {
     },
     generateExpression () {
       if (this.modelConfig.addRow.type === 'regex') {
+        if (!this.addRulesModal.regexParams) {
+          this.$Message.warning(this.$t('name_require'))
+          this.showAddRulesModal = true
+          return
+        }
         this.modelConfig.addRow.params = this.addRulesModal.regexParams
+        this.showAddRulesModal = false
       } else {
+        const isEmpty = this.addRulesModal.ruleResult.some(item => item.name === '')
+        if (!this.addRulesModal.name || isEmpty) {
+          this.$Message.warning(this.$t('name_ex_require'))
+          this.showAddRulesModal = true
+          return
+        }
         this.modelConfig.addRow.params = JSON.stringify({
           name: this.addRulesModal.name,
           opt_strip_path: this.addRulesModal.opt_strip_path,
           args: this.addRulesModal.ruleResult
         })
+        this.showAddRulesModal = false
       }
     },
     manageRuleResult () {
@@ -310,7 +338,7 @@ export default {
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
-      this.modelConfig.addRow.params = JSON.parse(this.modelConfig.addRow.params)
+      this.beautifyData()
       const { status, message } = await addTableRow(this.pageConfig.CRUD, [this.modelConfig.addRow])
       if (status === 'OK') {
         this.initTableData()
@@ -327,13 +355,21 @@ export default {
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
-      this.modelConfig.addRow.params = JSON.parse(this.modelConfig.addRow.params)
+      this.beautifyData()
       const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initTableData()
         this.$Message.success(message)
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
+    },
+    beautifyData () {
+      this.modelConfig.addRow.params = JSON.parse(this.modelConfig.addRow.params)
+      this.modelConfig.addRow.params.args.forEach(item => {
+        if (item.repeatable === 'null') {
+          item.repeatable = null
+        }
+      })
     },
     deleteConfirmModal (rowData) {
       this.$Modal.confirm({
@@ -354,4 +390,8 @@ export default {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.ivu-form-item {
+  margin-bottom: 0;
+}
+</style>

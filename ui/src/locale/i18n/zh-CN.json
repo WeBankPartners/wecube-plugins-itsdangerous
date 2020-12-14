@@ -146,5 +146,12 @@
   "query_filter_rule": "查看过滤规则",
   "please_choose": "请选择",
   "please_paste_here": "请在这粘贴",
-  "delete_node": "删除此节点"
+  "delete_node": "删除此节点",
+  "strip_path": "忽略路径",
+  "repeatable_one": "覆盖上一次",
+  "repeatable_two": "允许0次或1次",
+  "repeatable_three": "至少1次",
+  "repeatable_four": "任意次数",
+  "name_require": "名称为必填项",
+  "name_ex_require": "名称与表达式名称为必填项"
 }
