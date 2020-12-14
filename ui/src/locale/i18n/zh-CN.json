@@ -153,5 +153,6 @@
   "repeatable_three": "至少1次",
   "repeatable_four": "任意次数",
   "name_require": "名称为必填项",
-  "name_ex_require": "名称与表达式名称为必填项"
+  "name_ex_require": "名称与表达式名称为必填项",
+  "convert_int": "转换整数"
 }

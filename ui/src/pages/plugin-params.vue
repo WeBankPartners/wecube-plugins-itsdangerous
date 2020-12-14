@@ -29,7 +29,7 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('content_field') }}:</label>
-          <Select v-model="modelConfig.addRow.content_field" filterable style="width: 338px">
+          <Select v-model="modelConfig.addRow.content_field" clearable filterable style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.serviceAttr" :value="item.name" :key="item.name">{{
               item.name
             }}</Option>
@@ -37,7 +37,7 @@
         </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('endpoint_field') }}:</label>
-          <Select v-model="modelConfig.addRow.endpoint_field" filterable style="width: 338px">
+          <Select v-model="modelConfig.addRow.endpoint_field" clearable filterable style="width: 338px">
             <Option v-for="item in modelConfig.v_select_configs.serviceAttr" :value="item.name" :key="item.name">{{
               item.name
             }}</Option>
@@ -172,7 +172,7 @@ export default {
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           service: null,
-          content_type: null,
+          content_type: 'shell',
           content_field: null,
           endpoint_field: null,
           endpoint_include: ''
@@ -241,7 +241,10 @@ export default {
       this.modelConfig.addRow.service = rowData.service
       await this.changeService(rowData.service)
       this.modelConfig.addRow = this.$itsCommonUtil.manageEditParams(this.modelConfig.addRow, rowData)
-      this.modelConfig.endpoint_include_seleted = rowData.endpoint_include.split('|')
+      console.log(rowData.endpoint_include)
+      if (rowData.endpoint_include) {
+        this.modelConfig.endpoint_include_seleted = rowData.endpoint_include.split('|')
+      }
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
