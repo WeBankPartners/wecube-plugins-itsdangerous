@@ -3,22 +3,21 @@
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <Modal v-model="showAddRulesModal" :width="800" :z-index="1051" :title="$t('params')">
       <!-- @on-ok="generateExpression()" -->
-      <Form label-position="top" label-colon>
+      <Form label-position="right" label-colon>
         <FormItem v-if="modelConfig.addRow.type === 'regex'">
-          <label class="col-md-2 label-name">{{ $t('params') }}:</label>
-          <Input v-model="addRulesModal.regexParams" style="width:300px" placeholder="" />
+          <label class="col-md-2 label-name" style="text-align:right">{{ $t('params') }}:</label>
+          <Input v-model="addRulesModal.regexParams" style="width:625px" placeholder="" />
         </FormItem>
         <template v-else>
           <FormItem>
-            <label class="col-md-2 label-name">{{ $t('hr_name') }}:</label>
-            <Input v-model="addRulesModal.name" style="width:300px" placeholder="" />
+            <label class="col-md-2 label-name" style="text-align:right">{{ $t('hr_name') }}:</label>
+            <Input v-model="addRulesModal.name" style="width:625px" placeholder="" />
           </FormItem>
           <FormItem>
-            <label class="col-md-2 label-name">{{ $t('strip_path') }}:</label>
+            <label class="col-md-2 label-name" style="text-align:right">{{ $t('strip_path') }}:</label>
             <i-switch v-model="addRulesModal.opt_strip_path" />
           </FormItem>
           <FormItem>
-            <label class="col-md-2 label-name">{{ $t('match_value') }}:</label>
             <div style="margin: 4px 12px;padding:8px 12px;border:1px solid #dcdee2;border-radius:4px">
               <template v-for="(item, index) in addRulesModal.ruleResult">
                 <p :key="index">
@@ -237,7 +236,7 @@ export default {
             { label: this.$t('repeatable_four'), value: '*' }
           ]
         },
-        ruleResult: [{ name: '', shortcut: '', action: 'store', convert_int: true, repeatable: 'null' }]
+        ruleResult: [{ name: '', shortcut: '', action: 'store', convert_int: false, repeatable: 'null' }]
       },
       modelTip: {
         key: 'name',
@@ -320,7 +319,7 @@ export default {
         name: '',
         shortcut: '',
         action: 'store',
-        convert_int: true,
+        convert_int: false,
         repeatable: 'null'
       })
     },
