@@ -241,7 +241,6 @@ export default {
       this.modelConfig.addRow.service = rowData.service
       await this.changeService(rowData.service)
       this.modelConfig.addRow = this.$itsCommonUtil.manageEditParams(this.modelConfig.addRow, rowData)
-      console.log(rowData.endpoint_include)
       if (rowData.endpoint_include) {
         this.modelConfig.endpoint_include_seleted = rowData.endpoint_include.split('|')
       }

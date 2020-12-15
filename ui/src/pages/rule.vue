@@ -44,7 +44,7 @@
                 <Input
                   :disabled="setInputValue(item.symbolValue, index)"
                   v-model="item.inputValue"
-                  style="width: 146px"
+                  style="width: 160px"
                   placeholder=""
                 />
               </p>
@@ -521,6 +521,7 @@ export default {
     },
     changeEffectOn () {
       this.modelConfig.addRow.match_type = ''
+      this.modelConfig.addRow.match_value = ''
     },
     async initTableData () {
       const params = this.$itsCommonUtil.managementUrl(this)
