@@ -1,12 +1,111 @@
 <template>
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
-    <ModalComponent :modelConfig="modelConfig"></ModalComponent>
+    <Modal v-model="showAddRulesModal" :z-index="1051" :title="$t('args_scope')" @on-ok="generateExpression()">
+      <Form label-position="top" label-colon>
+        <FormItem :label="$t('hr_service_name')">
+          <Select v-model="addRulesModal.serviceName" @on-change="changeService" filterable style="width:475px">
+            <Option
+              v-for="service in addRulesModal.ruleConfig.serviceList"
+              :value="service.serviceName"
+              :key="service.serviceName"
+              >{{ service.serviceName }}</Option
+            >
+          </Select>
+          <!-- <Button @click="getRulesAttr('getRuleAttrByServiceName'), clearRuleResult()" type="success">获取配置</Button> -->
+        </FormItem>
+        <FormItem :label="$t('match_value')" v-if="this.addRulesModal.ruleConfig.attr.length > 0">
+          <div style="margin: 4px 12px;padding:8px 12px;border:1px solid #dcdee2;border-radius:4px">
+            <template v-for="(item, index) in addRulesModal.ruleResult">
+              <p :key="index">
+                <Button
+                  @click="deleterule(index)"
+                  size="small"
+                  style="background-color: #ff9900;border-color: #ff9900;"
+                  type="error"
+                  icon="md-close"
+                ></Button>
+                <Select v-model="item.attr" filterable style="width:140px">
+                  <Option v-for="attr in addRulesModal.ruleConfig.attr" :value="attr.value" :key="attr.value">{{
+                    attr.name
+                  }}</Option>
+                </Select>
+                <Select v-model="item.symbolValue" style="width:100px">
+                  <Option v-for="rule in addRulesModal.ruleConfig.filterRuleOp" :value="rule" :key="rule">{{
+                    rule
+                  }}</Option>
+                </Select>
+                <Input
+                  :disabled="setInputValue(item.symbolValue, index)"
+                  v-model="item.inputValue"
+                  style="width: 146px"
+                  placeholder=""
+                />
+              </p>
+            </template>
+            <Button
+              @click="addEmptyRule"
+              type="success"
+              size="small"
+              style="background-color: #0080FF;border-color: #0080FF;"
+              long
+              >{{ $t('hr_add_rule') }}</Button
+            >
+          </div>
+        </FormItem>
+      </Form>
+    </Modal>
+    <ModalComponent :modelConfig="modelConfig">
+      <div slot="rule">
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('args_scope') }}:</label>
+          <input
+            v-model="modelConfig.addRow.args_scope"
+            style="min-width:61%"
+            disabled
+            class="col-md-6 form-control model-input"
+          />
+          <Button
+            @click="configMatchValaue"
+            size="small"
+            style="background-color: #57a3f3;border-color: #57a3f3;"
+            type="primary"
+            icon="ios-create-outline"
+          ></Button>
+          <Button
+            @click="modelConfig.addRow.args_scope = ''"
+            size="small"
+            style="background-color: #ed4015;border-color: #ed4015;"
+            type="primary"
+            icon="md-close"
+          ></Button>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('entity_scope') }}:</label>
+          <FilterRules
+            style="display:inline-block;vertical-align: middle;padding:0"
+            class="col-md-9"
+            :needAttr="true"
+            v-model="modelConfig.addRow.entity_scope"
+            :allDataModelsWithAttrs="allEntityType"
+          ></FilterRules>
+        </div>
+      </div>
+    </ModalComponent>
   </div>
 </template>
 
 <script>
-import { getTableData, addTableRow, editTableRow, deleteTableRow } from '@/api/server'
+import FilterRules from './components/filter-rules.vue'
+import {
+  getTableData,
+  addTableRow,
+  editTableRow,
+  deleteTableRow,
+  getService,
+  getRuleAttrByServiceName,
+  getAllDataModels
+} from '@/api/server'
 let tableEle = [
   {
     title: 'hr_name',
@@ -61,7 +160,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'targets',
+        CRUD: '/itsdangerous/ui/v1/targets',
         researchConfig: {
           input_conditions: [
             {
@@ -117,9 +216,8 @@ export default {
             disabled: false,
             type: 'text'
           },
-          { label: 'args_scope', value: 'args_scope', placeholder: '', disabled: false, type: 'text' },
-          { label: 'entity_scope', value: 'entity_scope', placeholder: '', disabled: false, type: 'text' },
-          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' }
+          { label: 'hr_enabled', value: 'enabled', placeholder: '', disabled: false, type: 'checkbox' },
+          { name: 'rule', type: 'slot' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
@@ -129,17 +227,139 @@ export default {
           enabled: true
         }
       },
+      showAddRulesModal: false,
+      addRulesModal: {
+        serviceName: '', // filter时配置
+        ruleConfig: {
+          filterRuleOp: [
+            'set',
+            'notset',
+            'is',
+            'isnot',
+            'like',
+            'ilike',
+            'eq',
+            'neq',
+            'regex',
+            'iregex',
+            'lt',
+            'gt',
+            'lte',
+            'gte',
+            'in',
+            'notin'
+          ],
+          serviceList: [],
+          attr: []
+        },
+        ruleResult: [{ attr: '', symbolValue: '', inputValue: '' }]
+      },
       modelTip: {
         key: 'name',
         value: null
       },
-      id: ''
+      id: '',
+      routineExpression: '',
+      allEntityType: []
     }
   },
   mounted () {
     this.initTableData()
   },
   methods: {
+    changeService () {
+      this.getRulesAttr('getRuleAttrByServiceName')
+      this.clearRuleResult()
+    },
+    async getAllDataModels () {
+      let { data, status } = await getAllDataModels()
+      if (status === 'OK') {
+        this.allEntityType = data
+      }
+    },
+    // 规则配置函数-开始
+    generateExpression () {
+      let tmp = this.manageRuleResult()
+      this.modelConfig.addRow.args_scope = `{serviceName eq '${this.addRulesModal.serviceName}'}` + tmp
+    },
+    manageRuleResult () {
+      // eslint-disable-next-line no-unused-vars
+      let serviceNameResult = ''
+      this.addRulesModal.ruleResult.forEach(item => {
+        if (item.attr && item.symbolValue) {
+          if (['like', 'ilike', 'eq', 'neq', 'regex', 'iregex'].includes(item.symbolValue)) {
+            serviceNameResult += `{${item.attr} ${item.symbolValue} '${item.inputValue}'}`
+          } else {
+            serviceNameResult += `{${item.attr} ${item.symbolValue} ${item.inputValue}}`
+          }
+        }
+      })
+      return serviceNameResult
+    },
+    setInputValue (symbolValue, index) {
+      if (['set', 'notset', 'is', 'isnot'].includes(symbolValue)) {
+        this.addRulesModal.ruleResult[index].inputValue = 'NULL'
+        return true
+      } else {
+        return false
+      }
+    },
+    addEmptyRule () {
+      this.addRulesModal.ruleResult.push({ attr: '', symbolValue: '', inputValue: '' })
+    },
+    deleterule (index) {
+      this.addRulesModal.ruleResult.splice(index, 1)
+    },
+    clearRuleResult () {
+      this.addRulesModal.ruleResult = []
+    },
+    async getRulesAttr () {
+      this.addRulesModal.ruleResult = []
+      const { status, data } = await getRuleAttrByServiceName(this.addRulesModal.serviceName)
+      if (status === 'OK') {
+        this.addRulesModal.ruleConfig.attr = data.data
+      }
+    },
+    async configMatchValaue () {
+      await this.manageEditRules()
+      this.showAddRulesModal = true
+    },
+    async manageEditRules () {
+      this.addRulesModal.ruleResult = []
+      this.addRulesModal.serviceName = ''
+      this.addRulesModal.ruleConfig.attr = []
+      const { status, data } = await getService()
+      if (status === 'OK') {
+        this.addRulesModal.ruleConfig.serviceList = data.data
+      }
+      if (!this.modelConfig.addRow.args_scope) return
+      let singleMatchValue = this.modelConfig.addRow.args_scope.split('}{')
+      singleMatchValue[0] = singleMatchValue[0].substring(1)
+      // eslint-disable-next-line no-unused-vars
+      let lastRule = singleMatchValue[singleMatchValue.length - 1]
+      lastRule = lastRule.substring(0, lastRule.lastIndexOf('}'))
+      singleMatchValue[singleMatchValue.length - 1] = lastRule
+      singleMatchValue.forEach(item => {
+        const sRule = item.split(' ')
+        if (sRule[0] === 'serviceName') {
+          this.addRulesModal.serviceName = sRule[2].substring(1, sRule[2].length - 1)
+          this.getRulesAttr('getRuleAttrByServiceName')
+        } else {
+          this.addRulesModal.ruleResult.push({
+            attr: sRule[0],
+            symbolValue: sRule[1],
+            inputValue: this.tirmComma(sRule[1], sRule[2])
+          })
+        }
+      })
+    },
+    tirmComma (op, val) {
+      if (['like', 'ilike', 'eq', 'neq', 'regex', 'iregex'].includes(op)) {
+        return val.substring(1, val.lastIndexOf("'")) || ''
+      }
+      return val || ''
+    },
+    // 规则配置函数-结束
     async initTableData () {
       const params = this.$itsCommonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
@@ -148,9 +368,10 @@ export default {
         this.pageConfig.pagination.total = data.count
       }
     },
-    add () {
+    async add () {
       this.modelConfig.addRow.enabled = true
       this.modelConfig.isAdd = true
+      await this.getAllDataModels()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
@@ -162,11 +383,12 @@ export default {
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
     },
-    editF (rowData) {
+    async editF (rowData) {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
       this.modelConfig.addRow = this.$itsCommonUtil.manageEditParams(this.modelConfig.addRow, rowData)
+      await this.getAllDataModels()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
@@ -193,7 +415,9 @@ export default {
       })
     }
   },
-  components: {}
+  components: {
+    FilterRules
+  }
 }
 </script>
 

@@ -2,7 +2,7 @@
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
-      <div slot="subjects">
+      <template #subjects>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('hr_target') }}:</label>
           <Select v-model="modelConfig.addRow.targets" style="width: 338px" multiple>
@@ -11,7 +11,7 @@
             </Option>
           </Select>
         </div>
-      </div>
+      </template>
     </ModalComponent>
   </div>
 </template>
@@ -67,7 +67,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'subjects',
+        CRUD: '/itsdangerous/ui/v1/subjects',
         researchConfig: {
           input_conditions: [
             {
@@ -158,7 +158,7 @@ export default {
       }
     },
     async getConfigData () {
-      const params = 'targets'
+      const params = '/itsdangerous/ui/v1/targets'
       const { status, data } = await getTableData(params)
       if (status === 'OK') {
         this.modelConfig.v_select_configs.targetOptions = data.data.map(item => {
