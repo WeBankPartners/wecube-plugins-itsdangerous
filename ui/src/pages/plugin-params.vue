@@ -2,26 +2,69 @@
   <div class=" ">
     <DangerousPageTable :pageConfig="pageConfig"></DangerousPageTable>
     <ModalComponent :modelConfig="modelConfig">
-      <div slot="plugin-params">
+      <template #plugin-params>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('hr_service_name') }}:</label>
+          <Select v-model="modelConfig.addRow.service" @on-change="changeService" filterable style="width: 338px">
+            <Option
+              v-for="service in modelConfig.v_select_configs.serviceNameOptions"
+              :value="service.serviceName"
+              :key="service.serviceName"
+              >{{ service.serviceName }}</Option
+            >
+          </Select>
+          <label class="required-tip">*</label>
+        </div>
         <div class="marginbottom params-each">
           <label class="col-md-2 label-name">{{ $t('content_type') }}:</label>
-          <Select v-model="modelConfig.addRow.content_type" style="width: 338px">
+          <Select v-model="modelConfig.addRow.content_type" filterable style="width: 338px">
             <Option
               v-for="item in modelConfig.v_select_configs.contentTypeOptions"
               :value="item.value"
               :key="item.value"
+              >{{ item.label }}</Option
             >
-              {{ item.label }}
-            </Option>
+          </Select>
+          <label class="required-tip">*</label>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('content_field') }}:</label>
+          <Select v-model="modelConfig.addRow.content_field" clearable filterable style="width: 338px">
+            <Option v-for="item in modelConfig.v_select_configs.serviceAttr" :value="item.name" :key="item.name">{{
+              item.name
+            }}</Option>
           </Select>
         </div>
-      </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('endpoint_field') }}:</label>
+          <Select v-model="modelConfig.addRow.endpoint_field" clearable filterable style="width: 338px">
+            <Option v-for="item in modelConfig.v_select_configs.serviceAttr" :value="item.name" :key="item.name">{{
+              item.name
+            }}</Option>
+          </Select>
+        </div>
+        <div class="marginbottom params-each">
+          <label class="col-md-2 label-name">{{ $t('endpoint_include') }}:</label>
+          <Select v-model="modelConfig.endpoint_include_seleted" filterable multiple style="width: 338px">
+            <Option v-for="item in modelConfig.v_select_configs.serviceAttr" :value="item.name" :key="item.name">{{
+              item.name
+            }}</Option>
+          </Select>
+        </div>
+      </template>
     </ModalComponent>
   </div>
 </template>
 
 <script>
-import { getTableData, addTableRow, editTableRow, deleteTableRow } from '@/api/server'
+import {
+  getTableData,
+  addTableRow,
+  editTableRow,
+  deleteTableRow,
+  getService,
+  getRuleAttrByServiceName
+} from '@/api/server'
 let tableEle = [
   {
     title: 'service',
@@ -41,6 +84,11 @@ let tableEle = [
   {
     title: 'endpoint_field', // 脚本地址
     value: 'endpoint_field',
+    display: true
+  },
+  {
+    title: 'endpoint_include', // 脚本地址
+    value: 'endpoint_include',
     display: true
   },
   {
@@ -73,7 +121,7 @@ export default {
   data () {
     return {
       pageConfig: {
-        CRUD: 'service-scripts',
+        CRUD: '/itsdangerous/ui/v1/service-scripts',
         researchConfig: {
           input_conditions: [
             {
@@ -120,41 +168,19 @@ export default {
         modalId: 'add_edit_Modal',
         modalTitle: 'hr_plugin_params',
         isAdd: true,
-        config: [
-          {
-            label: 'service',
-            value: 'service',
-            placeholder: 'tips.inputRequired',
-            v_validate: 'required:true|min:2|max:60',
-            disabled: false,
-            type: 'text'
-          },
-          { name: 'plugin-params', type: 'slot' },
-          {
-            label: 'content_field',
-            value: 'content_field',
-            v_validate: '',
-            placeholder: '',
-            disabled: false,
-            type: 'text'
-          },
-          {
-            label: 'endpoint_field',
-            value: 'endpoint_field',
-            v_validate: '',
-            placeholder: '',
-            disabled: false,
-            type: 'text'
-          }
-        ],
+        config: [{ name: 'plugin-params', type: 'slot' }],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
           service: null,
-          content_type: null,
+          content_type: 'shell',
           content_field: null,
-          endpoint_field: ''
+          endpoint_field: null,
+          endpoint_include: ''
         },
+        endpoint_include_seleted: [],
         v_select_configs: {
+          serviceNameOptions: [],
+          serviceAttr: [],
           contentTypeOptions: [
             { label: 'shell', value: 'shell' },
             { label: 'sql', value: 'sql' }
@@ -172,6 +198,19 @@ export default {
     this.initTableData()
   },
   methods: {
+    async changeService (val) {
+      const { status, data } = await getRuleAttrByServiceName(val)
+      if (status === 'OK') {
+        this.modelConfig.v_select_configs.serviceAttr = data.data
+      }
+    },
+    async getService () {
+      this.modelConfig.endpoint_include_seleted = []
+      const { status, data } = await getService()
+      if (status === 'OK') {
+        this.modelConfig.v_select_configs.serviceNameOptions = data.data
+      }
+    },
     async initTableData () {
       const params = this.$itsCommonUtil.managementUrl(this)
       const { status, data } = await getTableData(params)
@@ -180,11 +219,13 @@ export default {
         this.pageConfig.pagination.total = data.count
       }
     },
-    add () {
+    async add () {
       this.modelConfig.isAdd = true
+      await this.getService()
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async addPost () {
+      this.modelConfig.addRow.endpoint_include = this.modelConfig.endpoint_include_seleted.join('|')
       const { status, message } = await addTableRow(this.pageConfig.CRUD, [this.modelConfig.addRow])
       if (status === 'OK') {
         this.initTableData()
@@ -192,14 +233,21 @@ export default {
         this.$root.JQ('#add_edit_Modal').modal('hide')
       }
     },
-    editF (rowData) {
+    async editF (rowData) {
       this.id = rowData.id
       this.modelConfig.isAdd = false
       this.modelTip.value = rowData[this.modelTip.key]
+      await this.getService()
+      this.modelConfig.addRow.service = rowData.service
+      await this.changeService(rowData.service)
       this.modelConfig.addRow = this.$itsCommonUtil.manageEditParams(this.modelConfig.addRow, rowData)
+      if (rowData.endpoint_include) {
+        this.modelConfig.endpoint_include_seleted = rowData.endpoint_include.split('|')
+      }
       this.$root.JQ('#add_edit_Modal').modal('show')
     },
     async editPost () {
+      this.modelConfig.addRow.endpoint_include = this.modelConfig.endpoint_include_seleted.join('|')
       const { status, message } = await editTableRow(this.pageConfig.CRUD, this.id, this.modelConfig.addRow)
       if (status === 'OK') {
         this.initTableData()

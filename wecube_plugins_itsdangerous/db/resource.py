@@ -40,10 +40,10 @@ class MatchParam(MetaCRUD):
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
-                             validate_on=['create:M', 'update:O']),
+                             validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='description',
                              rule=my_validator.LengthValidator(0, 63),
-                             validate_on=['create:O', 'update:O'],
+                             validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='type', rule_type='in', rule=['regex', 'cli'], validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='params', rule=validator.TypeValidator(dict), validate_on=('create:M', 'update:O')),
@@ -52,6 +52,55 @@ class MatchParam(MetaCRUD):
         crud.ColumnValidator(field='updated_by', validate_on=('create:O', 'update:O'), nullable=True),
         crud.ColumnValidator(field='updated_time', validate_on=('create:O', 'update:O'), nullable=True)
     ]
+
+    _validate_params_cli = [
+        crud.ColumnValidator(field='name', rule=my_validator.LengthValidator(1, 36), validate_on=('create:M', )),
+        crud.ColumnValidator(field='opt_strip_path',
+                             rule_type='in',
+                             rule=[True, False],
+                             validate_on=('create:O', ),
+                             nullable=True),
+        crud.ColumnValidator(field='args', rule=validator.TypeValidator(list), validate_on=('create:M', ))
+    ]
+
+    _validate_params_cli_args = [
+        crud.ColumnValidator(field='name', rule=my_validator.LengthValidator(1, 36), validate_on=('create:M', )),
+        crud.ColumnValidator(field='shortcut',
+                             rule=my_validator.LengthValidator(0, 255),
+                             validate_on=('create:O', ),
+                             nullable=True),
+        crud.ColumnValidator(field='action',
+                             rule_type='in',
+                             rule=['store', 'store_true', 'store_false', 'count', 'append'],
+                             validate_on=('create:O', )),
+        crud.ColumnValidator(field='convert_int',
+                             rule_type='in',
+                             rule=[True, False],
+                             validate_on=('create:O', ),
+                             nullable=True),
+        crud.ColumnValidator(field='repeatable',
+                             rule=my_validator.RepeatableValidator(),
+                             validate_on=('create:O', ),
+                             nullable=True),
+    ]
+
+    def _addtional_create(self, session, resource, created):
+        super()._addtional_create(session, resource, created)
+        if created['type'] == 'cli':
+            params = created['params']
+            self.validate(params, 'create', rule=self._validate_params_cli)
+            args = params['args']
+            for arg in args:
+                self.validate(arg, 'create', rule=self._validate_params_cli_args)
+
+    def _addtional_update(self, session, rid, resource, before_updated, after_updated):
+        super()._addtional_update(session, rid, resource, before_updated, after_updated)
+        if after_updated['type'] == 'cli':
+            params = after_updated['params']
+            self.validate(params, 'create', rule=self._validate_params_cli)
+            args = params['args']
+            for arg in args:
+                self.validate(arg, 'create', rule=self._validate_params_cli_args)
 
     def delete(self, rid, filters=None, detail=True):
         refs = Rule().list({'match_param_id': rid})
@@ -67,7 +116,7 @@ class Policy(MetaCRUD):
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
-                             validate_on=['create:M', 'update:O']),
+                             validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='description',
                              rule=my_validator.LengthValidator(0, 63),
                              validate_on=('create:O', 'update:O'),
@@ -133,7 +182,7 @@ class Rule(MetaCRUD):
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
-                             validate_on=['create:M', 'update:O']),
+                             validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='description',
                              rule=my_validator.LengthValidator(0, 63),
                              validate_on=('create:O', 'update:O'),
@@ -156,7 +205,7 @@ class Rule(MetaCRUD):
                              nullable=True),
         crud.ColumnValidator(field='enabled', rule_type='in', rule=[0, 1], validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='match_value',
-                             rule=my_validator.LengthValidator(1, 512),
+                             rule=my_validator.LengthValidator(0, 512),
                              validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='created_by', validate_on=('create:O', 'update:O'), nullable=True),
         crud.ColumnValidator(field='created_time', validate_on=('create:O', 'update:O'), nullable=True),
@@ -164,11 +213,42 @@ class Rule(MetaCRUD):
         crud.ColumnValidator(field='updated_time', validate_on=('create:O', 'update:O'), nullable=True),
     ]
 
+    def create(self, resource, validate=True, detail=False):
+        '''make detail False as default, or it will return policies.rules extra info[performance issue]'''
+        return super().create(resource, validate=validate, detail=detail)
+
+    def update(self, rid, resource, filters=None, validate=True, detail=False):
+        '''make detail False as default, or it will return policies.rules extra info[performance issue]'''
+        return super().update(rid, resource, filters=filters, validate=validate, detail=detail)
+
+    def _addtional_validation(self, resource):
+        if resource['effect_on'] == 'param' and resource['match_type'] not in ('filter', ):
+            raise exceptions.ValidationError(attribute='match_type',
+                                             msg=_('%(value)s is not acceptable, use %(fixed_value)s instead') % {
+                                                 'value': resource['match_type'],
+                                                 'fixed_value': 'filter'
+                                             })
+        if resource['effect_on'] == 'script' and resource['match_type'] not in ('cli', 'sql', 'text', 'fulltext'):
+            raise exceptions.ValidationError(attribute='match_type',
+                                             msg=_('%(value)s is not acceptable, use %(fixed_value)s instead') % {
+                                                 'value': resource['match_type'],
+                                                 'fixed_value': ('cli', 'sql', 'text', 'fulltext')
+                                             })
+        if resource['effect_on'] == 'script' and resource['match_type'] == 'cli' and not resource['match_param_id']:
+            raise exceptions.FieldRequired(attribute='match_param_id')
+
+    def _addtional_create(self, session, resource, created):
+        self._addtional_validation(created)
+
+    def _addtional_update(self, session, rid, resource, before_updated, after_updated):
+        self._addtional_validation(after_updated)
+
     def delete(self, rid, filters=None, detail=True):
         ref = super().get(rid)
         if ref:
             names = '|'.join([i['name'] for i in ref['policies']])
-            raise exceptions.ConflictError(oid=rid, name=names)
+            if names:
+                raise exceptions.ConflictError(oid=rid, name=names)
         return super().delete(rid, filters, detail)
 
 
@@ -178,7 +258,7 @@ class Subject(MetaCRUD):
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
-                             validate_on=['create:M', 'update:O']),
+                             validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='description',
                              rule=my_validator.LengthValidator(0, 63),
                              validate_on=('create:O', 'update:O'),
@@ -244,7 +324,7 @@ class Target(MetaCRUD):
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
-                             validate_on=['create:M', 'update:O']),
+                             validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='enabled', rule_type='in', rule=[0, 1], validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='args_scope',
                              rule=my_validator.LengthValidator(0, 512),
@@ -260,11 +340,20 @@ class Target(MetaCRUD):
         crud.ColumnValidator(field='updated_time', validate_on=('create:O', 'update:O'), nullable=True),
     ]
 
+    def create(self, resource, validate=True, detail=False):
+        '''make detail False as default, or it will return subjects.targets extra info[performance issue]'''
+        return super().create(resource, validate=validate, detail=detail)
+
+    def update(self, rid, resource, filters=None, validate=True, detail=False):
+        '''make detail False as default, or it will return subjects.targets extra info[performance issue]'''
+        return super().update(rid, resource, filters=filters, validate=validate, detail=detail)
+
     def delete(self, rid, filters=None, detail=True):
         ref = super().get(rid)
         if ref:
             names = '|'.join([i['name'] for i in ref['subjects']])
-            raise exceptions.ConflictError(oid=rid, name=names)
+            if names:
+                raise exceptions.ConflictError(oid=rid, name=names)
         return super().delete(rid, filters, detail)
 
 
@@ -281,10 +370,10 @@ class BoxManage(MetaCRUD):
     _validate = [
         crud.ColumnValidator(field='name',
                              rule=my_validator.LengthValidator(1, 36),
-                             validate_on=['create:M', 'update:O']),
+                             validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='description',
                              rule=my_validator.LengthValidator(0, 63),
-                             validate_on=['create:O', 'update:O'],
+                             validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='policy_id', rule=BackRefValidator(Policy), validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='subject_id', rule=BackRefValidator(Subject), validate_on=('create:M', 'update:O')),
@@ -317,19 +406,23 @@ class ServiceScript(MetaCRUD):
     _validate = [
         crud.ColumnValidator(field='service',
                              rule=my_validator.LengthValidator(1, 63),
-                             validate_on=['create:M', 'update:O']),
+                             validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='content_type',
                              rule_type='in',
                              rule=['shell', 'sql'],
-                             validate_on=['create:O', 'update:O'],
+                             validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='content_field',
                              rule=my_validator.LengthValidator(0, 63),
-                             validate_on=['create:O', 'update:O'],
+                             validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='endpoint_field',
                              rule=my_validator.LengthValidator(0, 63),
-                             validate_on=['create:O', 'update:O'],
+                             validate_on=('create:O', 'update:O'),
+                             nullable=True),
+        crud.ColumnValidator(field='endpoint_include',
+                             rule=my_validator.LengthValidator(0, 255),
+                             validate_on=('create:O', 'update:O'),
                              nullable=True),
         crud.ColumnValidator(field='created_by', validate_on=('create:O', 'update:O'), nullable=True),
         crud.ColumnValidator(field='created_time', validate_on=('create:O', 'update:O'), nullable=True),
