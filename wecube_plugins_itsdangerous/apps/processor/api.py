@@ -2,12 +2,14 @@
 
 from __future__ import absolute_import
 
+import fnmatch
 import glob
 import hashlib
 import json
 import logging
 import os
 import os.path
+import re
 import tempfile
 
 import requests
@@ -17,7 +19,7 @@ from talos.core.i18n import _
 from talos.db import crud
 import texttable
 from wecube_plugins_itsdangerous.apps.processor import detector
-from wecube_plugins_itsdangerous.common import exceptions, reader, s3, scope
+from wecube_plugins_itsdangerous.common import exceptions, reader, s3, scope, wecube
 from wecube_plugins_itsdangerous.common import utils as plugin_utils
 from wecube_plugins_itsdangerous.db import resource
 from wecube_plugins_itsdangerous.db import validator as my_validator
@@ -44,7 +46,7 @@ def download_from_url(dir_path, url, random_name=False):
     filepath = os.path.join(dir_path, filename)
     if url.startswith(CONF.wecube.base_url):
         # nexus url
-        token = scope.get_wecube_token(CONF.wecube.base_url)
+        token = wecube.get_wecube_token()
         resp = requests.get(url, headers={'Authorization': 'Bearer ' + token}, stream=True)
         chunk_size = 1024 * 1024
         stream = resp.raw
@@ -108,7 +110,13 @@ class MatchParam(resource.MatchParam):
     '''
     MatchParam Resource for CRUD
     '''
-    pass
+    def get_args(self, rid):
+        ref = self.get(rid)
+        results = []
+        if ref:
+            for arg in ref['params'].get('args', []):
+                results.append({'type': 'string', 'name': arg['name'], 'value': arg['name']})
+        return results
 
 
 class Subject(resource.Subject):
@@ -159,7 +167,17 @@ class ServiceScript(resource.ServiceScript):
             if content:
                 scripts.append({'type': content_type, 'content': content, 'name': None})
         # if endpoint_field present, download from endpoint(s3/artifacts url from platform)
+        common_spliter = r',|\||;'
         if script_location['endpoint_field']:
+            user_include = script_location['endpoint_include']
+            user_include_files = None
+            if user_include:
+                user_include_files = set()
+                user_include_fields = re.split(common_spliter, user_include)
+                for field in user_include_fields:
+                    field_content = utils.get_item(plugin_param, field)
+                    if field_content:
+                        user_include_files = user_include_files | set(re.split(common_spliter, field_content))
             endpoint_url = utils.get_item(plugin_param, script_location['endpoint_field'])
             filepath, filename = ensure_url_cached(endpoint_url)
             packed_extensions = [
@@ -173,19 +191,41 @@ class ServiceScript(resource.ServiceScript):
                 for name in glob.glob(os.path.join(unzip_path, '**/*' + shell_extension), recursive=True):
                     if not os.path.isfile(name):
                         continue
-                    with open(name, 'r') as f:
-                        scripts.append({'type': 'shell', 'content': f.read(), 'name': name[len(unzip_path) + 1:]})
+                    shortpath = name[len(unzip_path) + 1:]
+                    included = False
+                    if user_include_files is not None:
+                        for user_include_file in user_include_files:
+                            if fnmatch.fnmatch(shortpath, user_include_file):
+                                included = True
+                                break
+                    else:
+                        included = True
+                    if included:
+                        with open(name, 'r') as f:
+                            scripts.append({'type': 'shell', 'content': f.read(), 'name': shortpath})
                 for name in glob.glob(os.path.join(unzip_path, '**/*' + sql_extension), recursive=True):
                     if not os.path.isfile(name):
                         continue
-                    with open(name, 'r') as f:
-                        scripts.append({'type': 'sql', 'content': f.read(), 'name': name[len(unzip_path) + 1:]})
+                    shortpath = name[len(unzip_path) + 1:]
+                    included = False
+                    if user_include_files is not None:
+                        for user_include_file in user_include_files:
+                            if fnmatch.fnmatch(shortpath, user_include_file):
+                                included = True
+                                break
+                    else:
+                        included = True
+                    if included:
+                        with open(name, 'r') as f:
+                            scripts.append({'type': 'sql', 'content': f.read(), 'name': shortpath})
             elif filepath.endswith(shell_extension):
                 with open(filepath, 'r') as f:
                     scripts.append({'type': 'shell', 'content': f.read(), 'name': filename})
             elif filepath.endswith(sql_extension):
                 with open(filepath, 'r') as f:
                     scripts.append({'type': 'sql', 'content': f.read(), 'name': filename})
+            else:
+                LOG.warn('the type of this file[%s] could not be determined', filename)
         return scripts
 
 
@@ -419,4 +459,46 @@ class Box(resource.Box):
         for r in json_results:
             r['script_name'] = ''
         results.extend(json_results)
+        return results
+
+
+class WecubeService(object):
+    def list(self, filters=None, orders=None, offset=None, limit=None, hooks=None):
+        results = []
+        client = wecube.WeCubeClient(CONF.wecube.base_url)
+        key = '/platform/v1/plugins/interfaces/enabled'
+        cached = cache.get(key, 15)
+        if cache.validate(cached):
+            resp = cached
+        else:
+            resp = client.retrieve('/platform/v1/plugins/interfaces/enabled')
+            cache.set(key, resp)
+        results = resp['data']
+        return results
+
+
+class WecubeServiceAttribute(object):
+    def list(self, filters=None, orders=None, offset=None, limit=None, hooks=None):
+        results = []
+        service_name = filters.get('serviceName', '') or ''
+        if not service_name:
+            raise exceptions.FieldRequired(
+                message=_('missing query param: %(attribute)s, eg. /v1/api?%(attribute)s=value') %
+                {'attribute': 'serviceName'})
+        client = wecube.WeCubeClient(CONF.wecube.base_url)
+        key = '/platform/v1/plugins/interfaces/enabled'
+        cached = cache.get(key, 15)
+        if cache.validate(cached):
+            resp = cached
+        else:
+            resp = client.retrieve('/platform/v1/plugins/interfaces/enabled')
+            cache.set(key, resp)
+        for interface in resp['data']:
+            if interface['serviceName'] == service_name:
+                for param in interface['inputParameters']:
+                    results.append({
+                        'type': param['dataType'],
+                        'name': param['name'],
+                        'value': 'inputParams.' + param['name']
+                    })
         return results

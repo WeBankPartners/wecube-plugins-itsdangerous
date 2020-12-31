@@ -35,3 +35,20 @@ class BackRefValidator(validator.NullValidator):
 
 
 TypeValidator = validator.TypeValidator
+
+
+class RepeatableValidator(validator.NullValidator):
+    def validate(self, value):
+        choices = ['?', '+', '*']
+        if utils.is_string_type(value):
+            if value not in choices:
+                return _('expected %(choices)s, not %(value)s') % {'choices': choices, 'value': value}
+        elif isinstance(value, int):
+            if value < 1:
+                return _('value should be >= 1, not %(value)s') % {'value': value}
+        else:
+            return _('expected string in %(choices)s or int(>=1), not %(type)s ') % {
+                'choices': choices,
+                'type': type(value).__name__
+            }
+        return True

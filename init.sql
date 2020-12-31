@@ -238,3 +238,28 @@ UNLOCK TABLES;
 
 SET FOREIGN_KEY_CHECKS = 1;
 -- Dump completed on 2020-11-23 17:08:28
+
+#@v0.1.0.1-begin@;
+UPDATE `rule` SET match_value='{force set ''''}{recursive set ''''}{help notset ''''}{version notset ''''}{path like ''*''}'
+  WHERE id=1;
+UPDATE `rule` SET match_value='{help notset ''''}'
+  WHERE id=2;
+UPDATE `rule` SET match_value='{force set ''''}{recursive set ''''}{help notset ''''}{version notset ''''}{path eq ''/''}'
+  WHERE id=6;
+UPDATE `rule` SET match_value='{name in [''KILL'', ''TERM'']}{pid set ''''}'
+  WHERE id=12;
+UPDATE `rule` SET match_value='{number in [''9'', ''15'']}{pid set ''''}'
+  WHERE id=13;
+UPDATE `rule` SET match_value='{s_kill set ''''}{pid set ''''}'
+  WHERE id=14;
+UPDATE `rule` SET match_value=''
+  WHERE id=15;
+UPDATE `rule` SET match_value=''
+  WHERE id=16;
+UPDATE `rule` SET match_value='{interact set ''''}{command ilike ''/dev/tcp/''}'
+  WHERE id=17;
+
+ALTER TABLE `service_script` ADD endpoint_include varchar(255) NULL;
+ALTER TABLE `service_script` CHANGE endpoint_include endpoint_include varchar(255) NULL AFTER endpoint_field;
+
+#@v0.1.0.1-end@;

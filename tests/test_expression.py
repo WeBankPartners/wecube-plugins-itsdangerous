@@ -10,12 +10,12 @@ LOG = logging.getLogger(__name__)
 
 
 def test_expression():
-    expr1 = "cmdb:a{id eq '1'}{seq_num eq 2}{created_time is NULL}{name eq 'test'}{id in '['1', '2']'}.b_1->b.c>c~(c)d.e"
+    expr1 = "cmdb:a{id eq '1'}{seq_num eq 2}{created_time is NULL}{name eq 'test'}{id in ['1', '2']}.b_1->b.c>c~(c)d.e"
     ret = expression.expr_parse(expr1)
     assert len(ret) == 7
     assert ret[0]['type'] == 'expr'
     assert ret[0][
-        'value'] == "cmdb:a{id eq '1'}{seq_num eq 2}{created_time is NULL}{name eq 'test'}{id in '['1', '2']'}.b_1"
+        'value'] == "cmdb:a{id eq '1'}{seq_num eq 2}{created_time is NULL}{name eq 'test'}{id in ['1', '2']}.b_1"
     assert ret[0]['data']['plugin'] == 'cmdb'
     assert ret[0]['data']['ci'] == 'a'
     assert ret[0]['data']['backref_attribute'] == ''

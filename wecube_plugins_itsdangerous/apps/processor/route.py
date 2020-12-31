@@ -15,6 +15,7 @@ def add_routes(api):
     # matchparam
     api.add_route('/itsdangerous/ui/v1/matchparams', controller.CollectionMatchParam())
     api.add_route('/itsdangerous/ui/v1/matchparams/{rid}', controller.ItemMatchParam())
+    api.add_route('/itsdangerous/ui/v1/matchparams/{rid}/args', controller.ItemMatchParamArgs())
     # subject
     api.add_route('/itsdangerous/ui/v1/subjects', controller.CollectionSubject())
     api.add_route('/itsdangerous/ui/v1/subjects/{rid}', controller.ItemSubject())
@@ -28,4 +29,9 @@ def add_routes(api):
     api.add_route('/itsdangerous/ui/v1/boxes', controller.CollectionBox())
     api.add_route('/itsdangerous/ui/v1/boxes/{rid}', controller.ItemBox())
     api.add_route('/itsdangerous/ui/v1/boxes/{rid}/run', controller.BoxRun())
+    # batch execution
     api.add_route('/itsdangerous/v1/batch_execution_detection', controller.PluginCheck())
+    # service
+    api.add_route('/itsdangerous/v1/platform/services', controller.WecubeService())
+    # service param
+    api.add_route('/itsdangerous/v1/platform/service-attributes', controller.WecubeServiceAttribute())
