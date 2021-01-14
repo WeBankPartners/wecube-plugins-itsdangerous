@@ -378,11 +378,14 @@ class Box(resource.Box):
         :rtype: see funcion check
         '''
         results = []
+        render_results = []
         clean_data = crud.ColumnValidator.get_clean_data(self.runall_rules, data, 'check')
         service = clean_data['serviceName']
         entity_instances = clean_data['entityInstances']
         input_params = clean_data['inputParams']
-        for input_param in input_params:
+        for index, input_param in enumerate(input_params):
+            associate_instances = [entity_instances[index]
+                                   ] if len(input_params) == len(entity_instances) else entity_instances
             detect_data = {
                 "operator": clean_data.get('operator', None),
                 'serviceName': service,
@@ -390,22 +393,26 @@ class Box(resource.Box):
                 'inputParams': input_param,
                 'scripts': ServiceScript().get_contents(service, input_param),
                 'entityType': clean_data.get('entityType', None),
-                'entityInstances': entity_instances
+                'entityInstances': associate_instances
             }
             input_results = self.check(detect_data)
             results.extend(input_results)
+            for input_result in input_results:
+                render_results.append((associate_instances, input_result))
         text_output = ''
-        if results:
+        if render_results:
             table = texttable.Texttable(max_width=120)
             # {
             # 'lineno': [start, end], 'level': level of rule,
             # 'content': content, 'message': rule name, 'script_name': script name
             # }
-            table.set_cols_align(["c", "l", "l", "l"])
-            table.set_cols_valign(["m", "m", "m", "m"])
-            table.header([_("Line"), _("Content"), _("Message"), _('Source Script')])
-            for ret in results:
+            table.set_cols_align(["l", "c", "l", "l", "l"])
+            table.set_cols_valign(["m", "m", "m", "m", "m"])
+            table.header([_("Instance Ids"), _("Line"), _("Content"), _("Message"), _('Source Script')])
+            for associate_instances, ret in render_results:
+                associate_ids = ','.join(['#' + str(inst.get('id', '')) for inst in associate_instances])
                 table.add_row([
+                    associate_ids,
                     '%s-%s' % (ret['lineno'][0], ret['lineno'][1]), ret['content'], ret['message'], ret['script_name']
                 ])
             text_output = table.draw()
