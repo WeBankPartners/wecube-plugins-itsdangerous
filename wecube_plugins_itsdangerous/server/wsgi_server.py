@@ -20,6 +20,7 @@ from talos.core import config
 
 from wecube_plugins_itsdangerous.common import utils as plugin_utils
 from wecube_plugins_itsdangerous.middlewares import auth
+from wecube_plugins_itsdangerous.middlewares import permission
 
 RSA_KEY_PATH = '/certs/rsa_key'
 
@@ -68,5 +69,5 @@ application = base.initialize_server('wecube_plugins_itsdangerous',
                                                     '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
                                      conf_dir=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
                                                              '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'),
-                                     middlewares=[auth.JWTAuth()])
+                                     middlewares=[auth.JWTAuth(), permission.Permission()])
 application.set_error_serializer(error_serializer)
