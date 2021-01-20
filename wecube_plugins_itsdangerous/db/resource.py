@@ -45,7 +45,10 @@ class MatchParam(MetaCRUD):
                              rule=my_validator.LengthValidator(0, 63),
                              validate_on=('create:O', 'update:O'),
                              nullable=True),
-        crud.ColumnValidator(field='type', rule_type='in', rule=['regex', 'cli'], validate_on=('create:M', 'update:O')),
+        crud.ColumnValidator(field='type',
+                             rule_type='in',
+                             rule=['regex', 'cli', 'cli_handover'],
+                             validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='params', rule=validator.TypeValidator(dict), validate_on=('create:M', 'update:O')),
         crud.ColumnValidator(field='created_by', validate_on=('create:O', 'update:O'), nullable=True),
         crud.ColumnValidator(field='created_time', validate_on=('create:O', 'update:O'), nullable=True),
@@ -86,7 +89,7 @@ class MatchParam(MetaCRUD):
 
     def _addtional_create(self, session, resource, created):
         super()._addtional_create(session, resource, created)
-        if created['type'] == 'cli':
+        if created['type'] in ('cli', 'cli_handover'):
             params = created['params']
             self.validate(params, 'create', rule=self._validate_params_cli)
             args = params['args']
@@ -95,7 +98,7 @@ class MatchParam(MetaCRUD):
 
     def _addtional_update(self, session, rid, resource, before_updated, after_updated):
         super()._addtional_update(session, rid, resource, before_updated, after_updated)
-        if after_updated['type'] == 'cli':
+        if after_updated['type'] in ('cli', 'cli_handover'):
             params = after_updated['params']
             self.validate(params, 'create', rule=self._validate_params_cli)
             args = params['args']

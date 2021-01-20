@@ -419,7 +419,7 @@ class Box(resource.Box):
             text_output = table.draw()
         return {'text': text_output, 'data': results}
 
-    def check(self, data, boxes=None, without_subject_test=False):
+    def check(self, data, boxes=None, without_subject_test=False, handover_match_params=None):
         '''check script & param with boxes, return dangerous contents & rule name
 
         :param data: data with param & script content
@@ -443,6 +443,8 @@ class Box(resource.Box):
         scripts = data['scripts']
         rules = self._get_rules(data, boxes=boxes, without_subject_test=without_subject_test)
         rules = self._rule_grouping(rules)
+        handover_match_params = MatchParam().list({'type': 'cli_handover'
+                                                   }) if handover_match_params is None else handover_match_params
         for item in scripts:
             script_name = item.get('name', '') or ''
             script_content = item.get('content', '') or ''
@@ -452,7 +454,7 @@ class Box(resource.Box):
                 if not script_type:
                     script_type = reader.guess(script_content) or 'text'
                 if key == 'cli' and script_type == 'shell':
-                    script_results = detector.BashCliDetector(script_content, values).check()
+                    script_results = detector.BashCliDetector(script_content, values, handover_match_params).check()
                 elif key == 'sql' and script_type == 'sql':
                     script_results = detector.SqlDetector(script_content, values).check()
                 elif key == 'text':
