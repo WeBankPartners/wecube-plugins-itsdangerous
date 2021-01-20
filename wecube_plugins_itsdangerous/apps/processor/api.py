@@ -419,7 +419,7 @@ class Box(resource.Box):
             text_output = table.draw()
         return {'text': text_output, 'data': results}
 
-    def check(self, data, boxes=None, without_subject_test=False):
+    def check(self, data, boxes=None, without_subject_test=False, handover_match_params=None):
         '''check script & param with boxes, return dangerous contents & rule name
 
         :param data: data with param & script content
@@ -443,7 +443,8 @@ class Box(resource.Box):
         scripts = data['scripts']
         rules = self._get_rules(data, boxes=boxes, without_subject_test=without_subject_test)
         rules = self._rule_grouping(rules)
-        handover_match_params = MatchParam().list({'type': 'cli_handover'})
+        handover_match_params = MatchParam().list({'type': 'cli_handover'
+                                                   }) if handover_match_params is None else handover_match_params
         for item in scripts:
             script_name = item.get('name', '') or ''
             script_content = item.get('content', '') or ''
