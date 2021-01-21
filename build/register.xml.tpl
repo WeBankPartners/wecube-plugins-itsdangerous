@@ -28,10 +28,7 @@
         <docker imageName="{{IMAGENAME}}" containerName="{{CONTAINERNAME}}" 
         portBindings="{{ALLOCATE_PORT}}:9000" 
         volumeBindings="/etc/localtime:/etc/localtime,{{BASE_MOUNT_PATH}}/itsdangerous/logs:/var/log/itsdangerous,{{BASE_MOUNT_PATH}}/certs:/certs" 
-        envVariables="ITSDANGEROUS_DB_USERNAME={{DB_USER}},ITSDANGEROUS_DB_PASSWORD={{DB_PWD}},
-        ITSDANGEROUS_DB_HOSTIP={{DB_HOST}},ITSDANGEROUS_DB_HOSTPORT={{DB_PORT}},ITSDANGEROUS_DB_SCHEMA={{DB_SCHEMA}},
-        GATEWAY_URL={{GATEWAY_URL}},JWT_SIGNING_KEY={{JWT_SIGNING_KEY}},
-        WECUBE_S3_ACCESS_KEY={{S3_ACCESS_KEY}},WECUBE_S3_SECRET_KEY={{S3_SECRET_KEY}}" />
+        envVariables="ITSDANGEROUS_DB_USERNAME={{DB_USER}},ITSDANGEROUS_DB_PASSWORD={{DB_PWD}},ITSDANGEROUS_DB_HOSTIP={{DB_HOST}},ITSDANGEROUS_DB_HOSTPORT={{DB_PORT}},ITSDANGEROUS_DB_SCHEMA={{DB_SCHEMA}},GATEWAY_URL={{GATEWAY_URL}},JWT_SIGNING_KEY={{JWT_SIGNING_KEY}},WECUBE_S3_ACCESS_KEY={{S3_ACCESS_KEY}},WECUBE_S3_SECRET_KEY={{S3_SECRET_KEY}}" />
         <mysql schema="itsdangerous" initFileName="init.sql" upgradeFileName="upgrade.sql" />
     </resourceDependencies>
 
