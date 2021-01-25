@@ -268,7 +268,11 @@ class Box(resource.Box):
     ]
 
     def _get_rules(self, data, boxes=None, without_subject_test=False):
-        boxes = boxes or self.list(filters={'policy.enabled': 1, 'subject.enabled': 1, 'enabled': 1})
+        boxes = boxes if boxes is not None else self.list(filters={
+            'policy.enabled': 1,
+            'subject.enabled': 1,
+            'enabled': 1
+        })
         rules = {}
         hasher = hashlib.sha256()
         hasher.update(json.dumps(data).encode('utf-8'))
@@ -366,10 +370,10 @@ class Box(resource.Box):
         :return: see function check
         :rtype: see function check
         '''
-        # check even box is diabled
-        filters = None
+        # check box is enabled
+        filters = {'policy.enabled': 1, 'subject.enabled': 1, 'enabled': 1}
         if boxes:
-            filters = {'id': boxes}
+            filters['id'] = boxes
         refs = self.list(filters)
         results = self.check(data, boxes=refs, without_subject_test=False)
         associate_instances = data['entityInstances']
