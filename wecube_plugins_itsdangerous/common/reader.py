@@ -19,7 +19,8 @@ def _guess_text_sql(text):
     name_between_bracket_re = re.compile(r'\[[a-zA-Z_]\w*\]')
     name_between_backtick_re = re.compile(r'`[a-zA-Z_]\w*`')
     name_command_re = re.compile(
-        r'(insert\s+into|update\s+.*\s+set|alter\s+table|create\s+table|select\s+.+\s+from|delete\s+from).+;', re.I)
+        r'(insert\s+into|update\s+.*\s+set|alter\s+table|create\s+table|drop\s+table|select\s+.+\s+from|delete\s+from).+;',
+        re.I)
     name_between_backtick_count = len(name_between_backtick_re.findall(text))
     name_between_bracket_count = len(name_between_bracket_re.findall(text))
     name_command_count = len(name_command_re.findall(text))
