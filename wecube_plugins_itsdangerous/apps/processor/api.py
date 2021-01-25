@@ -356,6 +356,23 @@ class Box(resource.Box):
             raise exceptions.NotFoundError(resource='Box')
         return self.check(data, boxes=refs, without_subject_test=True)
 
+    def script_check(self, data, boxes=None):
+        '''run boxes rule check
+
+        :param data: see function check
+        :type data: dict
+        :param boxes: box ids
+        :type boxes: list
+        :return: see function check
+        :rtype: see function check
+        '''
+        # check even box is diabled
+        filters = None
+        if boxes:
+            filters = {'id': boxes}
+        refs = self.list(filters)
+        return self.check(data, boxes=refs, without_subject_test=False)
+
     def plugin_check(self, data):
         '''run plugin params check
 
