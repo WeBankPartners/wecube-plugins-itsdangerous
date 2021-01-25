@@ -218,7 +218,8 @@ export default {
         v_select_configs: {
           typeOptions: [
             { label: 'regex', value: 'regex' },
-            { label: 'cli', value: 'cli' }
+            { label: 'cli', value: 'cli' },
+            { label: 'cli_handover', value: 'cli_handover' }
           ]
         }
       },
