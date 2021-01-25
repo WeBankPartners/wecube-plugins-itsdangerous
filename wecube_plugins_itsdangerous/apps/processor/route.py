@@ -32,7 +32,7 @@ def add_routes(api):
     # batch execution detection
     api.add_route('/itsdangerous/v1/batch_execution_detection', controller.PluginCheck())
     # script detection
-    api.add_route('/itsdangerous/v1/detection', controller.PluginCheck())
+    api.add_route('/itsdangerous/v1/detection', controller.ScriptCheck())
     # service
     api.add_route('/itsdangerous/v1/platform/services', controller.WecubeService())
     # service param

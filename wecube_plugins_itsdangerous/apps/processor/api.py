@@ -371,7 +371,27 @@ class Box(resource.Box):
         if boxes:
             filters = {'id': boxes}
         refs = self.list(filters)
-        return self.check(data, boxes=refs, without_subject_test=False)
+        results = self.check(data, boxes=refs, without_subject_test=False)
+        associate_instances = data['entityInstances']
+        text_output = ''
+        if results:
+            table = texttable.Texttable(max_width=120)
+            # {
+            # 'lineno': [start, end], 'level': level of rule,
+            # 'content': content, 'message': rule name, 'script_name': script name
+            # }
+            table.set_cols_align(["l", "c", "l", "l", "l"])
+            table.set_cols_valign(["m", "m", "m", "m", "m"])
+            table.header([_("Instance Ids"), _("Line"), _("Content"), _("Message"), _('Source Script')])
+            for ret in results:
+                associate_ids = ','.join([(inst.get('displayName', '') or '#' + str(inst.get('id', '')))
+                                          for inst in associate_instances])
+                table.add_row([
+                    associate_ids,
+                    '%s-%s' % (ret['lineno'][0], ret['lineno'][1]), ret['content'], ret['message'], ret['script_name']
+                ])
+            text_output = table.draw()
+        return {'text': text_output, 'data': results}
 
     def plugin_check(self, data):
         '''run plugin params check
