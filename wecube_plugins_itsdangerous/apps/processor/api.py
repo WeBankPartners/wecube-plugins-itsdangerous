@@ -493,9 +493,13 @@ class Box(resource.Box):
             for key, values in rules.items():
                 script_results = []
                 if not script_type:
-                    script_type = reader.guess(script_content) or 'text'
+                    script_type = reader.guess(script_content) or 'shell'
                 if key == 'cli' and script_type == 'shell':
-                    script_results = detector.BashCliDetector(script_content, values, handover_match_params).check()
+                    try:
+                        script_results = detector.BashCliDetector(script_content, values, handover_match_params).check()
+                    except Exception as e:
+                        LOG.exception(e)
+                        script_results = []
                 elif key == 'sql' and script_type == 'sql':
                     script_results = detector.SqlDetector(script_content, values).check()
                 elif key == 'text':

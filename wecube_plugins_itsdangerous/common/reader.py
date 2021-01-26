@@ -43,7 +43,7 @@ def _guess_text_shell(text):
     rating = 0
     name_begin_re = re.compile(r'^#!\s+/.*/(bash|zsh|sh|dash)')
     name_variable_re = re.compile(r'\${?[a-zA-Z_]\w*}?')
-    name_command_re = re.compile(r'^(cd|cat|awk|ps|sed|find|echo|mkdir|ls) ', re.MULTILINE)
+    name_command_re = re.compile(r'^\s*(cd|cat|awk|ps|sed|find|echo|mkdir|ls|rm) ', re.MULTILINE)
     name_command_like_re = re.compile(r'^(\./)?([a-zA-Z_]\w*[ \t]+)+([-]+[a-zA-Z0-9])+', re.MULTILINE)
     if name_begin_re.search(text):
         rating = 1.0
