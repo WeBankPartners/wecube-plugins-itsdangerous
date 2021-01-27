@@ -34,7 +34,7 @@ def decrypt_rsa(secret_key, encrypt_text):
 
 
 @config.intercept('db_username', 'db_password', 'db_hostip', 'db_hostport', 'db_schema', 'gateway_url', 's3_access_key',
-                  's3_secret_key', 'jwt_signing_key')
+                  's3_secret_key', 'jwt_signing_key', 'platform_timezone')
 def get_env_value(value, origin_value):
     prefix = 'ENV@'
     encrypt_prefix = 'RSA@'
