@@ -522,8 +522,8 @@ class WecubeService(object):
     def list(self, filters=None, orders=None, offset=None, limit=None, hooks=None):
         results = []
         client = wecube.WeCubeClient(CONF.wecube.base_url)
-        subsys_token = cache.get_or_create(TOKEN_KEY, client.login_subsystem, expires=600)
-        client.token = subsys_token
+        # subsys_token = cache.get_or_create(TOKEN_KEY, client.login_subsystem, expires=600)
+        # client.token = subsys_token
         key = '/platform/v1/plugins/interfaces/enabled'
         cached = cache.get(key, 15)
         if cache.validate(cached):
@@ -544,8 +544,8 @@ class WecubeServiceAttribute(object):
                 message=_('missing query param: %(attribute)s, eg. /v1/api?%(attribute)s=value') %
                 {'attribute': 'serviceName'})
         client = wecube.WeCubeClient(CONF.wecube.base_url)
-        subsys_token = cache.get_or_create(TOKEN_KEY, client.login_subsystem, expires=600)
-        client.token = subsys_token
+        # subsys_token = cache.get_or_create(TOKEN_KEY, client.login_subsystem, expires=600)
+        # client.token = subsys_token
         key = '/platform/v1/plugins/interfaces/enabled'
         cached = cache.get(key, 15)
         if cache.validate(cached):
