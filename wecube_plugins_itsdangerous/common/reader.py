@@ -19,7 +19,8 @@ def _guess_text_sql(text):
     name_between_bracket_re = re.compile(r'\[[a-zA-Z_]\w*\]')
     name_between_backtick_re = re.compile(r'`[a-zA-Z_]\w*`')
     name_command_re = re.compile(
-        r'(insert\s+into|update\s+.*\s+set|alter\s+table|create\s+table|select\s+.+\s+from|delete\s+from).+;', re.I)
+        r'(insert\s+into|update\s+.*\s+set|alter\s+table|create\s+table|drop\s+table|select\s+.+\s+from|delete\s+from).+;',
+        re.I)
     name_between_backtick_count = len(name_between_backtick_re.findall(text))
     name_between_bracket_count = len(name_between_bracket_re.findall(text))
     name_command_count = len(name_command_re.findall(text))
@@ -42,7 +43,7 @@ def _guess_text_shell(text):
     rating = 0
     name_begin_re = re.compile(r'^#!\s+/.*/(bash|zsh|sh|dash)')
     name_variable_re = re.compile(r'\${?[a-zA-Z_]\w*}?')
-    name_command_re = re.compile(r'^(cd|cat|awk|ps|sed|find|echo|mkdir|ls) ', re.MULTILINE)
+    name_command_re = re.compile(r'^\s*(cd|cat|awk|ps|sed|find|echo|mkdir|ls|rm) ', re.MULTILINE)
     name_command_like_re = re.compile(r'^(\./)?([a-zA-Z_]\w*[ \t]+)+([-]+[a-zA-Z0-9])+', re.MULTILINE)
     if name_begin_re.search(text):
         rating = 1.0

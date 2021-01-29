@@ -13,3 +13,5 @@ gevent
 pytz
 apscheduler
 texttable
+# for platform login encryption, apt install swig
+M2Crypto

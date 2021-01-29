@@ -15,7 +15,7 @@ from wecube_plugins_itsdangerous.common import wecube
 
 CONF = config.CONF
 LOG = logging.getLogger(__name__)
-WECUBE_TOKEN = 'wecube_platform_token'
+TOKEN_KEY = 'itsdangerous_subsystem_token'
 
 
 class JsonScope(object):
@@ -40,6 +40,8 @@ def wecube_expr_query(expr):
         LOG.debug('wecube_expr_query with %s' % expr)
         cost_start = datetime.datetime.now()
         client = wecube.WeCubeClient(base_url)
+        subsys_token = cache.get_or_create(TOKEN_KEY, client.login_subsystem, expires=600)
+        client.token = subsys_token
         resp = client.post(base_url + '/platform/v1/data-model/dme/integrated-query', {
             'dataModelExpression': expr,
             'filters': []

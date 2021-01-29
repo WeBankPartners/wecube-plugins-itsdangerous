@@ -26,6 +26,7 @@ from wecube_plugins_itsdangerous.db import validator as my_validator
 
 LOG = logging.getLogger(__name__)
 CONF = config.CONF
+TOKEN_KEY = 'itsdangerous_subsystem_token'
 
 
 def download_from_url(dir_path, url, random_name=False):
@@ -268,7 +269,11 @@ class Box(resource.Box):
     ]
 
     def _get_rules(self, data, boxes=None, without_subject_test=False):
-        boxes = boxes or self.list(filters={'policy.enabled': 1, 'subject.enabled': 1, 'enabled': 1})
+        boxes = boxes if boxes is not None else self.list(filters={
+            'policy.enabled': 1,
+            'subject.enabled': 1,
+            'enabled': 1
+        })
         rules = {}
         hasher = hashlib.sha256()
         hasher.update(json.dumps(data).encode('utf-8'))
@@ -356,6 +361,43 @@ class Box(resource.Box):
             raise exceptions.NotFoundError(resource='Box')
         return self.check(data, boxes=refs, without_subject_test=True)
 
+    def script_check(self, data, boxes=None):
+        '''run boxes rule check
+
+        :param data: see function check
+        :type data: dict
+        :param boxes: box ids
+        :type boxes: list
+        :return: see function check
+        :rtype: see function check
+        '''
+        # check box is enabled
+        filters = {'policy.enabled': 1, 'subject.enabled': 1, 'enabled': 1}
+        if boxes:
+            filters['id'] = boxes
+        refs = self.list(filters)
+        results = self.check(data, boxes=refs, without_subject_test=False)
+        associate_instances = data['entityInstances']
+        text_output = ''
+        if results:
+            table = texttable.Texttable(max_width=120)
+            # {
+            # 'lineno': [start, end], 'level': level of rule,
+            # 'content': content, 'message': rule name, 'script_name': script name
+            # }
+            table.set_cols_align(["l", "c", "l", "l", "l"])
+            table.set_cols_valign(["m", "m", "m", "m", "m"])
+            table.header([_("Instance Ids"), _("Line"), _("Content"), _("Message"), _('Source Script')])
+            for ret in results:
+                associate_ids = ','.join([(inst.get('displayName', '') or '#' + str(inst.get('id', '')))
+                                          for inst in associate_instances])
+                table.add_row([
+                    associate_ids,
+                    '%s-%s' % (ret['lineno'][0], ret['lineno'][1]), ret['content'], ret['message'], ret['script_name']
+                ])
+            text_output = table.draw()
+        return {'text': text_output, 'data': results}
+
     def plugin_check(self, data):
         '''run plugin params check
 
@@ -378,11 +420,14 @@ class Box(resource.Box):
         :rtype: see funcion check
         '''
         results = []
+        render_results = []
         clean_data = crud.ColumnValidator.get_clean_data(self.runall_rules, data, 'check')
         service = clean_data['serviceName']
         entity_instances = clean_data['entityInstances']
         input_params = clean_data['inputParams']
-        for input_param in input_params:
+        for index, input_param in enumerate(input_params):
+            associate_instances = [entity_instances[index]
+                                   ] if len(input_params) == len(entity_instances) else entity_instances
             detect_data = {
                 "operator": clean_data.get('operator', None),
                 'serviceName': service,
@@ -390,28 +435,33 @@ class Box(resource.Box):
                 'inputParams': input_param,
                 'scripts': ServiceScript().get_contents(service, input_param),
                 'entityType': clean_data.get('entityType', None),
-                'entityInstances': entity_instances
+                'entityInstances': associate_instances
             }
             input_results = self.check(detect_data)
             results.extend(input_results)
+            for input_result in input_results:
+                render_results.append((associate_instances, input_result))
         text_output = ''
-        if results:
+        if render_results:
             table = texttable.Texttable(max_width=120)
             # {
             # 'lineno': [start, end], 'level': level of rule,
             # 'content': content, 'message': rule name, 'script_name': script name
             # }
-            table.set_cols_align(["c", "l", "l", "l"])
-            table.set_cols_valign(["m", "m", "m", "m"])
-            table.header([_("Line"), _("Content"), _("Message"), _('Source Script')])
-            for ret in results:
+            table.set_cols_align(["l", "c", "l", "l", "l"])
+            table.set_cols_valign(["m", "m", "m", "m", "m"])
+            table.header([_("Instance Ids"), _("Line"), _("Content"), _("Message"), _('Source Script')])
+            for associate_instances, ret in render_results:
+                associate_ids = ','.join([(inst.get('displayName', '') or '#' + str(inst.get('id', '')))
+                                          for inst in associate_instances])
                 table.add_row([
+                    associate_ids,
                     '%s-%s' % (ret['lineno'][0], ret['lineno'][1]), ret['content'], ret['message'], ret['script_name']
                 ])
             text_output = table.draw()
         return {'text': text_output, 'data': results}
 
-    def check(self, data, boxes=None, without_subject_test=False):
+    def check(self, data, boxes=None, without_subject_test=False, handover_match_params=None):
         '''check script & param with boxes, return dangerous contents & rule name
 
         :param data: data with param & script content
@@ -435,6 +485,8 @@ class Box(resource.Box):
         scripts = data['scripts']
         rules = self._get_rules(data, boxes=boxes, without_subject_test=without_subject_test)
         rules = self._rule_grouping(rules)
+        handover_match_params = MatchParam().list({'type': 'cli_handover'
+                                                   }) if handover_match_params is None else handover_match_params
         for item in scripts:
             script_name = item.get('name', '') or ''
             script_content = item.get('content', '') or ''
@@ -442,9 +494,13 @@ class Box(resource.Box):
             for key, values in rules.items():
                 script_results = []
                 if not script_type:
-                    script_type = reader.guess(script_content) or 'text'
+                    script_type = reader.guess(script_content) or 'shell'
                 if key == 'cli' and script_type == 'shell':
-                    script_results = detector.BashCliDetector(script_content, values).check()
+                    try:
+                        script_results = detector.BashCliDetector(script_content, values, handover_match_params).check()
+                    except Exception as e:
+                        LOG.exception(e)
+                        script_results = []
                 elif key == 'sql' and script_type == 'sql':
                     script_results = detector.SqlDetector(script_content, values).check()
                 elif key == 'text':
@@ -466,6 +522,8 @@ class WecubeService(object):
     def list(self, filters=None, orders=None, offset=None, limit=None, hooks=None):
         results = []
         client = wecube.WeCubeClient(CONF.wecube.base_url)
+        # subsys_token = cache.get_or_create(TOKEN_KEY, client.login_subsystem, expires=600)
+        # client.token = subsys_token
         key = '/platform/v1/plugins/interfaces/enabled'
         cached = cache.get(key, 15)
         if cache.validate(cached):
@@ -486,6 +544,8 @@ class WecubeServiceAttribute(object):
                 message=_('missing query param: %(attribute)s, eg. /v1/api?%(attribute)s=value') %
                 {'attribute': 'serviceName'})
         client = wecube.WeCubeClient(CONF.wecube.base_url)
+        # subsys_token = cache.get_or_create(TOKEN_KEY, client.login_subsystem, expires=600)
+        # client.token = subsys_token
         key = '/platform/v1/plugins/interfaces/enabled'
         cached = cache.get(key, 15)
         if cache.validate(cached):

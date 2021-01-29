@@ -105,6 +105,16 @@ class PluginCheck(controller.Controller):
         return self.make_resource(req).plugin_check(data, **kwargs)
 
 
+class ScriptCheck(controller.Controller):
+    allow_methods = ('POST', )
+    name = 'wecube_plugins_itsdangerous.processor.box.script_check'
+    resource = processor_api.Box
+
+    def create(self, req, data, **kwargs):
+        criteria = self._build_criteria(req)
+        return self.make_resource(req).script_check(data, boxes=criteria['filters'].get('boxes', None), **kwargs)
+
+
 class WecubeService(controller.Collection):
     allow_methods = ('GET', )
     name = 'wecube_plugins_itsdangerous.processor.wecube.services'

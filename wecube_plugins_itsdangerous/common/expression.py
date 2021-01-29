@@ -80,6 +80,10 @@ def expr_filter_parse(expr_filter):
                 elif filter_op == 'isnot':
                     filter_op = 'notnull'
                     filter_val = None
+                elif filter_op == 'set':
+                    filter_val = None
+                elif filter_op == 'notset':
+                    filter_val = None
                 elif filter_op in ('in', 'notin', 'nin'):
                     # TODO: fix this, replace is not good enough
                     filter_val = json.loads(filter_val.replace("'", '"'))
