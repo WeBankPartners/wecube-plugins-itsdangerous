@@ -7,6 +7,8 @@ wecube_plugins_itsdangerous.common.wecube
 
 """
 import logging
+import base64
+import random
 
 from talos.common import cache
 from talos.core import config
@@ -18,22 +20,25 @@ from wecube_plugins_itsdangerous.common import utils
 
 LOG = logging.getLogger(__name__)
 CONF = config.CONF
-WECUBE_TOKEN = 'wecube_platform_token'
+TOKEN_KEY = 'itsdangerous_subsystem_token'
 
 
 def get_wecube_token(base_url=None):
     base_url = base_url or CONF.wecube.base_url
     token = talos_utils.get_attr(scoped_globals.GLOBALS, 'request.auth_token') or CONF.wecube.token
-    if not CONF.wecube.use_token:
-        token = cache.get(WECUBE_TOKEN)
-        if not cache.validate(token):
-            token = utils.RestfulJson.post(base_url + '/auth/v1/api/login',
-                                           json={
-                                               "username": CONF.wecube.username,
-                                               "password": CONF.wecube.password
-                                           }).json()['data'][1]['token']
-            cache.set(WECUBE_TOKEN, token)
     return token
+
+
+def encrypt(message, rsa_key):
+    import M2Crypto.RSA
+    template = '''-----BEGIN PRIVATE KEY-----
+%s
+-----END PRIVATE KEY-----'''
+    key_pem = template % rsa_key
+    privat_key = M2Crypto.RSA.load_key_string(key_pem.encode())
+    ciphertext = privat_key.private_encrypt(message.encode(), M2Crypto.RSA.pkcs1_padding)
+    encrypted_message = base64.b64encode(ciphertext).decode()
+    return encrypted_message
 
 
 class WeCubeClient(object):
@@ -52,6 +57,28 @@ class WeCubeClient(object):
                 if 'message' in resp_json['data'][0]:
                     raise exceptions.PluginError(message=resp_json['data'][0]['message'])
             raise exceptions.PluginError(message=resp_json['message'])
+
+    def login_subsystem(self, set_self=True):
+        '''client = WeCubeClient('http://ip:port', None)
+           token = client.login_subsystem()
+           # use your access token
+        '''
+        sequence = 'abcdefghijklmnopqrstuvwxyz1234567890'
+        nonce = ''.join(random.choices(sequence, k=4))
+        url = self.server + '/auth/v1/api/login'
+        password = encrypt('%s:%s' % (CONF.wecube.sub_system_code, nonce), CONF.wecube.sub_system_key)
+        data = {
+            "password": password,
+            "username": CONF.wecube.sub_system_code,
+            "nonce": nonce,
+            "clientType": "SUB_SYSTEM"
+        }
+        resp_json = self.post(url, data)
+        for token in resp_json['data']:
+            if token['tokenType'] == 'accessToken':
+                if set_self:
+                    self.token = token['token']
+                return token['token']
 
     def get(self, url, param=None):
         LOG.info('GET %s', url)
