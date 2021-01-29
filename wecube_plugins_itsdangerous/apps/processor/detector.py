@@ -40,7 +40,7 @@ class JsonFilterDetector(object):
 
 
 class BashCliDetector(object):
-    def __init__(self, content, rules):
+    def __init__(self, content, rules, handover_match_params=None):
         '''
         :param content: script content
         :param rules: [{db.model.rule}]
@@ -60,17 +60,37 @@ class BashCliDetector(object):
             m_param['name'] = cli_param['name']
             m_param['opt_strip_path'] = cli_param.get('opt_strip_path', False)
             m_param['simulator'] = clisimulator.Simulator(cli_param['args'])
+        handover_match_params = handover_match_params or []
+        # parse handover type of match_param
+        self.handover_parsers = []
+        for match_param in handover_match_params:
+            cli_param = match_param['params']
+            m_param = {}
+            m_param['name'] = cli_param['name']
+            m_param['opt_strip_path'] = cli_param.get('opt_strip_path', False)
+            # m_param['simulator'] = clisimulator.Simulator(cli_param['args'])
+            self.handover_parsers.append(m_param)
 
     def _command_equal(self, cmd, parser):
         if parser['opt_strip_path']:
             return parser['name'] == os.path.basename(cmd)
         return parser['name'] == cmd
 
+    def _command_handover(self, tokens):
+        cmd, args = tokens[0], tokens[1:]
+        if len(args) >= 1:
+            for parser in self.handover_parsers:
+                if self._command_equal(cmd, parser):
+                    return args
+        return tokens
+
     def check(self):
         results = []
         stream = self.reader(self.content)
         for lineno, tokens in stream.iter():
             if tokens:
+                origin_tokens = tokens
+                tokens = self._command_handover(tokens)
                 cmd, args = tokens[0], tokens[1:]
                 for rule in self.rules:
                     r_name = rule['name']
@@ -83,20 +103,21 @@ class BashCliDetector(object):
                         r_filters = expression.expr_filter_parse(rule['match_value'])
                     if rule['match_param_id'] in self.parsers and self._command_equal(
                             cmd, self.parsers[rule['match_param_id']]):
-                        sim = self.parsers[rule['match_param_id']]['simulator']
+                        parser = self.parsers[rule['match_param_id']]
+                        sim = parser['simulator']
                         # command equal & empty filter means YES
                         if not r_filters:
                             results.append({
                                 'lineno': lineno,
                                 'level': r_level,
-                                'content': ' '.join(tokens),
+                                'content': ' '.join(origin_tokens),
                                 'message': r_name
                             })
                         elif sim.check(args, r_filters):
                             results.append({
                                 'lineno': lineno,
                                 'level': r_level,
-                                'content': ' '.join(tokens),
+                                'content': ' '.join(origin_tokens),
                                 'message': r_name
                             })
         return results

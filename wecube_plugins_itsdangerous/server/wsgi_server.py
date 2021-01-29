@@ -20,6 +20,7 @@ from talos.core import config
 
 from wecube_plugins_itsdangerous.common import utils as plugin_utils
 from wecube_plugins_itsdangerous.middlewares import auth
+from wecube_plugins_itsdangerous.middlewares import permission
 
 RSA_KEY_PATH = '/certs/rsa_key'
 
@@ -33,7 +34,7 @@ def decrypt_rsa(secret_key, encrypt_text):
 
 
 @config.intercept('db_username', 'db_password', 'db_hostip', 'db_hostport', 'db_schema', 'gateway_url', 's3_access_key',
-                  's3_secret_key', 'jwt_signing_key')
+                  's3_secret_key', 'jwt_signing_key', 'platform_timezone', 'sub_system_code', 'sub_system_key')
 def get_env_value(value, origin_value):
     prefix = 'ENV@'
     encrypt_prefix = 'RSA@'
@@ -68,5 +69,5 @@ application = base.initialize_server('wecube_plugins_itsdangerous',
                                                     '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
                                      conf_dir=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
                                                              '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'),
-                                     middlewares=[auth.JWTAuth()])
+                                     middlewares=[auth.JWTAuth(), permission.Permission()])
 application.set_error_serializer(error_serializer)
