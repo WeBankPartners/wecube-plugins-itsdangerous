@@ -17,6 +17,10 @@ from Crypto.PublicKey import RSA
 from talos.server import base
 from talos.core import utils
 from talos.core import config
+from talos.middlewares import lazy_init
+from talos.middlewares import json_translator
+from talos.middlewares import limiter
+from talos.middlewares import globalvars
 
 from wecube_plugins_itsdangerous.common import utils as plugin_utils
 from wecube_plugins_itsdangerous.middlewares import auth
@@ -70,5 +74,13 @@ application = base.initialize_server('wecube_plugins_itsdangerous',
                                                     '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
                                      conf_dir=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
                                                              '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'),
-                                     middlewares=[language.Language(), auth.JWTAuth(), permission.Permission()])
+                                     middlewares=[
+                                         language.Language(),
+                                         globalvars.GlobalVars(),
+                                         json_translator.JSONTranslator(),
+                                         lazy_init.LazyInit(limiter.Limiter),
+                                         auth.JWTAuth(),
+                                         permission.Permission()
+                                     ],
+                                     override_middlewares=True)
 application.set_error_serializer(error_serializer)
