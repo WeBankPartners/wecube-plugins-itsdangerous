@@ -19,172 +19,172 @@ msgstr ""
 
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:92
 msgid "failed to acquire lock, package cache may not be available"
-msgstr ""
+msgstr "获取锁失败，包文件缓存可能无法正常使用"
 
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:390
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:453
 msgid "Instance Ids"
-msgstr ""
+msgstr "实例"
 
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:390
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:453
 msgid "Line"
-msgstr ""
+msgstr "行"
 
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:390
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:453
 msgid "Content"
-msgstr ""
+msgstr "内容"
 
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:390
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:453
 msgid "Message"
-msgstr ""
+msgstr "消息"
 
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:390
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:453
-msgid "Source Script"
+msgid "源文件"
 msgstr ""
 
 #: ../wecube_plugins_itsdangerous/apps/processor/api.py:544
 #, python-format
 msgid "missing query param: %(attribute)s, eg. /v1/api?%(attribute)s=value"
-msgstr ""
+msgstr "缺少qeury参数: %(attribute)s, 例如 /v1/api?%(attribute)s=value"
 
 #: ../wecube_plugins_itsdangerous/common/controller.py:44
 #: ../wecube_plugins_itsdangerous/common/controller.py:62
 #: ../wecube_plugins_itsdangerous/common/controller.py:91
 msgid "data must be list type"
-msgstr ""
+msgstr "data必须是列表([])类型"
 
 #: ../wecube_plugins_itsdangerous/common/controller.py:124
 msgid "data must be dict type"
-msgstr ""
+msgstr "data必须是字典({})类型"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:30
 msgid "Plugin Business Processing Error"
-msgstr ""
+msgstr "插件业务处理错误"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:40
 msgid "Field Missing"
-msgstr ""
+msgstr "字段缺失"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:44
 #, python-format
 msgid "column: %(attribute)s must be specific"
-msgstr ""
+msgstr "必须指定 %(attribute)s 列的值"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:54
 msgid "Validation Error"
-msgstr ""
+msgstr "校验错误"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:58
 #, python-format
 msgid "column %(attribute)s validate failed, because: %(msg)s"
-msgstr ""
+msgstr "列 %(attribute)s 校验错误, 原因: %(msg)s"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:74
 #, python-format
 msgid "the resource(%(resource)s) you request not found"
-msgstr ""
+msgstr "资源(%(resource)s) 不存在"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:84
 msgid "Batch Operation Partial Error"
-msgstr ""
+msgstr "批量操作错误"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:88
 #, python-format
 msgid "fail to %(action)s [%(num)s] record, detail error in the data block"
-msgstr ""
+msgstr "[%(num)s] 个记录%(action)s失败, 详细信息请参见data内容"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:98
 msgid "Conflict"
-msgstr ""
+msgstr "冲突"
 
 #: ../wecube_plugins_itsdangerous/common/exceptions.py:102
 #, python-format
 msgid "object[%(oid)s] is used by %(name)s"
-msgstr ""
+msgstr "资源[%(oid)s] 被 %(name)s 使用"
 
 #: ../wecube_plugins_itsdangerous/common/s3.py:32
 msgid "invalid s3 endpoint url, eg: schema://host[:port]/bucket/object"
-msgstr ""
+msgstr "非法的s3 url, 正确格式如: schema://host[:port]/bucket/object"
 
 #: ../wecube_plugins_itsdangerous/common/s3.py:48
 #, python-format
 msgid "failed to download file[%(filepath)s] from s3: %(reason)s"
-msgstr ""
+msgstr "从s3下载文件[%(filepath)s]失败， %(reason)s"
 
 #: ../wecube_plugins_itsdangerous/common/utils.py:94
 msgid "Connection Error"
-msgstr ""
+msgstr "连接错误"
 
 #: ../wecube_plugins_itsdangerous/common/utils.py:95
 msgid "Failed to establish a new connection"
-msgstr ""
+msgstr "无法建立连接"
 
 #: ../wecube_plugins_itsdangerous/common/utils.py:101
 msgid "Timeout Error"
-msgstr ""
+msgstr "超时错误"
 
 #: ../wecube_plugins_itsdangerous/common/utils.py:102
 msgid "Server do not respond"
-msgstr ""
+msgstr "服务器无响应"
 
 #: ../wecube_plugins_itsdangerous/common/utils.py:111
 msgid "Not Found"
-msgstr ""
+msgstr "资源不存在"
 
 #: ../wecube_plugins_itsdangerous/common/utils.py:112
 msgid "The resource you request not exist"
-msgstr ""
+msgstr "你请求的资源不存在"
 
 #: ../wecube_plugins_itsdangerous/common/utils.py:126
 msgid "Server Error"
-msgstr ""
+msgstr "服务器错误"
 
 #: ../wecube_plugins_itsdangerous/db/resource.py:23
 #: ../wecube_plugins_itsdangerous/db/validator.py:33
 #, python-format
 msgid "reference of %(resource)s(%(id)s) not found"
-msgstr ""
+msgstr "引用的资源 %(resource)s(%(id)s) 不存在"
 
 #: ../wecube_plugins_itsdangerous/db/resource.py:230
 #: ../wecube_plugins_itsdangerous/db/resource.py:236
 #, python-format
 msgid "%(value)s is not acceptable, use %(fixed_value)s instead"
-msgstr ""
+msgstr "非法值：%(value)s, 请使用 %(fixed_value)s 之一"
 
 #: ../wecube_plugins_itsdangerous/db/resource.py:449
 msgid "specify at least one field content"
-msgstr ""
+msgstr "至少指定一个字段：脚本字段 或 脚本地址"
 
 #: ../wecube_plugins_itsdangerous/db/validator.py:17
 #, python-format
 msgid "expected string, not %(type)s "
-msgstr ""
+msgstr "期望字符串类型，当前输入类型为 %(type)s"
 
 #: ../wecube_plugins_itsdangerous/db/validator.py:20
 #, python-format
 msgid "length required: %(min)d <= %(value)d <= %(max)d"
-msgstr ""
+msgstr "非法长度: %(min)d <= %(value)d <= %(max)d"
 
 #: ../wecube_plugins_itsdangerous/db/validator.py:45
 #, python-format
 msgid "expected %(choices)s, not %(value)s"
-msgstr ""
+msgstr "期望值为 %(choices)s，当前输入为 %(value)s"
 
 #: ../wecube_plugins_itsdangerous/db/validator.py:48
 #, python-format
 msgid "value should be >= 1, not %(value)s"
-msgstr ""
+msgstr "值应 >= 1, 当前值为 %(value)s"
 
 #: ../wecube_plugins_itsdangerous/db/validator.py:50
 #, python-format
 msgid "expected string in %(choices)s or int(>=1), not %(type)s "
-msgstr ""
+msgstr "期望值为 %(choices)s 或 >= 1的整数，当前输入为 %(type)s"
 
 #: talos ValidationError
 #, python-format
 msgid "detail: column %(attribute)s validate failed, because: %(msg)s"
-msgstr ""
+msgstr "列 %(attribute)s 校验不通过, 原因: %(msg)s"
