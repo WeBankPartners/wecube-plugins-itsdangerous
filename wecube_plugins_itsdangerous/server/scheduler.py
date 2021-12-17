@@ -21,6 +21,7 @@ from talos.core import logging as mylogger
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor
+from wecube_plugins_itsdangerous.server.wsgi_server import application
 
 CONF = config.CONF
 LOG = logging.getLogger(__name__)
@@ -93,20 +94,10 @@ def rotate_log():
 
 
 def main():
-    config.setup(os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF',
-                                '/etc/itsdangerous/wecube_plugins_itsdangerous.conf'),
-                 dir_path=os.environ.get('WECUBE_PLUGINS_ITSDANGEROUS_CONF_DIR',
-                                         '/etc/itsdangerous/wecube_plugins_itsdangerous.conf.d'))
-    mylogger.setup()
     tz_info = timezone(CONF.timezone)
     try:
         if CONF.platform_timezone:
-            prefix = 'ENV@'
-            value = CONF.platform_timezone
-            if value.startswith(prefix):
-                env_name = value[len(prefix):]
-                value = os.getenv(env_name, default='')
-            tz_info = timezone(value)
+            tz_info = timezone(CONF.platform_timezone)
     except Exception as e:
         LOG.exception(e)
     scheduler = BlockingScheduler(jobstores=jobstores,
