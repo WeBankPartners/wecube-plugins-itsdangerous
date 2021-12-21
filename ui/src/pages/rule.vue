@@ -586,7 +586,7 @@ export default {
     },
     deleteConfirmModal (rowData) {
       this.$Modal.confirm({
-        title: rowData.name,
+        title: this.$t('delete_confirm') + new Option(rowData.name).innerHTML,
         'z-index': 1000000,
         onOk: async () => {
           const { status, message } = await deleteTableRow(this.pageConfig.CRUD, rowData.id)
