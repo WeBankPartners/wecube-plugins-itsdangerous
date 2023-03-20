@@ -21,6 +21,7 @@ from talos.middlewares import lazy_init
 from talos.middlewares import json_translator
 from talos.middlewares import limiter
 from talos.middlewares import globalvars
+from urllib.parse import quote_plus
 
 from wecube_plugins_itsdangerous.common import utils as plugin_utils
 from wecube_plugins_itsdangerous.middlewares import auth
@@ -38,7 +39,7 @@ def decrypt_rsa(secret_key, encrypt_text):
     return text.decode('utf-8')
 
 
-@config.intercept('db_username', 'db_password', 'db_hostip', 'db_hostport', 'db_schema', 'gateway_url', 's3_access_key',
+@config.intercept('db_username', 'db_hostip', 'db_hostport', 'db_schema', 'gateway_url', 's3_access_key',
                   's3_secret_key', 'jwt_signing_key', 'platform_timezone', 'sub_system_code', 'sub_system_key', 'log_level')
 def get_env_value(value, origin_value):
     prefix = 'ENV@'
@@ -54,6 +55,26 @@ def get_env_value(value, origin_value):
             else:
                 raise ValueError('keys with "RSA@", but rsa_key file not exists')
         return new_value
+    return value
+
+
+@config.intercept('db_password')
+def get_env_value(value, origin_value):
+    prefix = 'ENV@'
+    encrypt_prefix = 'RSA@'
+    if value.startswith(prefix):
+        env_name = value[len(prefix):]
+        new_value = os.getenv(env_name, default='')
+        if new_value.startswith(encrypt_prefix):
+            certs_path = RSA_KEY_PATH
+            if os.path.exists(certs_path) and os.path.isfile(certs_path):
+                with open(certs_path) as f:
+                    new_value = decrypt_rsa(f.read(), new_value[len(encrypt_prefix):])
+            else:
+                raise ValueError('keys with "RSA@", but rsa_key file not exists')
+        new_value = quote_plus(new_value)
+        return new_value
+    value = quote_plus(value)
     return value
 
 
