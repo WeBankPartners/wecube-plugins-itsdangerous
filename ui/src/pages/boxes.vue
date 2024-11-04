@@ -40,6 +40,11 @@
         </div>
         <DangerousPageTable :pageConfig="exectPageConfig"></DangerousPageTable>
       </template>
+      <template #footer>
+        <div style="text-align: right;">
+          <Button @click="detectConfigCancel" type="primary" ghost>{{ $t('button.cancel') }}</Button>
+        </div>
+      </template>
     </ModalComponent>
   </div>
 </template>
@@ -232,7 +237,8 @@ export default {
             disabled: false,
             type: 'textarea'
           },
-          { name: 'detectBtn', type: 'slot' }
+          { name: 'detectBtn', type: 'slot' },
+          { name: 'footer', type: 'slot' }
         ],
         addRow: {
           // [通用]-保存用户新增、编辑时数据
@@ -273,6 +279,9 @@ export default {
       this.exectPageConfig.table.tableData = []
       this.detectConfig.addRow.name = rowData.name
       this.$root.JQ('#detect_Modal').modal('show')
+    },
+    detectConfigCancel () {
+      this.$root.JQ('#detect_Modal').modal('hide')
     },
     async exectDetect () {
       this.exectPageConfig.table.tableData = []
