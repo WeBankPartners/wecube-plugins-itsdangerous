@@ -33,7 +33,7 @@ job_defaults = {'coalesce': False, 'max_instances': 1}
 
 def cleanup_cached_dir():
     try:
-        max_delta = 24 * 60 * 60
+        max_delta = 1 * 60 * 60
         base_dir = CONF.pakcage_cache_dir
         if os.path.exists(base_dir):
             for name in list(os.listdir(base_dir)):
