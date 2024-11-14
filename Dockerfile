@@ -19,6 +19,7 @@ RUN apt update && apt-get -y install gcc python3-dev swig libssl-dev && \
 # Use app:app to run gunicorn
 RUN mkdir -p /etc/itsdangerous/
 RUN mkdir -p /var/log/itsdangerous/
+RUN mkdir -p /tmp/artifacts/
 COPY etc /etc/itsdangerous
 # RUN adduser --disabled-password app
 # RUN chown -R app:app /etc/itsdangerous/
