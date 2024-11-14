@@ -110,7 +110,7 @@ def main():
                                   executors=executors,
                                   job_defaults=job_defaults,
                                   timezone=tz_info)
-    scheduler.add_job(cleanup_cached_dir, 'cron', hour='*')
+    scheduler.add_job(cleanup_cached_dir, 'cron', minute="*/5")
     scheduler.add_job(rotate_log, 'cron', hour=3, minute=5)
     try:
         scheduler.start()
