@@ -29,9 +29,9 @@ def add_routes(api):
     api.add_route('/itsdangerous/ui/v1/boxes', controller.CollectionBox())
     api.add_route('/itsdangerous/ui/v1/boxes/{rid}', controller.ItemBox())
     api.add_route('/itsdangerous/ui/v1/boxes/{rid}/run', controller.BoxRun())
-    # batch execution detection
+    # batch execution detection for platform batch & workflow
     api.add_route('/itsdangerous/v1/batch_execution_detection', controller.PluginCheck())
-    # script detection
+    # script detection for terminal plugin[Need to manually assemble the scripts field]
     api.add_route('/itsdangerous/v1/detection', controller.ScriptCheck())
     # service
     api.add_route('/itsdangerous/v1/platform/services', controller.WecubeService())

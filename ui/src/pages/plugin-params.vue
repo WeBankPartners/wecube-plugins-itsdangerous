@@ -7,9 +7,9 @@
           <label class="col-md-2 label-name">{{ $t('hr_service_name') }}:</label>
           <Select v-model="modelConfig.addRow.service" @on-change="changeService" filterable style="width: 338px">
             <Option
-              v-for="service in modelConfig.v_select_configs.serviceNameOptions"
+              v-for="(service, index) in modelConfig.v_select_configs.serviceNameOptions"
               :value="service.serviceName"
-              :key="service.serviceName"
+              :key="service.serviceName + index"
               >{{ service.serviceName }}</Option
             >
           </Select>

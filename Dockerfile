@@ -1,8 +1,8 @@
-FROM python:3.7-slim
+FROM python:3.8-slim-buster
 LABEL maintainer = "Webank CTB Team"
 # Install logrotate
-RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
-RUN sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+RUN sed -i 's/deb.debian.org/mirrors.tencentyun.com/g' /etc/apt/sources.list
+RUN sed -i 's/security.debian.org/mirrors.tencentyun.com/g' /etc/apt/sources.list
 # RUN apt update && apt -y install --no-install-recommends logrotate
 # Copy logrotate configuration
 # COPY build/logrotate.d/itsdangerous /etc/logrotate.d/
@@ -11,7 +11,7 @@ COPY requirements.txt /tmp/requirements.txt
 COPY dist/* /tmp/
 # Install && Clean up
 RUN apt update && apt-get -y install gcc python3-dev swig libssl-dev && \
-    pip3 install -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com -r /tmp/requirements.txt && \
+    pip3 install -i http://mirrors.tencentyun.com/pypi/simple/ --trusted-host mirrors.tencentyun.com -r /tmp/requirements.txt && \
     pip3 install /tmp/*.whl && \
     rm -rf /root/.cache && apt autoclean && \
     rm -rf /tmp/* /var/lib/apt/* /var/cache/* && \
@@ -19,6 +19,7 @@ RUN apt update && apt-get -y install gcc python3-dev swig libssl-dev && \
 # Use app:app to run gunicorn
 RUN mkdir -p /etc/itsdangerous/
 RUN mkdir -p /var/log/itsdangerous/
+RUN mkdir -p /tmp/artifacts/
 COPY etc /etc/itsdangerous
 # RUN adduser --disabled-password app
 # RUN chown -R app:app /etc/itsdangerous/
