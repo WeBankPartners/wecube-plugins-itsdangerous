@@ -9,7 +9,6 @@ build: clean
 	pip3 install wheel
 	python3 setup.py bdist_wheel
 	cd ui && npm --registry https://mirrors.cloud.tencent.com/npm/ install --unsafe-perm
-	cd ui && npm rebuild node-sass
 	cd ui && npm run plugin
 
 image: build
