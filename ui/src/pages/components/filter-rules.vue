@@ -33,12 +33,12 @@
                 @paste="pastePathExp($event)"
               />
             </li>
-            <li class v-if="pathList.length > 0" style="color: #ed4014" @click="deleteCurrentNode">
+            <li class v-if="pathList.length > 0" style="color: #FF4D4F" @click="deleteCurrentNode">
               {{ $t('delete_node') }}
             </li>
             <li
               class
-              style="color: #2d8cf0"
+              style="color: #5384FF"
               v-if="pathList.length > 0 && currentNode.nodeType === 'entity'"
               @click="addFilterRuleForCurrentNode"
             >
@@ -572,7 +572,7 @@ export default {
   position: relative;
   min-height: 32px;
   &:hover {
-    border-color: rgb(39, 166, 240);
+    border-color: #5384FF;
     cursor: pointer;
   }
   .path_exp {
@@ -580,7 +580,7 @@ export default {
     word-wrap: break-word;
     word-break: break-all;
     &:hover {
-      color: rgb(39, 166, 240);
+      color: #5384FF;
       cursor: pointer;
     }
   }
@@ -603,7 +603,7 @@ export default {
   border-radius: 3px;
 }
 .ul-li-selected {
-  color: rgb(6, 130, 231);
+  color: #5384FF;
 }
 .filter_rules_path_options ul li {
   width: 100%;

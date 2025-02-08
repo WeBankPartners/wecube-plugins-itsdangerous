@@ -24,7 +24,7 @@
                   <Button
                     @click="deleterule(index)"
                     size="small"
-                    style="background-color: #ff9900;border-color: #ff9900;"
+                    style="background-color: #F29360;border-color: #F29360;"
                     type="error"
                     icon="md-close"
                   ></Button>
