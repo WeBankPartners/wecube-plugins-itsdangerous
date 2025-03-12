@@ -389,7 +389,6 @@ export default {
 // }
 .modal-dialog {
   top: 15%;
-  font-family: MicrosoftYaHei;
 }
 .modal-body {
   position: initial;
