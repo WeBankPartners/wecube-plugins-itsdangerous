@@ -195,7 +195,7 @@ def b64decode_key(key):
             if max_padding <= 0:
                 raise e
             
-def truncate_for_text(input_str, max_length=65535, ellipsis="..."):
+def truncate_for_text(input_str, max_length=10240, ellipsis="..."):
     """
     检测字符串长度是否超过最大长度(65535字符)，
     如果超过则截断并添加省略号，否则保持原样

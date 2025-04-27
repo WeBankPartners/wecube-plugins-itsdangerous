@@ -11,6 +11,7 @@ import os
 import os.path
 import re
 import tempfile
+import shutil
 
 import requests
 from talos.common import cache
@@ -87,7 +88,8 @@ def ensure_url_cached(url):
                     LOG.info('download from: %s for pakcage: %s', url, url)
                     filepath = download_from_url(download_path, url)
                     LOG.info('download complete')
-                    os.rename(filepath, cached_file_path)
+                    # os.rename(filepath, cached_file_path)
+                    shutil.move(filepath, cached_file_path)
         else:
             raise OSError(_('failed to acquire lock, package cache may not be available'))
     return cached_file_path, filename
@@ -406,7 +408,7 @@ class Box(resource.Box):
                     break
                 counter += 1
             text_output = table.draw()
-        return {'text': plugin_utils.truncate_for_text(text_output), 'data': results}
+        return {'text': plugin_utils.truncate_for_text(text_output), 'data': results[:100]}
 
     def plugin_check(self, data):
         '''run plugin params check
@@ -479,7 +481,7 @@ class Box(resource.Box):
                     break
                 counter += 1
             text_output = table.draw()
-        return {'text': plugin_utils.truncate_for_text(text_output), 'data': results}
+        return {'text': plugin_utils.truncate_for_text(text_output), 'data': results[:100]}
 
     def check(self, data, boxes=None, without_subject_test=False, handover_match_params=None):
         '''check script & param with boxes, return dangerous contents & rule name
