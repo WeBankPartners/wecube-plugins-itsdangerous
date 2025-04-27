@@ -406,7 +406,7 @@ class Box(resource.Box):
                     break
                 counter += 1
             text_output = table.draw()
-        return {'text': utils.truncate_for_text(text_output), 'data': results}
+        return {'text': plugin_utils.truncate_for_text(text_output), 'data': results}
 
     def plugin_check(self, data):
         '''run plugin params check
@@ -479,7 +479,7 @@ class Box(resource.Box):
                     break
                 counter += 1
             text_output = table.draw()
-        return {'text': utils.truncate_for_text(text_output), 'data': results}
+        return {'text': plugin_utils.truncate_for_text(text_output), 'data': results}
 
     def check(self, data, boxes=None, without_subject_test=False, handover_match_params=None):
         '''check script & param with boxes, return dangerous contents & rule name
