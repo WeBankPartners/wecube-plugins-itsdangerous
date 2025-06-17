@@ -966,7 +966,7 @@ export default {
 
 .ivu-table-sort,
 .ivu-poptip-rel i.on {
-  color: #2d8cf0;
+  color: #5384ff;
 }
 .popfilter {
   max-height: 200px;
@@ -1044,7 +1044,6 @@ export default {
     /*width: 120px;*/
     height: 40px;
     padding: 2px 0px 2px 8px;
-    font-family: MicrosoftYaHei-Bold;
     font-size: 13px;
     color: #333333;
     letter-spacing: 0.7px;
@@ -1175,7 +1174,7 @@ export default {
 
 .cell-icon {
   padding: 4px;
-  color: #2d8cf0;
+  color: #5384ff;
   cursor: pointer;
 }
 .cell-edit {
@@ -1277,7 +1276,7 @@ button:focus {
   border-radius: 4px;
 }
 .tooltip-clipboard:hover {
-  background-color: #0080ff;
+  background-color: #5384ff;
   color: white;
   cursor: pointer;
 }
@@ -1289,7 +1288,6 @@ button:focus {
   margin-right: 20px;
   background-color: @color-blue;
   border-color: @color-blue;
-  font-family: MicrosoftYaHei;
   font-size: 14px;
   color: #ffffff;
   letter-spacing: 0.7px;

@@ -390,6 +390,8 @@ class Box(resource.Box):
             table.set_cols_align(["l", "c", "l", "l", "l"])
             table.set_cols_valign(["m", "m", "m", "m", "m"])
             table.header([_("Instance Ids"), _("Line"), _("Content"), _("Message"), _('Source Script')])
+            counter = 1
+            max_counter = 100
             for ret in results:
                 associate_ids = ','.join([(inst.get('displayName', '') or '#' + str(inst.get('id', '')))
                                           for inst in associate_instances])
@@ -397,8 +399,16 @@ class Box(resource.Box):
                     associate_ids,
                     '%s-%s' % (ret['lineno'][0], ret['lineno'][1]), ret['content'], ret['message'], ret['script_name']
                 ])
+                if counter >= max_counter and len(results) > max_counter:
+                    more_lines = len(results) - max_counter
+                    table.add_row([
+                        associate_ids,
+                        '...', '%d more lines(%d total)' % (more_lines, len(results)), '...', '...'
+                    ])
+                    break
+                counter += 1
             text_output = table.draw()
-        return {'text': text_output, 'data': results}
+        return {'text': plugin_utils.truncate_for_text(text_output), 'data': results[:100]}
 
     def plugin_check(self, data):
         '''run plugin params check
@@ -462,17 +472,16 @@ class Box(resource.Box):
                     associate_ids,
                     '%s-%s' % (ret['lineno'][0], ret['lineno'][1]), ret['content'], ret['message'], ret['script_name']
                 ])
-                # 到达max_counter行，并且剩余行数大于max_counter，则只显示max_counter行，并显示剩余行数数量
-                if counter >= max_counter and len(results) > max_counter:
-                    more_lines = len(results) - max_counter
+                if counter >= max_counter and len(render_results) > max_counter:
+                    more_lines = len(render_results) - max_counter
                     table.add_row([
                         associate_ids,
-                        '...', '%d more lines(%d total)' % (more_lines, len(results)), '...', '...'
+                        '...', '%d more lines(%d total)' % (more_lines, len(render_results)), '...', '...'
                     ])
                     break
                 counter += 1
             text_output = table.draw()
-        return {'text': text_output, 'data': results}
+        return {'text': plugin_utils.truncate_for_text(text_output), 'data': results[:100]}
 
     def check(self, data, boxes=None, without_subject_test=False, handover_match_params=None):
         '''check script & param with boxes, return dangerous contents & rule name

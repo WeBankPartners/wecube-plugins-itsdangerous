@@ -28,6 +28,8 @@ class EShlex(shlex.shlex):
                 nextchar = self._pushback_chars.pop()
             else:
                 nextchar = self.instream.read(1)
+                if nextchar == '':
+                    return token_line, None, is_punctuation, line_continue
             if nextchar == '\n':
                 self.lineno += 1
             if self.debug >= 3:

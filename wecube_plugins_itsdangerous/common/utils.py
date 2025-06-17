@@ -194,3 +194,27 @@ def b64decode_key(key):
             max_padding -= 1
             if max_padding <= 0:
                 raise e
+            
+def truncate_for_text(input_str, max_length=10240, ellipsis="..."):
+    """
+    检测字符串长度是否超过最大长度(65535字符)，
+    如果超过则截断并添加省略号，否则保持原样
+    
+    参数:
+        input_str (str): 输入的字符串
+        ellipsis (str, optional): 截断时添加的标记，默认为"..."
+        
+    返回:
+        str: 处理后的字符串(可能被截断并添加省略号)
+    """
+    ellipsis_length = len(ellipsis)
+    
+    if len(input_str) > max_length:
+        # 确保截断后加上省略号不会超过最大长度
+        if max_length < ellipsis_length:
+            # 如果最大长度比省略号还短，直接截断到最大长度（可能不完整）
+            return input_str[:max_length]
+        else:
+            # 截断后保留空间给省略号
+            return input_str[:max_length - ellipsis_length] + ellipsis
+    return input_str
