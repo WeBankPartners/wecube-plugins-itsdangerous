@@ -7,13 +7,13 @@ requests
 pymysql
 pyjwt<2.0.0
 minio
-pycrypto
+pycrypto==2.6.1
 gunicorn
 gevent
 pytz
 apscheduler
 texttable
 # for platform login encryption, apt install swig
-M2Crypto
+M2Crypto==0.40.1
 # better wrap for zh
 cjkwrap
