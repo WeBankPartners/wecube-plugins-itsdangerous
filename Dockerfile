@@ -22,10 +22,11 @@ RUN mkdir -p /etc/itsdangerous/
 RUN mkdir -p /var/log/itsdangerous/
 RUN mkdir -p /tmp/artifacts/
 COPY etc /etc/itsdangerous
-RUN addgroup --system --gid 6000 apps && useradd --uid 6001 --gid 6000 app
-RUN chown -R app:apps /etc/itsdangerous && chown -R app:apps /var/log/itsdangerous && chown -R app:apps /data/itsdangerous && chown -R app:apps /scripts
-RUN chmod -R 755 /etc/itsdangerous && chmod -R 755 /var/log/itsdangerous && chmod -R 755 /data/itsdangerous && chmod -R 755 /scripts
-USER app
 COPY build/start_all.sh /scripts/start_all.sh
 RUN chmod +x /scripts/start_all.sh
+RUN addgroup --system --gid 6000 apps && useradd --uid 6001 --gid 6000 app
+RUN chown -R app:apps /etc/itsdangerous && chown -R app:apps /var/log/itsdangerous && chown -R app:apps /scripts
+RUN chmod -R 755 /etc/itsdangerous && chmod -R 755 /var/log/itsdangerous && chmod -R 755 /scripts
+USER app
+
 CMD ["/bin/sh","-c","/scripts/start_all.sh"]
