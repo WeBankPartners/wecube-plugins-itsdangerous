@@ -12,6 +12,7 @@ COPY dist/* /tmp/
 # Install && Clean up
 RUN apt update && apt-get -y install gcc python3-dev swig libssl-dev && \
     pip3 install -i http://mirrors.tencentyun.com/pypi/simple/ --trusted-host mirrors.tencentyun.com -r /tmp/requirements.txt && \
+    pip3 uninstall -y celery && \
     pip3 install /tmp/*.whl && \
     rm -rf /root/.cache && apt autoclean && \
     rm -rf /tmp/* /var/lib/apt/* /var/cache/* && \
@@ -21,10 +22,10 @@ RUN mkdir -p /etc/itsdangerous/
 RUN mkdir -p /var/log/itsdangerous/
 RUN mkdir -p /tmp/artifacts/
 COPY etc /etc/itsdangerous
-# RUN adduser --disabled-password app
-# RUN chown -R app:app /etc/itsdangerous/
-# RUN chown -R app:app /var/log/itsdangerous/
-# USER app
+RUN addgroup --system --gid 6000 apps && useradd --uid 6001 --gid 6000 app
+RUN chown -R app:apps /etc/itsdangerous && chown -R app:apps /var/log/itsdangerous && chown -R app:apps /data/itsdangerous && chown -R app:apps /scripts
+RUN chmod -R 755 /etc/itsdangerous && chmod -R 755 /var/log/itsdangerous && chmod -R 755 /data/itsdangerous && chmod -R 755 /scripts
+USER app
 COPY build/start_all.sh /scripts/start_all.sh
 RUN chmod +x /scripts/start_all.sh
 CMD ["/bin/sh","-c","/scripts/start_all.sh"]
